@@ -35,7 +35,7 @@ namespace PennyPincher.Web
         /// </summary>
         /// <param name="name"></param>
         /// <param name="options"></param>
-        public void Configure(string name, SwaggerGenOptions options)
+        public void Configure(string? name, SwaggerGenOptions options)
         {
             Configure(options);
         }
@@ -45,11 +45,11 @@ namespace PennyPincher.Web
         /// </summary>
         /// <param name="description"></param>
         /// <returns>Information about the API</returns>
-        private OpenApiInfo CreateVersionInfo(ApiVersionDescription desc)
+        private static OpenApiInfo CreateVersionInfo(ApiVersionDescription desc)
         {
             var info = new OpenApiInfo()
             {
-                Title = ".NET Core (.NET 6) Web API",
+                Title = ".NET Core (.NET 7) Web API",
                 Version = desc.ApiVersion.ToString()
             };
 
