@@ -23,7 +23,16 @@ namespace PennyPincher
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             //you can pass options like SignIn.RequireConfirmedAccount or Password.RequireNonAlphanumeric
-            builder.Services.AddIdentityCore<IdentityUser>(options => options.User.RequireUniqueEmail = true)
+            builder.Services.AddIdentityCore<IdentityUser>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+                options.Password.RequireDigit = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredLength = 0;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredUniqueChars = 0;
+            })
                 .AddEntityFrameworkStores<PennyPincherApiDbContext>();
 
             var app = builder.Build();
@@ -45,10 +54,7 @@ namespace PennyPincher
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-
                 var context = services.GetRequiredService<PennyPincherApiDbContext>();
-                //context.Database.EnsureCreated();
-                // DbInitializer.Initialize(context);
                 await context.Database.MigrateAsync();
             }
 
