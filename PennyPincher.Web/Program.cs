@@ -1,4 +1,5 @@
 using Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace PennyPincher
@@ -19,6 +20,10 @@ namespace PennyPincher
             builder.Services.AddDbContext<PennyPincherApiDbContext>(options =>
                 options.UseMySql(cs, ServerVersion.AutoDetect(cs)));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+            //you can pass options like SignIn.RequireConfirmedAccount or Password.RequireNonAlphanumeric
+            builder.Services.AddIdentityCore<IdentityUser>(options => options.User.RequireUniqueEmail = true)
+                .AddEntityFrameworkStores<PennyPincherApiDbContext>();
 
             var app = builder.Build();
 
