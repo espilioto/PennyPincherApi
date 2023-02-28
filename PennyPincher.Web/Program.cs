@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
+using PennyPincher.Web;
 
 namespace PennyPincher
 {
@@ -15,8 +16,7 @@ namespace PennyPincher
 
             // Add services to the container.
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
+
             builder.Services.AddApiVersioning(o =>
             {
                 o.AssumeDefaultVersionWhenUnspecified = true;
@@ -27,7 +27,15 @@ namespace PennyPincher
                     new HeaderApiVersionReader("X-Version"),
                     new MediaTypeApiVersionReader("ver"));
             });
+
+            builder.Services.AddVersionedApiExplorer(setup =>
+            {
+                setup.GroupNameFormat = "'v'VVV";
+                setup.SubstituteApiVersionInUrl = true;
+            });
+
             builder.Services.AddSwaggerGen();
+            builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
             builder.Services.AddHealthChecks();
 
             // entity framework
@@ -47,24 +55,24 @@ namespace PennyPincher
                 o.Password.RequiredUniqueChars = 0;
             }).AddEntityFrameworkStores<PennyPincherApiDbContext>();
 
-
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                //var apiVersionDescriptionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+                var apiVersionDescriptionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
 
-                //app.UseSwagger();
-                //app.UseSwaggerUI(o =>
-                //{
-                //    foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions)
-                //    {
-                //        o.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
-                //            description.GroupName.ToUpperInvariant());
-                //    }
-                //}); app.UseDeveloperExceptionPage();
-                //app.UseMigrationsEndPoint();
+                app.UseSwagger();
+                app.UseSwaggerUI(o =>
+                {
+                    foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions)
+                    {
+                        o.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
+                            description.GroupName.ToUpperInvariant());
+                    }
+                }); 
+                app.UseDeveloperExceptionPage();
+                app.UseMigrationsEndPoint();
             }
             else
             {
