@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PennyPincher.Services.Models.User
+namespace PennyPincher.Services.User.Models
 {
     public class User
     {

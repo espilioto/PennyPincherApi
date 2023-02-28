@@ -1,9 +1,13 @@
+using AutoMapper;
 using Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
+using PennyPincher.Services;
+using PennyPincher.Services.Categories;
+using PennyPincher.Services.Statements;
 using PennyPincher.Web;
 
 namespace PennyPincher
@@ -40,8 +44,7 @@ namespace PennyPincher
 
             // entity framework
             var cs = builder.Configuration.GetConnectionString("MariaDbConnectionString");
-            builder.Services.AddDbContext<PennyPincherApiDbContext>(o =>
-                o.UseMySql(cs, ServerVersion.AutoDetect(cs)));
+            builder.Services.AddDbContext<PennyPincherApiDbContext>(o => o.UseMySql(cs, ServerVersion.AutoDetect(cs)));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services.AddIdentityCore<IdentityUser>(o =>
@@ -55,6 +58,10 @@ namespace PennyPincher
                 o.Password.RequiredUniqueChars = 0;
             }).AddEntityFrameworkStores<PennyPincherApiDbContext>();
 
+            builder.Services.AddAutoMapper(typeof(AutomapperProfiles));
+            builder.Services.AddScoped<IStatementsService, StatementsService>();
+            builder.Services.AddScoped<ICategoriesService, CategoriesService>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -67,8 +74,7 @@ namespace PennyPincher
                 {
                     foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions)
                     {
-                        o.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
-                            description.GroupName.ToUpperInvariant());
+                        o.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
                     }
                 }); 
                 app.UseDeveloperExceptionPage();
