@@ -5,10 +5,11 @@ using PennyPincher.Services.Models.User;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace PennyPincher.Web.Controllers
+namespace PennyPincher.Web.Controllers.v2
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
+    [ApiVersion("2")]
     public class UsersController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
