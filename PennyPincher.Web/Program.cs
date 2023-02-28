@@ -15,6 +15,7 @@ namespace PennyPincher
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddHealthChecks();
 
             var cs = builder.Configuration.GetConnectionString("MariaDbConnectionString");
             builder.Services.AddDbContext<PennyPincherApiDbContext>(options =>
@@ -54,6 +55,7 @@ namespace PennyPincher
             app.UseHttpsRedirection();
             app.UseAuthorization();
             app.MapControllers();
+            app.MapHealthChecks("/healthz");
 
             app.Run();
         }
