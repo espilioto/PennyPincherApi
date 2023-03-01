@@ -1,4 +1,3 @@
-using AutoMapper;
 using Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
