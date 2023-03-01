@@ -82,10 +82,7 @@ namespace PennyPincher
                 app.UseMigrationsEndPoint();
             }
             else
-            {
                 app.UseExceptionHandler("/Error");
-                app.UseHsts();
-            }
 
             using (var scope = app.Services.CreateScope())
             {
@@ -94,7 +91,6 @@ namespace PennyPincher
                 await context.Database.MigrateAsync();
             }
 
-            app.UseHttpsRedirection();
             app.UseAuthorization();
             app.MapControllers();
             app.MapHealthChecks("/healthz");
