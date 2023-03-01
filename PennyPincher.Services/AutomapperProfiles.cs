@@ -2,6 +2,7 @@
 using PennyPincher.Domain.Models;
 using PennyPincher.Services.Categories.Models;
 using PennyPincher.Services.Statements.Models;
+using PennyPincher.Services.Accounts.Models;
 
 namespace PennyPincher.Services
 {
@@ -11,6 +12,7 @@ namespace PennyPincher.Services
         {
             CreateMap<Statement, StatementDto>().ReverseMap();
             CreateMap<Category, CategoryDto>().ReverseMap();
+            CreateMap<Account, AccountDto>().ReverseMap();
         }
     }
 }

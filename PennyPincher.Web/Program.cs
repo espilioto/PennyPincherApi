@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using PennyPincher.Services;
+using PennyPincher.Services.Accounts;
 using PennyPincher.Services.Categories;
 using PennyPincher.Services.Statements;
 using PennyPincher.Web;
@@ -61,6 +62,7 @@ namespace PennyPincher
             builder.Services.AddAutoMapper(typeof(AutomapperProfiles));
             builder.Services.AddScoped<IStatementsService, StatementsService>();
             builder.Services.AddScoped<ICategoriesService, CategoriesService>();
+            builder.Services.AddScoped<IAccountService, AccountService>();
 
             var app = builder.Build();
 
