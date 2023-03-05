@@ -19,7 +19,7 @@ namespace PennyPincher.Web.Controllers.v1
         [HttpGet]
         public async Task<IEnumerable<StatementDto>> Get()
         {
-            var statements = await _statementsService.GetAllAsync();
+            var statements = await _statementsService.GetAllAsync(true);
             return statements;
         }
 

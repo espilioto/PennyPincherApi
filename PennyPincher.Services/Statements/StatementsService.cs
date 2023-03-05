@@ -26,11 +26,16 @@ namespace PennyPincher.Services.Statements
             return success == 1;
         }
 
-        public async Task<IEnumerable<StatementDto>> GetAllAsync()
+        public async Task<IEnumerable<StatementDto>> GetAllAsync(bool includeNavProperties = false)
         {
             var result = new List<StatementDto>();
 
-            var statements = await _context.Statements.OrderByDescending(x => x.Id).ToListAsync();
+            var statementsQuery = _context.Statements.AsQueryable().AsNoTracking();
+
+            if (includeNavProperties)
+                statementsQuery = statementsQuery.Include(x => x.Category);
+
+            var statements = await statementsQuery.OrderByDescending(x => x.Id).ToListAsync();
 
             foreach (var item in statements)
             {
