@@ -11,6 +11,7 @@ namespace PennyPincher.Services
         public AutomapperProfiles()
         {
             CreateMap<Statement, StatementDto>().ReverseMap();
+            CreateMap<Statement, LegacyStatementDto>().ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Description)).ReverseMap();
             CreateMap<Category, CategoryDto>().ReverseMap();
             CreateMap<Account, AccountDto>().ReverseMap();
         }
