@@ -26,6 +26,15 @@ namespace PennyPincher.Services.Statements
             return success == 1;
         }
 
+        public async Task<bool> InsertLegacyAsync(LegacyStatementDto statementRequest)
+        {
+            var statement = _mapper.Map<Statement>(statementRequest);
+            _ = await _context.Statements.AddAsync(statement);
+            var success = await _context.SaveChangesAsync();
+
+            return success == 1;
+        }
+
         public async Task<IEnumerable<LegacyStatementDto>> GetAllLegacyAsync()
         {
             var result = new List<LegacyStatementDto>();

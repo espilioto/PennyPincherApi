@@ -24,9 +24,9 @@ namespace PennyPincher.Web.Controllers.v1
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(StatementDto statementRequest)
+        public async Task<IActionResult> Post(LegacyStatementDto statementRequest)
         {
-            var result = await _statementsService.InsertAsync(statementRequest);
+            var result = await _statementsService.InsertLegacyAsync(statementRequest);
 
             return result ? Created(string.Empty, result) : StatusCode(500);
         }
