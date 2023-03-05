@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using PennyPincher.Domain.Models;
 using PennyPincher.Services.Categories.Models;
-using System.ComponentModel.DataAnnotations;
 
 namespace PennyPincher.Services.Statements.Models
 {
     public class LegacyStatementDto
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public DateTime Date { get; set; }
         public int AccountId { get; set; }
         public decimal Amount { get; set; }
