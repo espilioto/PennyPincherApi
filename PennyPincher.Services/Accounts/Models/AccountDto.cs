@@ -9,6 +9,6 @@ namespace PennyPincher.Services.Accounts.Models
         [Required] public string Name { get; set; } = string.Empty;
         [Required] public string UserId { get; set; } = string.Empty;
 
-        public virtual IdentityUser? User { get; set; }
+        public IdentityUser? User { get; set; }
     }
 }
