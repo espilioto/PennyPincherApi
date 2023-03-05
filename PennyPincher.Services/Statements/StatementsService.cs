@@ -30,7 +30,7 @@ namespace PennyPincher.Services.Statements
         {
             var result = new List<StatementDto>();
 
-            var statements = await _context.Statements.ToListAsync();
+            var statements = await _context.Statements.OrderByDescending(x => x.Id).ToListAsync();
 
             foreach (var item in statements)
             {
