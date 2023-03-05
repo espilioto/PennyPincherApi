@@ -26,20 +26,34 @@ namespace PennyPincher.Services.Statements
             return success == 1;
         }
 
-        public async Task<IEnumerable<StatementDto>> GetAllAsync(bool includeNavProperties = false)
+        public async Task<IEnumerable<StatementDto>> GetAllAsync()
         {
             var result = new List<StatementDto>();
 
-            var statementsQuery = _context.Statements.AsQueryable().AsNoTracking();
-
-            if (includeNavProperties)
-                statementsQuery = statementsQuery.Include(x => x.Category);
+            var statementsQuery = _context.Statements
+                .AsQueryable()
+                .Include(x => x.Category)
+                .AsNoTracking();
 
             var statements = await statementsQuery.OrderByDescending(x => x.Id).ToListAsync();
 
             foreach (var item in statements)
             {
                 result.Add(_mapper.Map<StatementDto>(item));
+            }
+
+            return result;
+        }
+
+        public async Task<IEnumerable<LegacyStatementDto>> GetAllLegacyAsync()
+        {
+            var result = new List<LegacyStatementDto>();
+
+            var statements = await _context.Statements.OrderByDescending(x => x.Id).ToListAsync();
+
+            foreach (var item in statements)
+            {
+                result.Add(_mapper.Map<LegacyStatementDto>(item));
             }
 
             return result;
