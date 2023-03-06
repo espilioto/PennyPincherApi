@@ -12,48 +12,79 @@ namespace PennyPincher.Web.Controllers.v1
     [ApiVersion("1")]
     public class StatementsController : ControllerBase
     {
+        private readonly ILogger<StatementsController> _logger;
         private readonly IStatementsService _statementsService;
-        private readonly IMapper _mapper;
 
-        public StatementsController(IStatementsService statementsService, IMapper mapper)
+        public StatementsController(IStatementsService statementsService, ILogger<StatementsController> logger)
         {
             _statementsService = statementsService;
-            _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<LegacyStatementDto>> GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var statements = await _statementsService.GetAllLegacyAsync();
-            return statements;
+            try
+            {
+                var statements = await _statementsService.GetAllLegacyAsync();
+                return new JsonResult(statements);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> Post(LegacyStatementDto statementRequest)
         {
-            var result = await _statementsService.InsertLegacyAsync(statementRequest);
+            try
+            {
+                var result = await _statementsService.InsertLegacyAsync(statementRequest);
 
-            return result ? Created(string.Empty, result) : StatusCode(500);
+                return result ? Created(string.Empty, result) : StatusCode(500);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] LegacyStatementDto request)
+        public async Task<IActionResult> Put([FromBody] LegacyStatementDto request)
         {
-            var result = false;
+            try
+            {
+                var result = false;
 
-            if (request is not null)
-                result = await _statementsService.UpdateLegacyAsync(request);
+                if (request is not null)
+                    result = await _statementsService.UpdateLegacyAsync(request);
 
-            return result ? Ok() : StatusCode(500);
+                return result ? Ok() : NotFound();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
-        // DELETE api/<UsersController>/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _statementsService.DeleteAsync(id);
+            try
+            {
+                var result = await _statementsService.DeleteAsync(id);
 
-            return result ? Ok() : StatusCode(500);
+                return result ? Ok() : NotFound();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
     }
 }

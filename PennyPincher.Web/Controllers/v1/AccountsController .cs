@@ -9,26 +9,48 @@ namespace PennyPincher.Web.Controllers.v1
     [ApiVersion("1")]
     public class AccountsController : ControllerBase
     {
+        private readonly ILogger<AccountsController> _logger;
         private readonly IAccountService _accountService;
 
-        public AccountsController(IAccountService accountService)
+        public AccountsController(IAccountService accountService, ILogger<AccountsController> logger)
         {
             _accountService = accountService;
+            _logger = logger;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<AccountDto>> Get()
+        public async Task<IActionResult> Get()
         {
-            var accounts = await _accountService.GetAllAsync();
-            return accounts;
+            try
+            {
+                var accounts = await _accountService.GetAllAsync();
+
+                if (accounts is not null && accounts.Any())
+                    return new JsonResult(accounts);
+                else
+                    return NotFound();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> Post(AccountDto accountRequest)
         {
-            var result = await _accountService.InsertAsync(accountRequest);
+            try
+            {
+                var result = await _accountService.InsertAsync(accountRequest);
 
-            return result ? Created(string.Empty, result) : StatusCode(500);
+                return result ? Created(string.Empty, result) : StatusCode(500);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
     }
 }
