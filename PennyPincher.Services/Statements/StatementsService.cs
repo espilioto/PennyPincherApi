@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using PennyPincher.Domain.Models;
 using PennyPincher.Services.Statements.Models;
 
@@ -8,95 +9,154 @@ namespace PennyPincher.Services.Statements
 {
     public class StatementsService : IStatementsService
     {
-        private readonly PennyPincherApiDbContext _context;
+        private readonly ILogger<StatementsService> _logger;
         private readonly IMapper _mapper;
+        private readonly PennyPincherApiDbContext _context;
 
-        public StatementsService(PennyPincherApiDbContext context, IMapper mapper)
+        public StatementsService(PennyPincherApiDbContext context, IMapper mapper, ILogger<StatementsService> logger)
         {
             _context = context;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<bool> InsertAsync(StatementDto statementRequest)
         {
-            var statement = _mapper.Map<Statement>(statementRequest);
-            _ = await _context.Statements.AddAsync(statement);
-            var success = await _context.SaveChangesAsync();
+            try
+            {
+                var statement = _mapper.Map<Statement>(statementRequest);
+                _ = await _context.Statements.AddAsync(statement);
+                var success = await _context.SaveChangesAsync();
 
-            return success == 1;
+                return success == 1;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return false;
+            }
         }
 
         public async Task<bool> InsertLegacyAsync(LegacyStatementDto statementRequest)
         {
-            var statement = _mapper.Map<Statement>(statementRequest);
-            _ = await _context.Statements.AddAsync(statement);
-            var success = await _context.SaveChangesAsync();
+            try
+            {
+                var statement = _mapper.Map<Statement>(statementRequest);
+                _ = await _context.Statements.AddAsync(statement);
+                var success = await _context.SaveChangesAsync();
 
-            return success == 1;
+                return success == 1;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return false;
+            }
         }
 
         public async Task<IEnumerable<LegacyStatementDto>> GetAllLegacyAsync()
         {
-            var result = new List<LegacyStatementDto>();
-
-            var statementsQuery = _context.Statements
-                .AsQueryable()
-                .Include(x => x.Category)
-                .AsNoTracking();
-
-            var statements = await statementsQuery.OrderByDescending(x => x.Id).ToListAsync();
-
-            foreach (var item in statements)
+            try
             {
-                result.Add(_mapper.Map<LegacyStatementDto>(item));
-            }
+                var result = new List<LegacyStatementDto>();
 
-            return result;
+                var statementsQuery = _context.Statements
+                    .AsQueryable()
+                    .Include(x => x.Category)
+                    .AsNoTracking();
+
+                var statements = await statementsQuery.OrderByDescending(x => x.Id).ToListAsync();
+
+                foreach (var item in statements)
+                {
+                    result.Add(_mapper.Map<LegacyStatementDto>(item));
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return Enumerable.Empty<LegacyStatementDto>();
+            }
         }
 
         public async Task<IEnumerable<StatementDto>> GetAllAsync()
         {
-            var result = new List<StatementDto>();
-
-            var statements = await _context.Statements.OrderByDescending(x => x.Id).ToListAsync();
-
-            foreach (var item in statements)
+            try
             {
-                result.Add(_mapper.Map<StatementDto>(item));
-            }
+                var result = new List<StatementDto>();
 
-            return result;
+                var statements = await _context.Statements.OrderByDescending(x => x.Id).ToListAsync();
+
+                foreach (var item in statements)
+                {
+                    result.Add(_mapper.Map<StatementDto>(item));
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return Enumerable.Empty<StatementDto>();
+            }
         }
 
         public async Task<bool> UpdateAsync(StatementDto statementRequest)
         {
-            _ = _context.Update(statementRequest);
-            var success = await _context.SaveChangesAsync();
+            try
+            {
+                _ = _context.Update(statementRequest);
+                var success = await _context.SaveChangesAsync();
 
-            return success == 1;
+                return success == 1;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return false;
+            }
         }
 
         public async Task<bool> UpdateLegacyAsync(LegacyStatementDto statementRequest)
         {
-            var statement = _mapper.Map<Statement>(statementRequest);
-            _ = _context.Update(statement);
-            var success = await _context.SaveChangesAsync();
+            try
+            {
+                var statement = _mapper.Map<Statement>(statementRequest);
+                _ = _context.Update(statement);
+                var success = await _context.SaveChangesAsync();
 
-            return success == 1;
+                return success == 1;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return false;
+            }
         }
 
         public async Task<bool> DeleteAsync(int statementId)
         {
-            var statementToRemove = await _context.Statements.FirstOrDefaultAsync(x => x.Id == statementId);
-
-            if (statementToRemove is not null)
+            try
             {
-                _context.Statements.Remove(statementToRemove);
-                await _context.SaveChangesAsync();
-                return true;
-            }
+                var statementToRemove = await _context.Statements.FirstOrDefaultAsync(x => x.Id == statementId);
 
-            return false;
+                if (statementToRemove is not null)
+                {
+                    _context.Statements.Remove(statementToRemove);
+                    var success = await _context.SaveChangesAsync();
+
+                    return success == 1;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return false;
+            }
         }
     }
 }

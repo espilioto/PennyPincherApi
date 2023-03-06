@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Data;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using PennyPincher.Domain.Models;
 using PennyPincher.Services.Categories.Models;
 
@@ -8,56 +10,93 @@ namespace PennyPincher.Services.Categories
 {
     public class CategoriesService : ICategoriesService
     {
-        private readonly PennyPincherApiDbContext _context;
+        private readonly ILogger<CategoriesService> _logger;
         private readonly IMapper _mapper;
+        private readonly PennyPincherApiDbContext _context;
 
-        public CategoriesService(PennyPincherApiDbContext context, IMapper mapper)
+        public CategoriesService(PennyPincherApiDbContext context, IMapper mapper, ILogger<CategoriesService> logger)
         {
-            _context = context;
+            _logger = logger;
             _mapper = mapper;
+            _context = context;
         }
 
         public async Task<bool> InsertAsync(CategoryDto categoryRequest)
         {
-            var category = _mapper.Map<Category>(categoryRequest);
-            _ = await _context.Categories.AddAsync(category);
-            var success = await _context.SaveChangesAsync();
+            try
+            {
+                var category = _mapper.Map<Category>(categoryRequest);
+                _ = await _context.Categories.AddAsync(category);
+                var success = await _context.SaveChangesAsync();
+                return success == 1;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return false;
+            }
 
-            return success == 1;
         }
 
         public async Task<IEnumerable<CategoryDto>> GetAllAsync()
         {
-            var result = new List<CategoryDto>();
-
-            var categories = await _context.Categories.ToListAsync();
-
-            foreach (var item in categories)
+            try
             {
-                result.Add(_mapper.Map<CategoryDto>(item));
-            }
+                var result = new List<CategoryDto>();
 
-            return result;
+                var categories = await _context.Categories.ToListAsync();
+
+                foreach (var item in categories)
+                {
+                    result.Add(_mapper.Map<CategoryDto>(item));
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return Enumerable.Empty<CategoryDto>();
+            }
         }
 
         public async Task<bool> UpdateAsync(CategoryDto categoryRequest)
         {
-            _ = _context.Update(categoryRequest);
-            var success = await _context.SaveChangesAsync();
+            try
+            {
+                _ = _context.Update(categoryRequest);
+                var success = await _context.SaveChangesAsync();
 
-            return success == 1;
+                return success == 1;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return false;
+            }
         }
 
         public async Task<bool> Delete(int categoryId)
         {
-            var categoryToRemove = await _context.Categories.FirstOrDefaultAsync(x => x.Id == categoryId);
-
-            if (categoryToRemove is not null)
+            try
             {
-                _context.Categories.Remove(categoryToRemove);
-                await _context.SaveChangesAsync();
+                var categoryToRemove = await _context.Categories.FirstOrDefaultAsync(x => x.Id == categoryId);
+
+                if (categoryToRemove is not null)
+                {
+                    _context.Categories.Remove(categoryToRemove);
+                    var success = await _context.SaveChangesAsync();
+
+                    return success == 1;
+                }
+
+                return false;
             }
-            return true;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return false;
+            }
         }
     }
 }
