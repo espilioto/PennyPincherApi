@@ -76,7 +76,16 @@ namespace PennyPincher.Services.Statements
             return success == 1;
         }
 
-        public async Task<bool> Delete(int statementId)
+        public async Task<bool> UpdateLegacyAsync(LegacyStatementDto statementRequest)
+        {
+            var statement = _mapper.Map<Statement>(statementRequest);
+            _ = _context.Update(statement);
+            var success = await _context.SaveChangesAsync();
+
+            return success == 1;
+        }
+
+        public async Task<bool> DeleteAsync(int statementId)
         {
             var statementToRemove = await _context.Statements.FirstOrDefaultAsync(x => x.Id == statementId);
 
@@ -84,8 +93,10 @@ namespace PennyPincher.Services.Statements
             {
                 _context.Statements.Remove(statementToRemove);
                 await _context.SaveChangesAsync();
+                return true;
             }
-            return true;
+
+            return false;
         }
     }
 }
