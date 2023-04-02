@@ -62,8 +62,8 @@ namespace PennyPincher.Services.Statements
 
                 var statementsQuery = _context.Statements
                     .AsQueryable()
-                    .Include(x => x.Category.Name)
-                    .Include(x => x.Account.Name)
+                    .Include(x => x.Category)
+                    .Include(x => x.Account)
                     .AsNoTracking();
 
                 var statements = await statementsQuery.OrderByDescending(x => x.Id).ToListAsync();
