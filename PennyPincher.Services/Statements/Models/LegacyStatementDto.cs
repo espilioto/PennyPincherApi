@@ -12,7 +12,7 @@ namespace PennyPincher.Services.Statements.Models
         public decimal Amount { get; set; }
         public string Notes { get; set; } = string.Empty;
         public int CategoryId { get; set; }
-        public string UserId { get; set; } = string.Empty;
+        public string UserId { get; set; } = null!;
 
         public CategoryDto? Category { get; set; }
         public Account? Account { get; set; }
