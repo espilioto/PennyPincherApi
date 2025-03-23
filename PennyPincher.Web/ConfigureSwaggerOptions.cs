@@ -49,7 +49,7 @@ namespace PennyPincher.Web
         {
             var info = new OpenApiInfo()
             {
-                Title = ".NET Core (.NET 7) Web API",
+                Title = "Web API",
                 Version = desc.ApiVersion.ToString()
             };
 
