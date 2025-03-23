@@ -101,9 +101,28 @@ namespace PennyPincher.Services.Accounts
             }
         }
 
-        public Task<ErrorOr<List<AccountResponse>>> GetAllAsyncV2()
+        public async Task<ErrorOr<List<AccountResponse>>> GetAllAsyncV2()
         {
-            throw new NotImplementedException();
+            try
+            {
+                var accounts = await _context.Accounts
+                    .Select(a => new AccountResponse
+                    (
+                        a.Id,
+                        a.Name,
+                        _context.Statements
+                            .Where(x => x.AccountId == a.Id)
+                            .Sum(x => x.Amount)
+                    ))
+                    .ToListAsync();
+
+                return accounts;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return Error.Unexpected(description: ex.Message);
+            }
         }
     }
 }
