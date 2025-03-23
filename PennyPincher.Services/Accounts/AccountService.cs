@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Data;
+using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using PennyPincher.Contracts.Accounts;
 using PennyPincher.Domain.Models;
 using PennyPincher.Services.Accounts.Models;
 using PennyPincher.Services.Statements;
@@ -97,6 +99,11 @@ namespace PennyPincher.Services.Accounts
                 _logger.LogError(ex.Message);
                 return false;
             }
+        }
+
+        public Task<ErrorOr<List<AccountResponse>>> GetAllAsyncV2()
+        {
+            throw new NotImplementedException();
         }
     }
 }

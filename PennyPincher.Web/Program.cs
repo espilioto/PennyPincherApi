@@ -72,6 +72,7 @@ namespace PennyPincher
                 builder.Services.AddScoped<IStatementsService, StatementsService>();
                 builder.Services.AddScoped<ICategoriesService, CategoriesService>();
                 builder.Services.AddScoped<IAccountService, AccountService>();
+                builder.Services.AddScoped<IAccountService, AccountServiceV2>();
 
                 var app = builder.Build();
 
