@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PennyPincher.Data", "PennyP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PennyPincher.Services", "PennyPincher.Services\PennyPincher.Services.csproj", "{61C3BDDF-DED8-4D67-8450-FCC8F2345FF6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PennyPincher.Contracts", "PennyPincher.Contracts\PennyPincher.Contracts.csproj", "{D922FDFD-8712-4E22-AA8A-9C05E43737BC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{61C3BDDF-DED8-4D67-8450-FCC8F2345FF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61C3BDDF-DED8-4D67-8450-FCC8F2345FF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61C3BDDF-DED8-4D67-8450-FCC8F2345FF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D922FDFD-8712-4E22-AA8A-9C05E43737BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D922FDFD-8712-4E22-AA8A-9C05E43737BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D922FDFD-8712-4E22-AA8A-9C05E43737BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D922FDFD-8712-4E22-AA8A-9C05E43737BC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ErrorOr" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.ApiExplorer" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0" />
@@ -24,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PennyPincher.Contracts\PennyPincher.Contracts.csproj" />
     <ProjectReference Include="..\PennyPincher.Data\PennyPincher.Data.csproj" />
     <ProjectReference Include="..\PennyPincher.Services\PennyPincher.Services.csproj" />
   </ItemGroup>
