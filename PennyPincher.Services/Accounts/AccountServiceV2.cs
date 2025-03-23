@@ -37,12 +37,12 @@ public class AccountServiceV2 : IAccountService
         try
         {
             var accounts = await _context.Accounts
-                .Select(x => new AccountResponse
+                .Select(a => new AccountResponse
                 (
-                    x.Id,
-                    x.Name,
+                    a.Id,
+                    a.Name,
                     _context.Statements
-                        .Where(x => x.AccountId == x.Id)
+                        .Where(x => x.AccountId == a.Id)
                         .Sum(x => x.Amount)
                 ))
                 .ToListAsync();
