@@ -3,5 +3,6 @@
 public record AccountResponse(
         int Id,
         string Name,
-        decimal Balance
+        decimal Balance,
+        string ColorHex
     );

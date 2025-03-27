@@ -112,7 +112,8 @@ namespace PennyPincher.Services.Accounts
                         a.Name,
                         _context.Statements
                             .Where(x => x.AccountId == a.Id)
-                            .Sum(x => x.Amount)
+                            .Sum(x => x.Amount),
+                        a.ColorHex
                     ))
                     .ToListAsync();
 
