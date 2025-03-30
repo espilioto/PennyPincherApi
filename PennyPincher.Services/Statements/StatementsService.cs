@@ -116,12 +116,12 @@ namespace PennyPincher.Services.Statements
 
                 if (filters.MinAmount.HasValue)
                 {
-                    statementsQuery = statementsQuery.Where(s => s.Amount >= filters.MinAmount.Value);
+                    statementsQuery = statementsQuery.Where(s => Math.Abs(s.Amount) >= filters.MinAmount.Value);
                 }
 
                 if (filters.MaxAmount.HasValue)
                 {
-                    statementsQuery = statementsQuery.Where(s => s.Amount <= filters.MaxAmount.Value);
+                    statementsQuery = statementsQuery.Where(s => Math.Abs(s.Amount) <= filters.MaxAmount.Value);
                 }
 
                 statementsQuery = sorting.SortBy.ToLower() switch
