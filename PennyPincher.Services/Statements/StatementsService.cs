@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Data;
+using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using PennyPincher.Contracts.Statements;
 using PennyPincher.Domain.Models;
 using PennyPincher.Services.Statements.Models;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace PennyPincher.Services.Statements
 {
@@ -82,25 +86,60 @@ namespace PennyPincher.Services.Statements
             }
         }
 
-        public async Task<IEnumerable<StatementDto>> GetAllAsync()
+        public async Task<ErrorOr<IEnumerable<StatementDtoV2>>> GetAllAsync(StatementFilterRequest filters, StatementSortingRequest sorting)
         {
             try
             {
-                var result = new List<StatementDto>();
+                var statementsQuery = _context.Statements
+                    .AsQueryable()
+                    .AsNoTracking();
 
-                var statements = await _context.Statements.OrderByDescending(x => x.Id).ToListAsync();
-
-                foreach (var item in statements)
+                if (filters.AccountIds != null && filters.AccountIds.Any())
                 {
-                    result.Add(_mapper.Map<StatementDto>(item));
+                    statementsQuery = statementsQuery.Where(s => filters.AccountIds.Contains(s.AccountId));
                 }
 
-                return result;
+                if (filters.CategoryIds is not null && filters.CategoryIds.Any())
+                {
+                    statementsQuery = statementsQuery.Where(s => filters.CategoryIds.Contains(s.CategoryId));
+                }
+
+                if (filters.DateFrom.HasValue)
+                {
+                    statementsQuery = statementsQuery.Where(s => s.Date >= filters.DateFrom.Value);
+                }
+
+                if (filters.DateTo.HasValue)
+                {
+                    statementsQuery = statementsQuery.Where(s => s.Date <= filters.DateTo.Value);
+                }
+
+                if (filters.MinAmount.HasValue)
+                {
+                    statementsQuery = statementsQuery.Where(s => s.Amount >= filters.MinAmount.Value);
+                }
+
+                if (filters.MaxAmount.HasValue)
+                {
+                    statementsQuery = statementsQuery.Where(s => s.Amount <= filters.MaxAmount.Value);
+                }
+
+                statementsQuery = sorting.SortBy.ToLower() switch
+                {
+                    "amount" => sorting.Direction == "asc" ? statementsQuery.OrderBy(s => s.Amount) : statementsQuery.OrderByDescending(s => s.Amount),
+                    _ => sorting.Direction == "asc" ? statementsQuery.OrderBy(s => s.Date) : statementsQuery.OrderByDescending(s => s.Date)
+                };
+
+                var statements = await statementsQuery
+                    .ProjectTo<StatementDtoV2>(_mapper.ConfigurationProvider)
+                    .ToListAsync();
+
+                return statements.Any() ? statements : Error.NotFound();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return Enumerable.Empty<StatementDto>();
+                return Error.Unexpected(description: ex.Message);
             }
         }
 

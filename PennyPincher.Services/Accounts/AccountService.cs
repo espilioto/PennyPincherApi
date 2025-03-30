@@ -4,6 +4,7 @@ using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PennyPincher.Contracts.Accounts;
+using PennyPincher.Contracts.Statements;
 using PennyPincher.Domain.Models;
 using PennyPincher.Services.Accounts.Models;
 using PennyPincher.Services.Statements;

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using PennyPincher.Domain.Models;
 using PennyPincher.Services.Categories.Models;
-using System.ComponentModel.DataAnnotations;
 
 namespace PennyPincher.Services.Statements.Models
 {
@@ -9,7 +8,7 @@ namespace PennyPincher.Services.Statements.Models
     {
         public int Id { get; set; }
         public DateTime Date { get; set; }
-         public int AccountId { get; set; }
+        public int AccountId { get; set; }
         public decimal Amount { get; set; }
         public string Description { get; set; } = string.Empty;
         public int CategoryId { get; set; }
