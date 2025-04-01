@@ -20,6 +20,7 @@ public class AutomapperProfiles : Profile
             .ReverseMap();
         CreateMap<Statement, StatementResponse>().ReverseMap();
         CreateMap<StatementDtoV2, StatementResponse>().ReverseMap();
+        CreateMap<StatementDto, CreateStatementRequest>().ReverseMap();
 
 
         CreateMap<Category, CategoryDto>().ReverseMap();

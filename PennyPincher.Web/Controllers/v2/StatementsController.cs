@@ -4,6 +4,7 @@ using PennyPincher.Contracts.Statements;
 using PennyPincher.Services.Accounts;
 using PennyPincher.Services.Accounts.Models;
 using PennyPincher.Services.Statements;
+using PennyPincher.Services.Statements.Models;
 
 namespace PennyPincher.Web.Controllers.v2;
 
@@ -35,8 +36,21 @@ public class StatementsController : ErrorOrApiController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(AccountDto accountRequest)
+    public async Task<IActionResult> Post([FromBody] CreateStatementRequest request)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var result = await _statementsService.InsertAsync(_mapper.Map<StatementDto>(request));
+
+            return result.Match(
+                statement => Created(string.Empty, result),
+                errors => Problem(errors)
+            ); 
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
     }
 }

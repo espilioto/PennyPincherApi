@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using PennyPincher.Contracts.Statements;
 using PennyPincher.Domain.Models;
 using PennyPincher.Services.Statements.Models;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace PennyPincher.Services.Statements
 {
@@ -24,7 +23,7 @@ namespace PennyPincher.Services.Statements
             _logger = logger;
         }
 
-        public async Task<bool> InsertAsync(StatementDto statementRequest)
+        public async Task<ErrorOr<bool>> InsertAsync(StatementDto statementRequest)
         {
             try
             {
@@ -32,12 +31,12 @@ namespace PennyPincher.Services.Statements
                 _ = await _context.Statements.AddAsync(statement);
                 var success = await _context.SaveChangesAsync();
 
-                return success == 1;
+                return success == 1 ? true : Error.Failure(description: "Error creating statement");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return false;
+                return Error.Unexpected(description: $"{ex.Message} {(!string.IsNullOrEmpty(ex.InnerException?.Message) ? ex.InnerException.Message : string.Empty)}");
             }
         }
 
