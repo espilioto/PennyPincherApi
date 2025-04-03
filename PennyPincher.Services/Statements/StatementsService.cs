@@ -40,53 +40,6 @@ public class StatementsService : IStatementsService
         }
     }
 
-    [Obsolete]
-    public async Task<bool> InsertLegacyAsync(LegacyStatementDto statementRequest)
-    {
-        try
-        {
-            var statement = _mapper.Map<Statement>(statementRequest);
-            _ = await _context.Statements.AddAsync(statement);
-            var success = await _context.SaveChangesAsync();
-
-            return success == 1;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return false;
-        }
-    }
-
-    [Obsolete]
-    public async Task<IEnumerable<LegacyStatementDto>> GetAllLegacyAsync()
-    {
-        try
-        {
-            var result = new List<LegacyStatementDto>();
-
-            var statementsQuery = _context.Statements
-                .AsQueryable()
-                .Include(x => x.Category)
-                .Include(x => x.Account)
-                .AsNoTracking();
-
-            var statements = await statementsQuery.OrderByDescending(x => x.Id).ToListAsync();
-
-            foreach (var item in statements)
-            {
-                result.Add(_mapper.Map<LegacyStatementDto>(item));
-            }
-
-            return result;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return Enumerable.Empty<LegacyStatementDto>();
-        }
-    }
-
     public async Task<ErrorOr<IEnumerable<StatementDtoV2>>> GetAllAsync(StatementFilterRequest filters, StatementSortingRequest sorting)
     {
         try
@@ -158,24 +111,6 @@ public class StatementsService : IStatementsService
         {
             _logger.LogError(ex.Message);
             return Error.Unexpected(description: ex.Message);
-        }
-    }
-
-    [Obsolete]
-    public async Task<bool> UpdateLegacyAsync(LegacyStatementDto statementRequest)
-    {
-        try
-        {
-            var statement = _mapper.Map<Statement>(statementRequest);
-            _ = _context.Update(statement);
-            var success = await _context.SaveChangesAsync();
-
-            return success == 1;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return false;
         }
     }
 
