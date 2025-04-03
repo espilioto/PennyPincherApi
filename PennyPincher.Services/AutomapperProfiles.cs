@@ -24,6 +24,7 @@ public class AutomapperProfiles : Profile
 
 
         CreateMap<Category, CategoryDto>().ReverseMap();
+        CreateMap<Category, CategoryRequest>().ReverseMap();
         CreateMap<Category, CategoryResponse>().ReverseMap();
         CreateMap<CategoryDto, CategoryResponse>().ReverseMap();
 
