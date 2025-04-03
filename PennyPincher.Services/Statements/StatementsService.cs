@@ -48,12 +48,12 @@ public class StatementsService : IStatementsService
                 .AsQueryable()
                 .AsNoTracking();
 
-            if (filters.AccountIds != null && filters.AccountIds.Any())
+            if (filters.AccountIds != null && filters.AccountIds.Count != 0)
             {
                 statementsQuery = statementsQuery.Where(s => filters.AccountIds.Contains(s.AccountId));
             }
 
-            if (filters.CategoryIds is not null && filters.CategoryIds.Any())
+            if (filters.CategoryIds is not null && filters.CategoryIds.Count != 0)
             {
                 statementsQuery = statementsQuery.Where(s => filters.CategoryIds.Contains(s.CategoryId));
             }
@@ -88,7 +88,7 @@ public class StatementsService : IStatementsService
                 .ProjectTo<StatementDtoV2>(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
-            return statements.Any() ? statements : Error.NotFound();
+            return statements.Count != 0 ? statements : Error.NotFound();
         }
         catch (Exception ex)
         {

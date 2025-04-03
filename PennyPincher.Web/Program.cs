@@ -10,9 +10,8 @@ using PennyPincher.Services;
 using PennyPincher.Services.Accounts;
 using PennyPincher.Services.Categories;
 using PennyPincher.Services.Statements;
-using PennyPincher.Web;
 
-namespace PennyPincher
+namespace PennyPincher.Web
 {
     public class Program
     {
