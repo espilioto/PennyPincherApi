@@ -142,11 +142,12 @@ namespace PennyPincher.Services.Statements
             }
         }
 
-        public async Task<bool> UpdateAsync(StatementDto statementRequest)
+        public async Task<ErrorOr<bool>> UpdateAsync(StatementRequest statementRequest)
         {
             try
             {
-                _ = _context.Update(statementRequest);
+                var statement = _mapper.Map<Statement>(statementRequest);
+                _ = _context.Statements.Update(statement);
                 var success = await _context.SaveChangesAsync();
 
                 return success == 1;
@@ -154,7 +155,7 @@ namespace PennyPincher.Services.Statements
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return false;
+                return Error.Unexpected(description: ex.Message);
             }
         }
 

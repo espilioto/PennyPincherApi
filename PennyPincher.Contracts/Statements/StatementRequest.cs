@@ -1,6 +1,7 @@
 ﻿namespace PennyPincher.Contracts.Statements;
 
-public record CreateStatementRequest(
+public record StatementRequest(
+        int? Id,
         DateTime Date,
         int AccountId,
         double Amount,

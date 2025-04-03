@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using PennyPincher.Contracts.Statements;
-using PennyPincher.Services.Accounts;
-using PennyPincher.Services.Accounts.Models;
 using PennyPincher.Services.Statements;
 using PennyPincher.Services.Statements.Models;
 
@@ -36,16 +34,35 @@ public class StatementsController : ErrorOrApiController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post([FromBody] CreateStatementRequest request)
+    public async Task<IActionResult> Post([FromBody] StatementRequest request)
+    {
+        var result = await _statementsService.InsertAsync(_mapper.Map<StatementDto>(request));
+
+        return result.Match(
+            statement => Created(string.Empty, result),
+            errors => Problem(errors)
+        );
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Put([FromBody] StatementRequest request)
+    {
+        var result = await _statementsService.UpdateAsync(request);
+
+        return result.Match(
+          statement => Ok(),
+          errors => Problem(errors)
+      );
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
     {
         try
         {
-            var result = await _statementsService.InsertAsync(_mapper.Map<StatementDto>(request));
+            var result = await _statementsService.DeleteAsync(id);
 
-            return result.Match(
-                statement => Created(string.Empty, result),
-                errors => Problem(errors)
-            ); 
+            return result ? Ok() : NotFound();
         }
         catch (Exception ex)
         {
