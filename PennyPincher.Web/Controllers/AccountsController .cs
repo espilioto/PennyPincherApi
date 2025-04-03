@@ -37,7 +37,7 @@ public class AccountsController : ErrorOrApiController
         );
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{accountId}")]
     public async Task<IActionResult> Put(int accountId, [FromBody] AccountRequest request)
     {
         var result = await _accountService.UpdateAsync(accountId, request);
