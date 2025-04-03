@@ -8,195 +8,194 @@ using PennyPincher.Contracts.Statements;
 using PennyPincher.Domain.Models;
 using PennyPincher.Services.Statements.Models;
 
-namespace PennyPincher.Services.Statements
+namespace PennyPincher.Services.Statements;
+
+public class StatementsService : IStatementsService
 {
-    public class StatementsService : IStatementsService
+    private readonly ILogger<StatementsService> _logger;
+    private readonly IMapper _mapper;
+    private readonly PennyPincherApiDbContext _context;
+
+    public StatementsService(PennyPincherApiDbContext context, IMapper mapper, ILogger<StatementsService> logger)
     {
-        private readonly ILogger<StatementsService> _logger;
-        private readonly IMapper _mapper;
-        private readonly PennyPincherApiDbContext _context;
+        _context = context;
+        _mapper = mapper;
+        _logger = logger;
+    }
 
-        public StatementsService(PennyPincherApiDbContext context, IMapper mapper, ILogger<StatementsService> logger)
+    public async Task<ErrorOr<bool>> InsertAsync(StatementDto statementRequest)
+    {
+        try
         {
-            _context = context;
-            _mapper = mapper;
-            _logger = logger;
+            var statement = _mapper.Map<Statement>(statementRequest);
+            _ = await _context.Statements.AddAsync(statement);
+            var success = await _context.SaveChangesAsync();
+
+            return success == 1 ? true : Error.Failure(description: "Error creating statement");
         }
-
-        public async Task<ErrorOr<bool>> InsertAsync(StatementDto statementRequest)
+        catch (Exception ex)
         {
-            try
-            {
-                var statement = _mapper.Map<Statement>(statementRequest);
-                _ = await _context.Statements.AddAsync(statement);
-                var success = await _context.SaveChangesAsync();
-
-                return success == 1 ? true : Error.Failure(description: "Error creating statement");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return Error.Unexpected(description: $"{ex.Message} {(!string.IsNullOrEmpty(ex.InnerException?.Message) ? ex.InnerException.Message : string.Empty)}");
-            }
+            _logger.LogError(ex.Message);
+            return Error.Unexpected(description: $"{ex.Message} {(!string.IsNullOrEmpty(ex.InnerException?.Message) ? ex.InnerException.Message : string.Empty)}");
         }
+    }
 
-        public async Task<bool> InsertLegacyAsync(LegacyStatementDto statementRequest)
+    [Obsolete]
+    public async Task<bool> InsertLegacyAsync(LegacyStatementDto statementRequest)
+    {
+        try
         {
-            try
-            {
-                var statement = _mapper.Map<Statement>(statementRequest);
-                _ = await _context.Statements.AddAsync(statement);
-                var success = await _context.SaveChangesAsync();
+            var statement = _mapper.Map<Statement>(statementRequest);
+            _ = await _context.Statements.AddAsync(statement);
+            var success = await _context.SaveChangesAsync();
 
-                return success == 1;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return false;
-            }
+            return success == 1;
         }
-
-        public async Task<IEnumerable<LegacyStatementDto>> GetAllLegacyAsync()
+        catch (Exception ex)
         {
-            try
-            {
-                var result = new List<LegacyStatementDto>();
-
-                var statementsQuery = _context.Statements
-                    .AsQueryable()
-                    .Include(x => x.Category)
-                    .Include(x => x.Account)
-                    .AsNoTracking();
-
-                var statements = await statementsQuery.OrderByDescending(x => x.Id).ToListAsync();
-
-                foreach (var item in statements)
-                {
-                    result.Add(_mapper.Map<LegacyStatementDto>(item));
-                }
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return Enumerable.Empty<LegacyStatementDto>();
-            }
+            _logger.LogError(ex.Message);
+            return false;
         }
+    }
 
-        public async Task<ErrorOr<IEnumerable<StatementDtoV2>>> GetAllAsync(StatementFilterRequest filters, StatementSortingRequest sorting)
+    [Obsolete]
+    public async Task<IEnumerable<LegacyStatementDto>> GetAllLegacyAsync()
+    {
+        try
         {
-            try
+            var result = new List<LegacyStatementDto>();
+
+            var statementsQuery = _context.Statements
+                .AsQueryable()
+                .Include(x => x.Category)
+                .Include(x => x.Account)
+                .AsNoTracking();
+
+            var statements = await statementsQuery.OrderByDescending(x => x.Id).ToListAsync();
+
+            foreach (var item in statements)
             {
-                var statementsQuery = _context.Statements
-                    .AsQueryable()
-                    .AsNoTracking();
-
-                if (filters.AccountIds != null && filters.AccountIds.Any())
-                {
-                    statementsQuery = statementsQuery.Where(s => filters.AccountIds.Contains(s.AccountId));
-                }
-
-                if (filters.CategoryIds is not null && filters.CategoryIds.Any())
-                {
-                    statementsQuery = statementsQuery.Where(s => filters.CategoryIds.Contains(s.CategoryId));
-                }
-
-                if (filters.DateFrom.HasValue)
-                {
-                    statementsQuery = statementsQuery.Where(s => s.Date >= filters.DateFrom.Value);
-                }
-
-                if (filters.DateTo.HasValue)
-                {
-                    statementsQuery = statementsQuery.Where(s => s.Date <= filters.DateTo.Value);
-                }
-
-                if (filters.MinAmount.HasValue)
-                {
-                    statementsQuery = statementsQuery.Where(s => Math.Abs(s.Amount) >= filters.MinAmount.Value);
-                }
-
-                if (filters.MaxAmount.HasValue)
-                {
-                    statementsQuery = statementsQuery.Where(s => Math.Abs(s.Amount) <= filters.MaxAmount.Value);
-                }
-
-                statementsQuery = sorting.SortBy.ToLower() switch
-                {
-                    "amount" => sorting.Direction == "asc" ? statementsQuery.OrderBy(s => s.Amount) : statementsQuery.OrderByDescending(s => s.Amount),
-                    _ => sorting.Direction == "asc" ? statementsQuery.OrderBy(s => s.Date) : statementsQuery.OrderByDescending(s => s.Date)
-                };
-
-                var statements = await statementsQuery
-                    .ProjectTo<StatementDtoV2>(_mapper.ConfigurationProvider)
-                    .ToListAsync();
-
-                return statements.Any() ? statements : Error.NotFound();
+                result.Add(_mapper.Map<LegacyStatementDto>(item));
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return Error.Unexpected(description: ex.Message);
-            }
+
+            return result;
         }
-
-        public async Task<ErrorOr<bool>> UpdateAsync(StatementRequest statementRequest)
+        catch (Exception ex)
         {
-            try
-            {
-                var statement = _mapper.Map<Statement>(statementRequest);
-                _ = _context.Statements.Update(statement);
-                var success = await _context.SaveChangesAsync();
-
-                return success == 1;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return Error.Unexpected(description: ex.Message);
-            }
+            _logger.LogError(ex.Message);
+            return Enumerable.Empty<LegacyStatementDto>();
         }
+    }
 
-        public async Task<bool> UpdateLegacyAsync(LegacyStatementDto statementRequest)
+    public async Task<ErrorOr<IEnumerable<StatementDtoV2>>> GetAllAsync(StatementFilterRequest filters, StatementSortingRequest sorting)
+    {
+        try
         {
-            try
-            {
-                var statement = _mapper.Map<Statement>(statementRequest);
-                _ = _context.Update(statement);
-                var success = await _context.SaveChangesAsync();
+            var statementsQuery = _context.Statements
+                .AsQueryable()
+                .AsNoTracking();
 
-                return success == 1;
-            }
-            catch (Exception ex)
+            if (filters.AccountIds != null && filters.AccountIds.Any())
             {
-                _logger.LogError(ex.Message);
-                return false;
+                statementsQuery = statementsQuery.Where(s => filters.AccountIds.Contains(s.AccountId));
             }
+
+            if (filters.CategoryIds is not null && filters.CategoryIds.Any())
+            {
+                statementsQuery = statementsQuery.Where(s => filters.CategoryIds.Contains(s.CategoryId));
+            }
+
+            if (filters.DateFrom.HasValue)
+            {
+                statementsQuery = statementsQuery.Where(s => s.Date >= filters.DateFrom.Value);
+            }
+
+            if (filters.DateTo.HasValue)
+            {
+                statementsQuery = statementsQuery.Where(s => s.Date <= filters.DateTo.Value);
+            }
+
+            if (filters.MinAmount.HasValue)
+            {
+                statementsQuery = statementsQuery.Where(s => Math.Abs(s.Amount) >= filters.MinAmount.Value);
+            }
+
+            if (filters.MaxAmount.HasValue)
+            {
+                statementsQuery = statementsQuery.Where(s => Math.Abs(s.Amount) <= filters.MaxAmount.Value);
+            }
+
+            statementsQuery = sorting.SortBy.ToLower() switch
+            {
+                "amount" => sorting.Direction == "asc" ? statementsQuery.OrderBy(s => s.Amount) : statementsQuery.OrderByDescending(s => s.Amount),
+                _ => sorting.Direction == "asc" ? statementsQuery.OrderBy(s => s.Date) : statementsQuery.OrderByDescending(s => s.Date)
+            };
+
+            var statements = await statementsQuery
+                .ProjectTo<StatementDtoV2>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return statements.Any() ? statements : Error.NotFound();
         }
-
-        public async Task<bool> DeleteAsync(int statementId)
+        catch (Exception ex)
         {
-            try
-            {
-                var statementToRemove = await _context.Statements.FirstOrDefaultAsync(x => x.Id == statementId);
+            _logger.LogError(ex.Message);
+            return Error.Unexpected(description: ex.Message);
+        }
+    }
 
-                if (statementToRemove is not null)
-                {
-                    _context.Statements.Remove(statementToRemove);
-                    var success = await _context.SaveChangesAsync();
+    public async Task<ErrorOr<bool>> UpdateAsync(StatementRequest statementRequest)
+    {
+        try
+        {
+            var statement = _mapper.Map<Statement>(statementRequest);
+            _ = _context.Statements.Update(statement);
+            var success = await _context.SaveChangesAsync();
 
-                    return success == 1;
-                }
+            return success == 1;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return Error.Unexpected(description: ex.Message);
+        }
+    }
 
-                return false;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return false;
-            }
+    [Obsolete]
+    public async Task<bool> UpdateLegacyAsync(LegacyStatementDto statementRequest)
+    {
+        try
+        {
+            var statement = _mapper.Map<Statement>(statementRequest);
+            _ = _context.Update(statement);
+            var success = await _context.SaveChangesAsync();
+
+            return success == 1;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return false;
+        }
+    }
+
+    public async Task<ErrorOr<bool>> DeleteAsync(int statementId)
+    {
+        try
+        {
+            var statementToRemove = await _context.Statements.FirstOrDefaultAsync(x => x.Id == statementId);
+            if (statementToRemove is null)
+                return Error.NotFound(description: "Statement not found");
+
+            _context.Statements.Remove(statementToRemove);
+            var success = await _context.SaveChangesAsync();
+
+            return success == 1 ? true : Error.Failure(description: "Error deleting statement");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return Error.Unexpected(description: ex.Message);
         }
     }
 }

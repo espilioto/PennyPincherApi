@@ -52,22 +52,17 @@ public class StatementsController : ErrorOrApiController
         return result.Match(
           statement => Ok(),
           errors => Problem(errors)
-      );
+        );
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        try
-        {
-            var result = await _statementsService.DeleteAsync(id);
+        var result = await _statementsService.DeleteAsync(id);
 
-            return result ? Ok() : NotFound();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
+        return result.Match(
+         _ => NoContent(),
+         errors => Problem(errors)
+     );
     }
 }

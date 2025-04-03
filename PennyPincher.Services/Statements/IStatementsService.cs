@@ -6,7 +6,7 @@ namespace PennyPincher.Services.Statements;
 
 public interface IStatementsService
 {
-    public Task<bool> DeleteAsync(int statementId);
+    public Task<ErrorOr<bool>> DeleteAsync(int statementId);
     public Task<IEnumerable<LegacyStatementDto>> GetAllLegacyAsync();
     public Task<ErrorOr<IEnumerable<StatementDtoV2>>> GetAllAsync(StatementFilterRequest filters, StatementSortingRequest sorting);
     public Task<ErrorOr<bool>> InsertAsync(StatementDto statementRequest);

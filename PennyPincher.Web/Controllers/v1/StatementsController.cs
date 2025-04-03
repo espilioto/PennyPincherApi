@@ -1,9 +1,6 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PennyPincher.Services.Statements;
 using PennyPincher.Services.Statements.Models;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace PennyPincher.Web.Controllers.v1
 {
@@ -71,6 +68,7 @@ namespace PennyPincher.Web.Controllers.v1
             }
         }
 
+        [Obsolete]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -78,7 +76,8 @@ namespace PennyPincher.Web.Controllers.v1
             {
                 var result = await _statementsService.DeleteAsync(id);
 
-                return result ? Ok() : NotFound();
+                //return result ? Ok() : NotFound();
+                return Ok();
             }
             catch (Exception ex)
             {
