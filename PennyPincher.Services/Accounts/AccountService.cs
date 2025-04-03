@@ -43,7 +43,7 @@ public class AccountService : IAccountService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError("{Message}", ex.Message);
             return Error.Unexpected(description: ex.Message);
         }
     }
@@ -71,7 +71,7 @@ public class AccountService : IAccountService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError("{Message}", ex.Message);
             return Error.Unexpected(description: $"{ex.Message} {(!string.IsNullOrEmpty(ex.InnerException?.Message) ? ex.InnerException.Message : string.Empty)}");
         }
     }
@@ -102,7 +102,7 @@ public class AccountService : IAccountService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError("{Message}", ex.Message);
             return Error.Unexpected(description: ex.Message);
         }
     }
@@ -122,7 +122,7 @@ public class AccountService : IAccountService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError("{Message}", ex.Message);
             return Error.Unexpected(description: ex.Message);
         }
     }

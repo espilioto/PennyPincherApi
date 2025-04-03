@@ -34,7 +34,7 @@ public class StatementsService : IStatementsService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError("{Message}", ex.Message);
             return Error.Unexpected(description: $"{ex.Message} {(!string.IsNullOrEmpty(ex.InnerException?.Message) ? ex.InnerException.Message : string.Empty)}");
         }
     }
@@ -91,7 +91,7 @@ public class StatementsService : IStatementsService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError("{Message}", ex.Message);
             return Error.Unexpected(description: ex.Message);
         }
     }
@@ -108,7 +108,7 @@ public class StatementsService : IStatementsService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError("{Message}", ex.Message);
             return Error.Unexpected(description: ex.Message);
         }
     }
@@ -128,7 +128,7 @@ public class StatementsService : IStatementsService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError("{Message}", ex.Message);
             return Error.Unexpected(description: ex.Message);
         }
     }

@@ -41,7 +41,7 @@ namespace PennyPincher.Services.Categories
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                _logger.LogError("{Message}", ex.Message);
                 return Error.Unexpected(description: $"{ex.Message} {(!string.IsNullOrEmpty(ex.InnerException?.Message) ? ex.InnerException.Message : string.Empty)}");
             }
         }
@@ -62,7 +62,7 @@ namespace PennyPincher.Services.Categories
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                _logger.LogError("{Message}", ex.Message);
                 return Error.Unexpected(description: ex.Message);
             }
         }
