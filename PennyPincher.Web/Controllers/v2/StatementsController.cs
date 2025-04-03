@@ -4,9 +4,9 @@ using PennyPincher.Services.Statements;
 
 namespace PennyPincher.Web.Controllers.v2;
 
-[Route("api/v{version:apiVersion}/[controller]")]
 [ApiController]
-[ApiVersion("2")]
+[Route("api/[controller]")]
+
 public class StatementsController : ErrorOrApiController
 {
     private readonly IStatementsService _statementsService;

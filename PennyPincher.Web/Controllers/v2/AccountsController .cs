@@ -4,9 +4,8 @@ using PennyPincher.Services.Accounts;
 
 namespace PennyPincher.Web.Controllers.v2;
 
-[Route("api/v{version:apiVersion}/[controller]")]
 [ApiController]
-[ApiVersion("2")]
+[Route("api/[controller]")]
 public class AccountsController : ErrorOrApiController
 {
     private readonly IAccountService _accountService;
