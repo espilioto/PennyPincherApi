@@ -76,13 +76,13 @@ public class AccountService : IAccountService
         }
     }
 
-    public async Task<ErrorOr<bool>> UpdateAsync(AccountRequest request)
+    public async Task<ErrorOr<bool>> UpdateAsync(int accountId, AccountRequest request)
     {
         List<Error> errors = [];
 
         try
         {
-            var account = await _context.Accounts.AsNoTracking().FirstOrDefaultAsync(x => x.Id == request.Id);
+            var account = await _context.Accounts.AsNoTracking().FirstOrDefaultAsync(x => x.Id == accountId);
             if (account is null)
                 return Error.NotFound(description: "Account not found");
 

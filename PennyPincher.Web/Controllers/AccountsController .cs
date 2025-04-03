@@ -38,9 +38,9 @@ public class AccountsController : ErrorOrApiController
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put([FromBody] AccountRequest request)
+    public async Task<IActionResult> Put(int accountId, [FromBody] AccountRequest request)
     {
-        var result = await _accountService.UpdateAsync(request);
+        var result = await _accountService.UpdateAsync(accountId, request);
 
         return result.Match(
           _ => Ok(),

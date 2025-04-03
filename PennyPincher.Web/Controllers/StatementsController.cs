@@ -39,9 +39,9 @@ public class StatementsController : ErrorOrApiController
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put([FromBody] StatementRequest request)
+    public async Task<IActionResult> Put(int statementId, [FromBody] StatementRequest request)
     {
-        var result = await _statementsService.UpdateAsync(request);
+        var result = await _statementsService.UpdateAsync(statementId, request);
 
         return result.Match(
           _ => Ok(),
