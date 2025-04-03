@@ -39,7 +39,7 @@ public class StatementsController : ErrorOrApiController
         var result = await _statementsService.InsertAsync(_mapper.Map<StatementDto>(request));
 
         return result.Match(
-            statement => Created(string.Empty, result),
+            statement => Created(string.Empty, statement),
             errors => Problem(errors)
         );
     }
@@ -50,7 +50,7 @@ public class StatementsController : ErrorOrApiController
         var result = await _statementsService.UpdateAsync(request);
 
         return result.Match(
-          statement => Ok(),
+          _ => Ok(),
           errors => Problem(errors)
         );
     }

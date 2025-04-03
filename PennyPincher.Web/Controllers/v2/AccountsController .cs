@@ -33,7 +33,7 @@ public class AccountsController : ErrorOrApiController
         var result = await _accountService.InsertAsync(request);
 
         return result.Match(
-            accounts => Ok(accounts),
+            account => Created(string.Empty, account),
             errors => Problem(errors)
         );
     }
@@ -44,7 +44,7 @@ public class AccountsController : ErrorOrApiController
         var result = await _accountService.UpdateAsync(request);
 
         return result.Match(
-          statement => Ok(),
+          _ => Ok(),
           errors => Problem(errors)
         );
     }
