@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PennyPincher.Contracts.Accounts;
 using PennyPincher.Domain.Models;
-using PennyPincher.Services.Accounts.Models;
 using PennyPincher.Services.Statements;
 using System.Text.RegularExpressions;
 
@@ -24,63 +23,7 @@ public class AccountService : IAccountService
         _logger = logger;
     }
 
-    [Obsolete]
-    public async Task<bool> InsertAsync(AccountDto accountRequest)
-    {
-        try
-        {
-            var account = _mapper.Map<Account>(accountRequest);
-            _ = await _context.Accounts.AddAsync(account);
-            var success = await _context.SaveChangesAsync();
-
-            return success == 1;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return false;
-        }
-    }
-
-    public async Task<IEnumerable<AccountDto>> GetAllAsync()
-    {
-        try
-        {
-            var result = new List<AccountDto>();
-
-            var accounts = await _context.Accounts.ToListAsync();
-
-            foreach (var item in accounts)
-            {
-                result.Add(_mapper.Map<AccountDto>(item));
-            }
-
-            return result;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return Enumerable.Empty<AccountDto>();
-        }
-    }
-
-    public async Task<bool> UpdateAsync(AccountDto accountRequest)
-    {
-        try
-        {
-            _ = _context.Update(accountRequest);
-            var success = await _context.SaveChangesAsync();
-
-            return success == 1;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return false;
-        }
-    }
-
-    public async Task<ErrorOr<List<AccountResponse>>> GetAllAsyncV2()
+    public async Task<ErrorOr<List<AccountResponse>>> GetAllAsync()
     {
         try
         {

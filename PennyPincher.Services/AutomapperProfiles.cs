@@ -3,7 +3,6 @@ using PennyPincher.Contracts.Accounts;
 using PennyPincher.Contracts.Categories;
 using PennyPincher.Contracts.Statements;
 using PennyPincher.Domain.Models;
-using PennyPincher.Services.Accounts.Models;
 using PennyPincher.Services.Categories.Models;
 using PennyPincher.Services.Statements.Models;
 
@@ -28,10 +27,8 @@ public class AutomapperProfiles : Profile
         CreateMap<Category, CategoryResponseLite>().ReverseMap();
         CreateMap<CategoryDto, CategoryResponseLite>().ReverseMap();
 
-        CreateMap<Account, AccountDto>().ReverseMap();
         CreateMap<Account, AccountResponse>().ReverseMap();
         CreateMap<Account, AccountRequest>().ReverseMap();
         CreateMap<Account, AccountResponseLite>().ReverseMap();
-        CreateMap<AccountDto, AccountResponse>().ReverseMap();
     }
 }

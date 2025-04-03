@@ -19,7 +19,7 @@ public class AccountsController : ErrorOrApiController
     [HttpGet]
     public async Task<IActionResult> Get()
     {
-        var result = await _accountService.GetAllAsyncV2();
+        var result = await _accountService.GetAllAsync();
 
         return result.Match(
             accounts => Ok(accounts),
