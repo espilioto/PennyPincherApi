@@ -30,6 +30,7 @@ public class AutomapperProfiles : Profile
 
         CreateMap<Account, AccountDto>().ReverseMap();
         CreateMap<Account, AccountResponse>().ReverseMap();
+        CreateMap<Account, AccountRequest>().ReverseMap();
         CreateMap<Account, AccountResponseLite>().ReverseMap();
         CreateMap<AccountDto, AccountResponse>().ReverseMap();
     }

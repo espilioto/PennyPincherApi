@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PennyPincher.Contracts.Accounts;
 using PennyPincher.Services.Accounts;
-using PennyPincher.Services.Accounts.Models;
 
 namespace PennyPincher.Web.Controllers.v2;
 
@@ -9,13 +9,11 @@ namespace PennyPincher.Web.Controllers.v2;
 [ApiVersion("2")]
 public class AccountsController : ErrorOrApiController
 {
-    private readonly ILogger<AccountsController> _logger;
     private readonly IAccountService _accountService;
 
-    public AccountsController(IAccountService accountService, ILogger<AccountsController> logger)
+    public AccountsController(IAccountService accountService)
     {
         _accountService = accountService;
-        _logger = logger;
     }
 
     [HttpGet]
@@ -30,8 +28,35 @@ public class AccountsController : ErrorOrApiController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(AccountDto accountRequest)
+    public async Task<IActionResult> Post(AccountRequest request)
     {
-        throw new NotImplementedException();
+        var result = await _accountService.InsertAsync(request);
+
+        return result.Match(
+            accounts => Ok(accounts),
+            errors => Problem(errors)
+        );
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Put([FromBody] AccountRequest request)
+    {
+        var result = await _accountService.UpdateAsync(request);
+
+        return result.Match(
+          statement => Ok(),
+          errors => Problem(errors)
+        );
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var result = await _accountService.DeleteAsync(id);
+
+        return result.Match(
+         _ => NoContent(),
+         errors => Problem(errors)
+     );
     }
 }
