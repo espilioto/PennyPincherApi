@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PennyPincher.Services.User.Models;
 
-namespace PennyPincher.Web.Controllers.v2;
+namespace PennyPincher.Web.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

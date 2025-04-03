@@ -2,7 +2,7 @@
 using PennyPincher.Contracts.Categories;
 using PennyPincher.Services.Categories;
 
-namespace PennyPincher.Web.Controllers.v2;
+namespace PennyPincher.Web.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
