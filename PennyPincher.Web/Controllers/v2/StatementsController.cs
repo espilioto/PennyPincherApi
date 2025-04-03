@@ -1,8 +1,6 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PennyPincher.Contracts.Statements;
 using PennyPincher.Services.Statements;
-using PennyPincher.Services.Statements.Models;
 
 namespace PennyPincher.Web.Controllers.v2;
 
@@ -11,15 +9,11 @@ namespace PennyPincher.Web.Controllers.v2;
 [ApiVersion("2")]
 public class StatementsController : ErrorOrApiController
 {
-    private readonly ILogger<StatementsController> _logger;
     private readonly IStatementsService _statementsService;
-    private readonly IMapper _mapper;
 
-    public StatementsController(ILogger<StatementsController> logger, IStatementsService statementsService, IMapper mapper)
+    public StatementsController(IStatementsService statementsService)
     {
-        _logger = logger;
         _statementsService = statementsService;
-        _mapper = mapper;
     }
 
     [HttpGet]
@@ -28,7 +22,7 @@ public class StatementsController : ErrorOrApiController
         var result = await _statementsService.GetAllAsync(filters, sorting);
 
         return result.Match(
-            statements => Ok(_mapper.Map<List<StatementResponse>>(statements)),
+            statements => Ok(statements),
             errors => Problem(errors)
         );
     }
@@ -36,7 +30,7 @@ public class StatementsController : ErrorOrApiController
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] StatementRequest request)
     {
-        var result = await _statementsService.InsertAsync(_mapper.Map<StatementDto>(request));
+        var result = await _statementsService.InsertAsync(request);
 
         return result.Match(
             statement => Created(string.Empty, statement),

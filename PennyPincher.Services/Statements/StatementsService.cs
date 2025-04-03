@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PennyPincher.Contracts.Statements;
 using PennyPincher.Domain.Models;
-using PennyPincher.Services.Statements.Models;
 
 namespace PennyPincher.Services.Statements;
 
@@ -23,11 +22,11 @@ public class StatementsService : IStatementsService
         _logger = logger;
     }
 
-    public async Task<ErrorOr<bool>> InsertAsync(StatementDto statementRequest)
+    public async Task<ErrorOr<bool>> InsertAsync(StatementRequest request)
     {
         try
         {
-            var statement = _mapper.Map<Statement>(statementRequest);
+            var statement = _mapper.Map<Statement>(request);
             _ = await _context.Statements.AddAsync(statement);
             var success = await _context.SaveChangesAsync();
 
@@ -40,7 +39,7 @@ public class StatementsService : IStatementsService
         }
     }
 
-    public async Task<ErrorOr<IEnumerable<StatementDtoV2>>> GetAllAsync(StatementFilterRequest filters, StatementSortingRequest sorting)
+    public async Task<ErrorOr<IEnumerable<StatementResponse>>> GetAllAsync(StatementFilterRequest filters, StatementSortingRequest sorting)
     {
         try
         {
@@ -85,7 +84,7 @@ public class StatementsService : IStatementsService
             };
 
             var statements = await statementsQuery
-                .ProjectTo<StatementDtoV2>(_mapper.ConfigurationProvider)
+                .ProjectTo<StatementResponse>(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
             return statements.Count != 0 ? statements : Error.NotFound();
