@@ -1,12 +1,13 @@
-﻿using PennyPincher.Services.Categories.Models;
+﻿using ErrorOr;
+using PennyPincher.Contracts.Categories;
 
 namespace PennyPincher.Services.Categories
 {
     public interface ICategoriesService
     {
-        public Task<bool> Delete(int categoryId);
-        public Task<IEnumerable<CategoryDto>> GetAllAsync();
-        public Task<bool> InsertAsync(CategoryDto categoryRequest);
-        public Task<bool> UpdateAsync(CategoryDto categoryRequest);
+        public Task<ErrorOr<bool>> Delete(int categoryId);
+        public Task<ErrorOr<IEnumerable<CategoryResponse>>> GetAllAsync();
+        public Task<ErrorOr<bool>> InsertAsync(CategoryRequest categoryRequest);
+        public Task<ErrorOr<bool>> UpdateAsync(CategoryRequest categoryRequest);
     }
 }

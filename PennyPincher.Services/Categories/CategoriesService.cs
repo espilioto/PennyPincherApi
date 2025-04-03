@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using Data;
-using Microsoft.AspNetCore.Http.HttpResults;
+using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using PennyPincher.Contracts.Categories;
 using PennyPincher.Domain.Models;
-using PennyPincher.Services.Categories.Models;
 
 namespace PennyPincher.Services.Categories
 {
@@ -21,82 +21,62 @@ namespace PennyPincher.Services.Categories
             _context = context;
         }
 
-        public async Task<bool> InsertAsync(CategoryDto categoryRequest)
+        public async Task<ErrorOr<bool>> InsertAsync(CategoryRequest request)
         {
+            List<Error> errors = [];
+
             try
             {
-                var category = _mapper.Map<Category>(categoryRequest);
+                if (!await _context.Users.AnyAsync(x => x.Id == request.userId))
+                    errors.Add(Error.Validation(description: "User does not exist"));
+
+                if (errors.Count > 0)
+                    return errors;
+
+                var category = _mapper.Map<Category>(request);
                 _ = await _context.Categories.AddAsync(category);
                 var success = await _context.SaveChangesAsync();
-                return success == 1;
+
+                return success == 1 ? true : Error.Failure(description: "Error creating category");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return false;
-            }
-
-        }
-
-        public async Task<IEnumerable<CategoryDto>> GetAllAsync()
-        {
-            try
-            {
-                var result = new List<CategoryDto>();
-
-                var categories = await _context.Categories.ToListAsync();
-
-                foreach (var item in categories)
-                {
-                    result.Add(_mapper.Map<CategoryDto>(item));
-                }
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return Enumerable.Empty<CategoryDto>();
+                return Error.Unexpected(description: $"{ex.Message} {(!string.IsNullOrEmpty(ex.InnerException?.Message) ? ex.InnerException.Message : string.Empty)}");
             }
         }
 
-        public async Task<bool> UpdateAsync(CategoryDto categoryRequest)
+        public async Task<ErrorOr<IEnumerable<CategoryResponse>>> GetAllAsync()
         {
             try
             {
-                _ = _context.Update(categoryRequest);
-                var success = await _context.SaveChangesAsync();
+                var categories = await _context.Categories
+                .Select(x => new CategoryResponse
+                (
+                    x.Id,
+                    x.Name
+                ))
+                .ToListAsync();
 
-                return success == 1;
+                return categories.Count == 0 ? Error.NotFound() : categories;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return false;
+                return Error.Unexpected(description: ex.Message);
             }
         }
 
-        public async Task<bool> Delete(int categoryId)
+        public async Task<ErrorOr<bool>> UpdateAsync(CategoryRequest categoryRequest)
         {
-            try
-            {
-                var categoryToRemove = await _context.Categories.FirstOrDefaultAsync(x => x.Id == categoryId);
+            //TODO
+            throw new NotImplementedException();
+        }
 
-                if (categoryToRemove is not null)
-                {
-                    _context.Categories.Remove(categoryToRemove);
-                    var success = await _context.SaveChangesAsync();
-
-                    return success == 1;
-                }
-
-                return false;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return false;
-            }
+        public async Task<ErrorOr<bool>> Delete(int categoryId)
+        {
+            //TODO
+            throw new NotImplementedException();
         }
     }
 }

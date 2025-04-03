@@ -3,11 +3,11 @@ using PennyPincher.Contracts.Categories;
 
 namespace PennyPincher.Contracts.Statements;
 
-public record StatementResponse (
+public record StatementResponse(
         int Id,
         DateTime Date,
         decimal Amount,
         string Description,
-        CategoryResponseLite Category,
+        CategoryResponse Category,
         AccountResponseLite Account
     );

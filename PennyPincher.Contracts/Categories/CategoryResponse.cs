@@ -1,6 +1,6 @@
 ﻿namespace PennyPincher.Contracts.Categories;
 
-public record CategoryResponseLite (
+public record CategoryResponse(
         int Id,
         string Name
     );
