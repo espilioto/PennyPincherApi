@@ -6,6 +6,7 @@ using NLog.Web;
 using PennyPincher.Services;
 using PennyPincher.Services.Accounts;
 using PennyPincher.Services.Categories;
+using PennyPincher.Services.Charts;
 using PennyPincher.Services.Statements;
 
 namespace PennyPincher.Web
@@ -49,6 +50,7 @@ namespace PennyPincher.Web
                 builder.Services.AddScoped<IStatementsService, StatementsService>();
                 builder.Services.AddScoped<ICategoriesService, CategoriesService>();
                 builder.Services.AddScoped<IAccountService, AccountService>();
+                builder.Services.AddScoped<IChartDataService, ChartDataService>();
 
                 var app = builder.Build();
 
