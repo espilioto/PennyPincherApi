@@ -39,7 +39,7 @@ public class StatementsService : IStatementsService
         }
     }
 
-    public async Task<ErrorOr<IEnumerable<StatementResponse>>> GetAllAsync(StatementFilterRequest filters, StatementSortingRequest sorting)
+    public async Task<ErrorOr<IEnumerable<StatementResponse>>> GetAllAsync(StatementFilterRequest? filters = null, StatementSortingRequest? sorting = null)
     {
         try
         {
@@ -47,34 +47,25 @@ public class StatementsService : IStatementsService
                 .AsQueryable()
                 .AsNoTracking();
 
-            if (filters.AccountIds != null && filters.AccountIds.Count != 0)
+            if (filters is not null)
             {
-                statementsQuery = statementsQuery.Where(s => filters.AccountIds.Contains(s.AccountId));
-            }
+                if (filters.AccountIds is not null && filters.AccountIds.Count > 0)
+                    statementsQuery = statementsQuery.Where(s => filters.AccountIds.Contains(s.AccountId));
 
-            if (filters.CategoryIds is not null && filters.CategoryIds.Count != 0)
-            {
-                statementsQuery = statementsQuery.Where(s => filters.CategoryIds.Contains(s.CategoryId));
-            }
+                if (filters.CategoryIds is not null && filters.CategoryIds.Count > 0)
+                    statementsQuery = statementsQuery.Where(s => filters.CategoryIds.Contains(s.CategoryId));
 
-            if (filters.DateFrom.HasValue)
-            {
-                statementsQuery = statementsQuery.Where(s => s.Date >= filters.DateFrom.Value);
-            }
+                if (filters.DateFrom.HasValue)
+                    statementsQuery = statementsQuery.Where(s => s.Date >= filters.DateFrom.Value);
 
-            if (filters.DateTo.HasValue)
-            {
-                statementsQuery = statementsQuery.Where(s => s.Date <= filters.DateTo.Value);
-            }
+                if (filters.DateTo.HasValue)
+                    statementsQuery = statementsQuery.Where(s => s.Date <= filters.DateTo.Value);
 
-            if (filters.MinAmount.HasValue)
-            {
-                statementsQuery = statementsQuery.Where(s => Math.Abs(s.Amount) >= filters.MinAmount.Value);
-            }
+                if (filters.MinAmount.HasValue)
+                    statementsQuery = statementsQuery.Where(s => Math.Abs(s.Amount) >= filters.MinAmount.Value);
 
-            if (filters.MaxAmount.HasValue)
-            {
-                statementsQuery = statementsQuery.Where(s => Math.Abs(s.Amount) <= filters.MaxAmount.Value);
+                if (filters.MaxAmount.HasValue)
+                    statementsQuery = statementsQuery.Where(s => Math.Abs(s.Amount) <= filters.MaxAmount.Value);
             }
 
             statementsQuery = sorting.SortBy.ToLower() switch
