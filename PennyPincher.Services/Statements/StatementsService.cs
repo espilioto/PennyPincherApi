@@ -109,7 +109,7 @@ public class StatementsService : IStatementsService
             if (errors.Count > 0)
                 return errors;
 
-            _ = _context.Statements.Update(statement);
+            _ = _context.Statements.Update(_mapper.Map<Statement>(statement));
             var success = await _context.SaveChangesAsync();
 
             return success == 1 ? true : Error.Failure(description: "Error updating statement");
