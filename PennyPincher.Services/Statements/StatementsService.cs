@@ -98,18 +98,13 @@ public class StatementsService : IStatementsService
 
     public async Task<ErrorOr<bool>> UpdateAsync(int statementId, StatementRequest request)
     {
-        List<Error> errors = [];
-
         try
         {
-            var statement = await _context.Statements.AsNoTracking().FirstOrDefaultAsync(x => x.Id == statementId);
+            var statement = await _context.Statements.FirstOrDefaultAsync(x => x.Id == statementId);
             if (statement is null)
                 return Error.NotFound(description: "Statement not found");
 
-            if (errors.Count > 0)
-                return errors;
-
-            _ = _context.Statements.Update(_mapper.Map<Statement>(statement));
+            _mapper.Map(request, statement);
             var success = await _context.SaveChangesAsync();
 
             return success == 1 ? true : Error.Failure(description: "Error updating statement");

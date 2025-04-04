@@ -2,7 +2,7 @@
 
 public record AccountRequest(
         string Name,
-        string userId,
+        string UserId,
         string ColorHex
     );
 

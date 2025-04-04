@@ -54,7 +54,7 @@ public class AccountService : IAccountService
 
         try
         {
-            if (!await _context.Users.AnyAsync(x => x.Id == request.userId))
+            if (!await _context.Users.AnyAsync(x => x.Id == request.UserId))
                 errors.Add(Error.Validation(description: "User does not exist"));
 
             if (!Regex.IsMatch(request.ColorHex, @"[#][0-9A-Fa-f]{6}\b"))
@@ -86,7 +86,7 @@ public class AccountService : IAccountService
             if (account is null)
                 return Error.NotFound(description: "Account not found");
 
-            if (!await _context.Users.AnyAsync(x => x.Id == request.userId))
+            if (!await _context.Users.AnyAsync(x => x.Id == request.UserId))
                 errors.Add(Error.Validation(description: "User does not exist"));
 
             if (!Regex.IsMatch(request.ColorHex, @"[#][0-9A-Fa-f]{6}\b"))
