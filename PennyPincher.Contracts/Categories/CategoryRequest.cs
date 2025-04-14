@@ -2,5 +2,5 @@
 
 public record CategoryRequest(
         string Name,
-        string userId
+        string UserId
     );

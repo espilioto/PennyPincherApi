@@ -27,7 +27,7 @@ namespace PennyPincher.Services.Categories
 
             try
             {
-                if (!await _context.Users.AnyAsync(x => x.Id == request.userId))
+                if (!await _context.Users.AnyAsync(x => x.Id == request.UserId))
                     errors.Add(Error.Validation(description: "User does not exist"));
 
                 if (errors.Count > 0)
