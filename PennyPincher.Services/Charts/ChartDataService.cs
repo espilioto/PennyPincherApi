@@ -47,10 +47,12 @@ public class ChartDataService : IChartDataService
                 .ToList();
 
             var income = statements.Value.Where(x => x.Amount > 0).ToList();
+            var totalIncome = income.Sum(x => x.Amount);
             var expenses = statements.Value.Where(x => x.Amount < 0).ToList();
+            var totalExpenses = expenses.Sum(x => x.Amount);
             var balance = income.Sum(x => x.Amount) + expenses.Sum(x => x.Amount);
 
-            return new BreakdownDetailsForMonth(donutData, income, expenses, balance);
+            return new BreakdownDetailsForMonth(donutData, income, expenses, totalIncome, totalExpenses, balance);
 
         }
         catch (Exception ex)
