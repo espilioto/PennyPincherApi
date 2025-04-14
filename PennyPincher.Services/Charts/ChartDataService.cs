@@ -18,7 +18,7 @@ public class ChartDataService : IChartDataService
         _logger = logger;
     }
 
-    public async Task<ErrorOr<BreakdownDetailsForMonth>> GetBreakdownDataForMonth(int month, int year)
+    public async Task<ErrorOr<BreakdownDetailsForMonthResponse>> GetBreakdownDataForMonth(int month, int year)
     {
         List<Error> errors = [];
 
@@ -52,7 +52,7 @@ public class ChartDataService : IChartDataService
             var totalExpenses = expenses.Sum(x => x.Amount);
             var balance = income.Sum(x => x.Amount) + expenses.Sum(x => x.Amount);
 
-            return new BreakdownDetailsForMonth(donutData, income, expenses, totalIncome, totalExpenses, balance);
+            return new BreakdownDetailsForMonthResponse(requestDate.ToString("MMMM yyyy"), donutData, income, expenses, totalIncome, totalExpenses, balance);
 
         }
         catch (Exception ex)
