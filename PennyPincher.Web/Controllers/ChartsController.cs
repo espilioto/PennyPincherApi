@@ -25,4 +25,16 @@ public class ChartsController : ErrorOrApiController
             errors => Problem(errors)
         );
     }
+
+    [HttpGet("GetMonthlyBreakdownData")]
+    public async Task<IActionResult> GetMonthlyBreakdownData()
+    {
+        var result = await _chartDataService.GetMonthlyBreakdownData();
+
+        return result.Match(
+            chartData => Ok(chartData),
+            errors => Problem(errors)
+        );
+    }
+
 }
