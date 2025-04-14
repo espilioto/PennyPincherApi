@@ -30,7 +30,7 @@ public class ChartDataService : IChartDataService
             var result = new List<MonthlyBreakdownResponse>();
 
             var statements = await _statementsService.GetAllAsync(null, new StatementSortingRequest("date", "desc"));
-            var groupedStatements = statements.Value.GroupBy(x => new { date = $"{x.Date.ToString("MMMM yyyy", CultureInfo.InvariantCulture)}" });
+            var groupedStatements = statements.Value.GroupBy(x => new { date = $"{x.Date.ToString("MMMM yyyy", CultureInfo.InvariantCulture)}", month = x.Date.Month, year = x.Date.Year });
 
             foreach (var item in groupedStatements)
             {
@@ -39,6 +39,8 @@ public class ChartDataService : IChartDataService
 
                 result.Add(new MonthlyBreakdownResponse(
                     item.Key.date,
+                    item.Key.month,
+                    item.Key.year,
                     income,
                     expenses,
                     income + expenses)
