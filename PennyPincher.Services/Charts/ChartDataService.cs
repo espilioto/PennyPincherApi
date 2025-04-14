@@ -18,9 +18,46 @@ public class ChartDataService : IChartDataService
         _logger = logger;
     }
 
-    public Task<ErrorOr<BreakdownDetailsForMonth>> GetBreakdownDataForMonth(DateTime date)
+    public async Task<ErrorOr<BreakdownDetailsForMonth>> GetBreakdownDataForMonth(int month, int year)
     {
-        throw new NotImplementedException();
+        List<Error> errors = [];
+
+        if (month < 1 || month > 12)
+            errors.Add(Error.Validation(description: "wtf is that month bruh"));
+
+        if (errors.Count > 0)
+            return errors;
+
+        try
+        {
+            var requestDate = new DateTime(year, month, 1);
+
+            var statements = await _statementsService.GetAllAsync(
+                new StatementFilterRequest(null, null, requestDate, requestDate.AddMonths(1).AddDays(-1), null, null, null),
+                new StatementSortingRequest("date", "asc")
+            );
+
+            if (!statements.Value.Any())
+                return Error.NotFound();
+
+            var donutData = statements.Value
+                .Where(x => x.Amount < 0)
+                .GroupBy(x => x.Category.Name)
+                .Select(x => new BreakdownDetailsForMonthDonutData(x.Sum(d => d.Amount), x.Key))
+                .ToList();
+
+            var income = statements.Value.Where(x => x.Amount > 0).ToList();
+            var expenses = statements.Value.Where(x => x.Amount < 0).ToList();
+            var balance = income.Sum(x => x.Amount) + expenses.Sum(x => x.Amount);
+
+            return new BreakdownDetailsForMonth(donutData, income, expenses, balance);
+
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("{Message}", ex.Message);
+            return Error.Unexpected(description: ex.Message);
+        }
     }
 
     public async Task<ErrorOr<List<MonthlyBreakdownResponse>>> GetMonthlyBreakdownData()

@@ -3,13 +3,8 @@
 namespace PennyPincher.Contracts.Charts;
 
 public record BreakdownDetailsForMonth(
-        DonutData DonutData,
-        List<StatementResponse> Income,
-        List<StatementResponse> Expenses,
-        double Balance
-    );
-
-public record DonutData(
-        double Value,
-        string Title
+        List<BreakdownDetailsForMonthDonutData> DonutData,
+        List<StatementResponse> IncomeStatements,
+        List<StatementResponse> ExpenseStatements,
+        decimal Balance
     );

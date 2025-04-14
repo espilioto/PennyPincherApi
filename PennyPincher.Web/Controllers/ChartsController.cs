@@ -37,14 +37,14 @@ public class ChartsController : ErrorOrApiController
         );
     }
 
-    //[HttpGet("GetBreakdownDataForMonth/{date}")]
-    //public async Task<IActionResult> GetBreakdownDataForMonth(string date)
-    //{
-    //    var result = await _chartDataService.GetBreakdownDataForMonth(date);
+    [HttpGet("GetBreakdownDataForMonth")]
+    public async Task<IActionResult> GetBreakdownDataForMonth(int month, int year)
+    {
+        var result = await _chartDataService.GetBreakdownDataForMonth(month, year);
 
-    //    return result.Match(
-    //        chartData => Ok(chartData),
-    //        errors => Problem(errors)
-    //    );
-    //}
+        return result.Match(
+            chartData => Ok(chartData),
+            errors => Problem(errors)
+        );
+    }
 }
