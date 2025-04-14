@@ -37,4 +37,14 @@ public class ChartsController : ErrorOrApiController
         );
     }
 
+    //[HttpGet("GetBreakdownDataForMonth/{date}")]
+    //public async Task<IActionResult> GetBreakdownDataForMonth(string date)
+    //{
+    //    var result = await _chartDataService.GetBreakdownDataForMonth(date);
+
+    //    return result.Match(
+    //        chartData => Ok(chartData),
+    //        errors => Problem(errors)
+    //    );
+    //}
 }
