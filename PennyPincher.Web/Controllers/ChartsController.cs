@@ -27,9 +27,9 @@ public class ChartsController : ErrorOrApiController
     }
 
     [HttpGet("GetMonthlyBreakdownData")]
-    public async Task<IActionResult> GetMonthlyBreakdownData()
+    public async Task<IActionResult> GetMonthlyBreakdownData(bool ignoreInitsAndTransfers, bool ignoreLoans)
     {
-        var result = await _chartDataService.GetMonthlyBreakdownData();
+        var result = await _chartDataService.GetMonthlyBreakdownData(ignoreInitsAndTransfers, ignoreLoans);
 
         return result.Match(
             chartData => Ok(chartData),
@@ -38,9 +38,9 @@ public class ChartsController : ErrorOrApiController
     }
 
     [HttpGet("GetBreakdownDataForMonth")]
-    public async Task<IActionResult> GetBreakdownDataForMonth(int month, int year)
+    public async Task<IActionResult> GetBreakdownDataForMonth(int month, int year, bool ignoreInitsAndTransfers, bool ignoreLoans)
     {
-        var result = await _chartDataService.GetBreakdownDataForMonth(month, year);
+        var result = await _chartDataService.GetBreakdownDataForMonth(month, year, ignoreInitsAndTransfers, ignoreLoans);
 
         return result.Match(
             chartData => Ok(chartData),

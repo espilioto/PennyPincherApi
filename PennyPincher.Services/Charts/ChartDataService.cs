@@ -18,7 +18,7 @@ public class ChartDataService : IChartDataService
         _logger = logger;
     }
 
-    public async Task<ErrorOr<BreakdownDetailsForMonthResponse>> GetBreakdownDataForMonth(int month, int year)
+    public async Task<ErrorOr<BreakdownDetailsForMonthResponse>> GetBreakdownDataForMonth(int month, int year, bool ignoreInitsAndTransfers, bool ignoreLoans)
     {
         List<Error> errors = [];
 
@@ -62,13 +62,23 @@ public class ChartDataService : IChartDataService
         }
     }
 
-    public async Task<ErrorOr<List<MonthlyBreakdownResponse>>> GetMonthlyBreakdownData()
+    public async Task<ErrorOr<List<MonthlyBreakdownResponse>>> GetMonthlyBreakdownData(bool ignoreInitsAndTransfers, bool ignoreLoans)
     {
         try
         {
             var result = new List<MonthlyBreakdownResponse>();
 
             var statements = await _statementsService.GetAllAsync(null, new StatementSortingRequest("date", "desc"));
+
+            if (!statements.Value.Any())
+                return Error.NotFound();
+
+            if (ignoreInitsAndTransfers) //TODO oof
+                statements = statements.Value.Where(x => x.Category.Id != 1).ToList();
+
+            if (ignoreLoans) //TODO more oof
+                statements = statements.Value.Where(x => x.Category.Id != 29).ToList();
+
             var groupedStatements = statements.Value.GroupBy(x => new { date = $"{x.Date.ToString("MMMM yyyy", CultureInfo.InvariantCulture)}", month = x.Date.Month, year = x.Date.Year });
 
             foreach (var item in groupedStatements)
