@@ -40,6 +40,12 @@ public class ChartDataService : IChartDataService
             if (!statements.Value.Any())
                 return Error.NotFound();
 
+            if (ignoreInitsAndTransfers) //TODO oof
+                statements = statements.Value.Where(x => x.Category.Id != 1).ToList();
+
+            if (ignoreLoans) //TODO more oof
+                statements = statements.Value.Where(x => x.Category.Id != 29).ToList();
+
             var donutData = statements.Value
                 .Where(x => x.Amount < 0)
                 .GroupBy(x => x.Category.Name)
