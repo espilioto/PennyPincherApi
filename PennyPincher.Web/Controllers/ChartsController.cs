@@ -47,4 +47,15 @@ public class ChartsController : ErrorOrApiController
             errors => Problem(errors)
         );
     }
+
+    [HttpGet("GetCategoryAnalyticsChartData")]
+    public async Task<IActionResult> GetCategoryAnalyticsChartData(int categoryId)
+    {
+        var result = await _chartDataService.GetCategoryAnalyticsChartData(categoryId);
+
+        return result.Match(
+            chartData => Ok(chartData),
+            errors => Problem(errors)
+        );
+    }
 }
