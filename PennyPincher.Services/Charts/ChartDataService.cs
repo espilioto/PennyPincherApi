@@ -181,4 +181,49 @@ public class ChartDataService : IChartDataService
             return Error.Unexpected(description: ex.Message);
         }
     }
+
+    public async Task<ErrorOr<SavingsChartResponse>> GetSavingsRateChartData()
+    {
+        try
+        {
+            var incomeResult = new List<GenericChartResponse>();
+            var expensesResult = new List<GenericChartResponse>();
+            var savingsResult = new List<GenericChartResponse>();
+
+            var statements = await _statementsService.GetAllAsync(null, new StatementSortingRequest("date", "asc"));
+
+            if (statements.IsError)
+                return statements.Errors;
+
+            var groupedStatements = statements.Value
+                .Where(x => x.Amount < 0) //only expenses
+                .GroupBy(x => new { date = $"{x.Date.ToString("MM/yy", CultureInfo.InvariantCulture)}" });
+
+            var minDate = statements.Value.Min(x => x.Date);
+            var currentDate = DateTime.UtcNow;
+            var monthList = _utils.GetMonthList(minDate, currentDate);
+
+            foreach (var month in monthList.Value)
+            {
+                var date = month.ToString("MM/yy", CultureInfo.InvariantCulture);
+
+                var incomeAmount = groupedStatements.FirstOrDefault(x => x.Key.date == date)?.Where(x => x.Amount > 0).Sum(x => Math.Abs(x.Amount));
+                var expensesAmount = groupedStatements.FirstOrDefault(x => x.Key.date == date)?.Where(x => x.Amount < 0).Sum(x => Math.Abs(x.Amount));
+                var savingsAmount = incomeAmount - expensesAmount;
+
+                incomeResult.Add(new GenericChartResponse(date, incomeAmount ?? 0));
+                expensesResult.Add(new GenericChartResponse(date, expensesAmount ?? 0));
+                savingsResult.Add(new GenericChartResponse(date, savingsAmount ?? 0));
+            }
+
+            var result = new SavingsChartResponse(incomeResult, expensesResult, savingsResult);
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("{Message}", ex.Message);
+            return Error.Unexpected(description: ex.Message);
+        }
+    }
 }

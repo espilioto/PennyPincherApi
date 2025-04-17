@@ -9,4 +9,5 @@ public interface IChartDataService
     public Task<ErrorOr<List<MonthlyBreakdownResponse>>> GetMonthlyBreakdownData(bool ignoreInitsAndTransfers, bool ignoreLoans);
     public Task<ErrorOr<List<GenericChartResponse>>> GetOverviewBalanceChartData();
     public Task<ErrorOr<List<GenericChartResponse>>> GetCategoryAnalyticsChartData(int categoryId);
+    public Task<ErrorOr<SavingsChartResponse>> GetSavingsRateChartData();
 }

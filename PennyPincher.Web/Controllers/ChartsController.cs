@@ -58,4 +58,15 @@ public class ChartsController : ErrorOrApiController
             errors => Problem(errors)
         );
     }
+
+    [HttpGet("GetSavingsRateChartData")]
+    public async Task<IActionResult> GetSavingsRateChartData()
+    {
+        var result = await _chartDataService.GetSavingsRateChartData();
+
+        return result.Match(
+            chartData => Ok(chartData),
+            errors => Problem(errors)
+        );
+    }
 }
