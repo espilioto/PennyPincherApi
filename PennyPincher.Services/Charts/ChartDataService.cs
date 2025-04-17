@@ -155,10 +155,20 @@ public class ChartDataService : IChartDataService
                 return statements.Errors;
 
             var groupedStatements = statements.Value
-                .Where(x => x.Amount < 0)
+                .Where(x => x.Amount < 0) //only expenses
                 .GroupBy(x => new { date = $"{x.Date.ToString("MM/yy", CultureInfo.InvariantCulture)}" });
 
-            result = groupedStatements.Select(x => new CategoryAnalyticsChartResponse(x.Key.date, Math.Abs(x.Sum(z => z.Amount)))).ToList();
+            var minDate = statements.Value.Min(x => x.Date);
+            var currentDate = DateTime.UtcNow;
+            var monthList = new List<string>();
+
+            for (var d = minDate; d <= currentDate; d = d.AddMonths(1)) //do not display only months with expenses in graph
+            {
+                string date = d.ToString("MM/yy", CultureInfo.InvariantCulture);
+                var amount = groupedStatements.FirstOrDefault(x => x.Key.date == date)?.Sum(x => Math.Abs(x.Amount));
+
+                result.Add(new CategoryAnalyticsChartResponse(date, amount ?? 0));
+            }
 
             return result.Count > 0 ? result : Error.NotFound();
         }
