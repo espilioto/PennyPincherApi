@@ -8,6 +8,7 @@ using PennyPincher.Services.Accounts;
 using PennyPincher.Services.Categories;
 using PennyPincher.Services.Charts;
 using PennyPincher.Services.Statements;
+using PennyPincher.Services.Utils;
 
 namespace PennyPincher.Web
 {
@@ -51,6 +52,7 @@ namespace PennyPincher.Web
                 builder.Services.AddScoped<ICategoriesService, CategoriesService>();
                 builder.Services.AddScoped<IAccountService, AccountService>();
                 builder.Services.AddScoped<IChartDataService, ChartDataService>();
+                builder.Services.AddScoped<IUtils, Utils>();
 
                 var app = builder.Build();
 

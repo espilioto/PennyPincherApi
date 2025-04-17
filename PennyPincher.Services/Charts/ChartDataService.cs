@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using PennyPincher.Contracts.Charts;
 using PennyPincher.Contracts.Statements;
 using PennyPincher.Services.Statements;
+using PennyPincher.Services.Utils;
 using System.Globalization;
 
 namespace PennyPincher.Services.Charts;
@@ -11,11 +12,13 @@ public class ChartDataService : IChartDataService
 {
     private readonly IStatementsService _statementsService;
     private readonly ILogger<StatementsService> _logger;
+    private readonly IUtils _utils;
 
-    public ChartDataService(IStatementsService statementsService, ILogger<StatementsService> logger)
+    public ChartDataService(IStatementsService statementsService, ILogger<StatementsService> logger, IUtils utils)
     {
         _statementsService = statementsService;
         _logger = logger;
+        _utils = utils;
     }
 
     public async Task<ErrorOr<BreakdownDetailsForMonthResponse>> GetBreakdownDataForMonth(int month, int year, bool ignoreInitsAndTransfers, bool ignoreLoans)
@@ -160,11 +163,11 @@ public class ChartDataService : IChartDataService
 
             var minDate = statements.Value.Min(x => x.Date);
             var currentDate = DateTime.UtcNow;
-            var monthList = new List<string>();
+            var monthList = _utils.GetMonthList(minDate, currentDate);
 
-            for (var d = minDate; d <= currentDate; d = d.AddMonths(1)) //do not display only months with expenses in graph
+            foreach (var month in monthList.Value)
             {
-                string date = d.ToString("MM/yy", CultureInfo.InvariantCulture);
+                var date = month.ToString("MM/yy", CultureInfo.InvariantCulture);
                 var amount = groupedStatements.FirstOrDefault(x => x.Key.date == date)?.Sum(x => Math.Abs(x.Amount));
 
                 result.Add(new CategoryAnalyticsChartResponse(date, amount ?? 0));
