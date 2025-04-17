@@ -52,7 +52,7 @@ public class ChartDataService : IChartDataService
             var donutData = statements.Value
                 .Where(x => x.Amount < 0)
                 .GroupBy(x => x.Category.Name)
-                .Select(x => new BreakdownDetailsForMonthDonutData(x.Sum(d => d.Amount), x.Key))
+                .Select(x => new GenericChartResponse(x.Key, x.Sum(d => d.Amount)))
                 .ToList();
 
             var income = statements.Value.Where(x => x.Amount > 0).ToList();
@@ -114,12 +114,12 @@ public class ChartDataService : IChartDataService
         }
     }
 
-    public async Task<ErrorOr<List<OverviewBalanceChartResponse>>> GetOverviewBalanceChartData()
+    public async Task<ErrorOr<List<GenericChartResponse>>> GetOverviewBalanceChartData()
     {
         try
         {
             decimal balanceSum = 0;
-            var result = new List<OverviewBalanceChartResponse>();
+            var result = new List<GenericChartResponse>();
 
             var statements = await _statementsService.GetAllAsync(null, new StatementSortingRequest("date", "asc"));
 
@@ -131,7 +131,7 @@ public class ChartDataService : IChartDataService
             foreach (var item in groupedStatements)
             {
                 balanceSum += item.Sum(x => x.Amount);
-                result.Add(new OverviewBalanceChartResponse(item.Key.date, balanceSum));
+                result.Add(new GenericChartResponse(item.Key.date, balanceSum));
             }
 
             return result.Count > 0 ? result : Error.NotFound();
@@ -143,11 +143,11 @@ public class ChartDataService : IChartDataService
         }
     }
 
-    public async Task<ErrorOr<List<CategoryAnalyticsChartResponse>>> GetCategoryAnalyticsChartData(int categoryId)
+    public async Task<ErrorOr<List<GenericChartResponse>>> GetCategoryAnalyticsChartData(int categoryId)
     {
         try
         {
-            var result = new List<CategoryAnalyticsChartResponse>();
+            var result = new List<GenericChartResponse>();
 
             var statements = await _statementsService.GetAllAsync(
                 new StatementFilterRequest(null, [categoryId], null, null, null, null, null),
@@ -170,7 +170,7 @@ public class ChartDataService : IChartDataService
                 var date = month.ToString("MM/yy", CultureInfo.InvariantCulture);
                 var amount = groupedStatements.FirstOrDefault(x => x.Key.date == date)?.Sum(x => Math.Abs(x.Amount));
 
-                result.Add(new CategoryAnalyticsChartResponse(date, amount ?? 0));
+                result.Add(new GenericChartResponse(date, amount ?? 0));
             }
 
             return result.Count > 0 ? result : Error.NotFound();
