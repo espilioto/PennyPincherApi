@@ -57,3 +57,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+
+      - name: Update image in server
+        run: curl -X POST -H ${{ secrets.WATCHTOWER_AUTH_HEADER }} ${{ secrets.WATCHTOWER_URL }}
