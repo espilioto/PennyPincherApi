@@ -59,11 +59,5 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
 
-      - name: Update image in server
-        uses: indiesdev/curl@v1.1
-        with:
-          url: ${{ secrets.WATCHTOWER_URL }}
-          method: POST
-          bearer-token: ${{ secrets.WATCHTOWER_BEARER_TOKEN }}
-                
-        # run: curl -X POST -H ${{ secrets.WATCHTOWER_AUTH_HEADER }} ${{ secrets.WATCHTOWER_URL }}
+      - name: Trigger watchtower                
+        run: curl -X POST -H ${{ secrets.WATCHTOWER_AUTH_HEADER }} ${{ secrets.WATCHTOWER_URL }}
