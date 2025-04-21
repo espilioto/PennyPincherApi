@@ -30,7 +30,6 @@ public class ChartsController : ErrorOrApiController
     public async Task<IActionResult> GetMonthlyBreakdownData(bool ignoreInitsAndTransfers, bool ignoreLoans)
     {
         var result = await _chartDataService.GetMonthlyBreakdownData(ignoreInitsAndTransfers, ignoreLoans);
-        var gg=666;//trigger cicd
 
         return result.Match(
             chartData => Ok(chartData),
