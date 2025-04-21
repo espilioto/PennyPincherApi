@@ -1,3 +1,12 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+# GitHub recommends pinning actions to a commit SHA.
+# To get a newer version, you will need to update the SHA.
+# You can also reference a tag or branch, but the action may change without warning.
+
 name: Create and publish a Docker image
 
 on:
@@ -11,17 +20,15 @@ env:
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
-    # Enhanced permissions block
     permissions:
       contents: read
       packages: write
-      id-token: write  # Required for GitHub OIDC token authentication
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Log in to GitHub Container Registry
+      - name: Log in to the Container registry
         uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
@@ -30,10 +37,7 @@ jobs:
 
       - name: Get current timestamp
         id: timestamp
-        run: |
-          TS=$(date +'%Y%m%d%H%M%S')
-          echo "timestamp=$TS" >> $GITHUB_OUTPUT
-          echo "Generated timestamp: $TS"  # For debugging
+        run: echo "timestamp=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
 
       - name: Extract metadata
         id: meta
