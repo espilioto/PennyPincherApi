@@ -229,7 +229,7 @@ public class ChartDataService : IChartDataService
 
                 incomeResult.Add(new GenericChartResponse(date, incomeAmount ?? 0));
                 expensesResult.Add(new GenericChartResponse(date, expensesAmount ?? 0));
-                savingsResult.Add(new GenericChartResponse(date, savingsAmount ?? 0));
+                savingsResult.Add(new GenericChartResponse(date, savingsAmount.HasValue ? Math.Abs(savingsAmount.Value) : 0));
             }
 
             var result = new SavingsChartResponse(incomeResult, expensesResult, savingsResult);
