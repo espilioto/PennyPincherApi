@@ -35,19 +35,20 @@ public class ChartDataService : IChartDataService
         {
             var requestDate = new DateTime(year, month, 1);
 
+            var excludedCategoryIds = new List<int>();
+            if (ignoreInitsAndTransfers) //TODO oof
+                excludedCategoryIds.Add(1);
+
+            if (ignoreLoans) //TODO more oof
+                excludedCategoryIds.Add(29);
+
             var statements = await _statementsService.GetAllAsync(
-                new StatementFilterRequest(null, null, requestDate, requestDate.AddMonths(1).AddDays(-1), null, null, null),
+                new StatementFilterRequest(null, null, null, excludedCategoryIds, requestDate, requestDate.AddMonths(1).AddDays(-1), null, null, null),
                 new StatementSortingRequest("date", "asc")
             );
 
             if (statements.IsError)
                 return statements.Errors;
-
-            if (ignoreInitsAndTransfers) //TODO oof
-                statements = statements.Value.Where(x => x.Category.Id != 1).ToList();
-
-            if (ignoreLoans) //TODO more oof
-                statements = statements.Value.Where(x => x.Category.Id != 29).ToList();
 
             var donutData = statements.Value
                 .Where(x => x.Amount < 0)
@@ -77,16 +78,20 @@ public class ChartDataService : IChartDataService
         {
             var result = new List<MonthlyBreakdownResponse>();
 
-            var statements = await _statementsService.GetAllAsync(null, new StatementSortingRequest("date", "desc"));
+            var excludedCategoryIds = new List<int>();
+            if (ignoreInitsAndTransfers) //TODO oof
+                excludedCategoryIds.Add(1);
+
+            if (ignoreLoans) //TODO more oof
+                excludedCategoryIds.Add(29);
+
+            var statements = await _statementsService.GetAllAsync(
+                new StatementFilterRequest(null, null, null, excludedCategoryIds, null, null, null, null, null),
+                new StatementSortingRequest("date", "desc")
+            );
 
             if (statements.IsError)
                 return statements.Errors;
-
-            if (ignoreInitsAndTransfers) //TODO oof
-                statements = statements.Value.Where(x => x.Category.Id != 1).ToList();
-
-            if (ignoreLoans) //TODO more oof
-                statements = statements.Value.Where(x => x.Category.Id != 29).ToList();
 
             var groupedStatements = statements.Value.GroupBy(x => new { date = $"{x.Date.ToString("MMMM yyyy", CultureInfo.InvariantCulture)}", month = x.Date.Month, year = x.Date.Year });
 
@@ -150,7 +155,7 @@ public class ChartDataService : IChartDataService
             var result = new List<GenericChartResponse>();
 
             var statements = await _statementsService.GetAllAsync(
-                new StatementFilterRequest(null, [categoryId], null, null, null, null, null),
+                new StatementFilterRequest(null, [categoryId], null, null, null, null, null, null, null),
                 new StatementSortingRequest("date", "asc")
             );
 
@@ -182,7 +187,7 @@ public class ChartDataService : IChartDataService
         }
     }
 
-    public async Task<ErrorOr<SavingsChartResponse>> GetSavingsRateChartData()
+    public async Task<ErrorOr<SavingsChartResponse>> GetSavingsRateChartData(bool ignoreInitsAndTransfers, bool ignoreLoans)
     {
         try
         {
@@ -190,7 +195,18 @@ public class ChartDataService : IChartDataService
             var expensesResult = new List<GenericChartResponse>();
             var savingsResult = new List<GenericChartResponse>();
 
-            var statements = await _statementsService.GetAllAsync(null, new StatementSortingRequest("date", "asc"));
+            var excludedCategoryIds = new List<int>();
+            if (ignoreInitsAndTransfers) //TODO oof
+                excludedCategoryIds.Add(1);
+
+            if (ignoreLoans) //TODO more oof
+                excludedCategoryIds.Add(29);
+
+            var statements = await _statementsService.GetAllAsync(
+                new StatementFilterRequest(null, null, null, excludedCategoryIds, null, null, null, null, null),
+                new StatementSortingRequest("date", "asc")
+            );
+
 
             if (statements.IsError)
                 return statements.Errors;

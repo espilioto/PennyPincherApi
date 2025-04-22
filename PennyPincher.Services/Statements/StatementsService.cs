@@ -49,11 +49,17 @@ public class StatementsService : IStatementsService
 
             if (filters is not null)
             {
-                if (filters.AccountIds is not null && filters.AccountIds.Count > 0)
-                    statementsQuery = statementsQuery.Where(s => filters.AccountIds.Contains(s.AccountId));
+                if (filters.AccountIdsIncluded is not null && filters.AccountIdsIncluded.Count > 0)
+                    statementsQuery = statementsQuery.Where(s => filters.AccountIdsIncluded.Contains(s.AccountId));
 
-                if (filters.CategoryIds is not null && filters.CategoryIds.Count > 0)
-                    statementsQuery = statementsQuery.Where(s => filters.CategoryIds.Contains(s.CategoryId));
+                if (filters.CategoryIdsIncluded is not null && filters.CategoryIdsIncluded.Count > 0)
+                    statementsQuery = statementsQuery.Where(s => filters.CategoryIdsIncluded.Contains(s.CategoryId));
+
+                if (filters.AccountIdsExcluded is not null && filters.AccountIdsExcluded.Count > 0)
+                    statementsQuery = statementsQuery.Where(s => !filters.AccountIdsExcluded.Contains(s.AccountId));
+
+                if (filters.CategoryIdsExcluded is not null && filters.CategoryIdsExcluded.Count > 0)
+                    statementsQuery = statementsQuery.Where(s => !filters.CategoryIdsExcluded.Contains(s.CategoryId));
 
                 if (filters.DateFrom.HasValue)
                     statementsQuery = statementsQuery.Where(s => s.Date >= filters.DateFrom.Value);

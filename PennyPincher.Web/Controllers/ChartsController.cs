@@ -60,9 +60,9 @@ public class ChartsController : ErrorOrApiController
     }
 
     [HttpGet("GetSavingsRateChartData")]
-    public async Task<IActionResult> GetSavingsRateChartData()
+    public async Task<IActionResult> GetSavingsRateChartData(bool ignoreInitsAndTransfers, bool ignoreLoans)
     {
-        var result = await _chartDataService.GetSavingsRateChartData();
+        var result = await _chartDataService.GetSavingsRateChartData(ignoreInitsAndTransfers, ignoreLoans);
 
         return result.Match(
             chartData => Ok(chartData),

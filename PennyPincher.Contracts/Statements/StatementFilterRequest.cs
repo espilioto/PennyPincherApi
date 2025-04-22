@@ -1,8 +1,10 @@
 ﻿namespace PennyPincher.Contracts.Statements;
 
 public record StatementFilterRequest(
-        List<int>? AccountIds,
-        List<int>? CategoryIds,
+        List<int>? AccountIdsIncluded,
+        List<int>? CategoryIdsIncluded,
+        List<int>? AccountIdsExcluded,
+        List<int>? CategoryIdsExcluded,
         DateTime? DateFrom,
         DateTime? DateTo,
         decimal? MinAmount,
