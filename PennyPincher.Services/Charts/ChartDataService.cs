@@ -211,9 +211,7 @@ public class ChartDataService : IChartDataService
             if (statements.IsError)
                 return statements.Errors;
 
-            var groupedStatements = statements.Value
-                .Where(x => x.Amount < 0) //only expenses
-                .GroupBy(x => new { date = $"{x.Date.ToString("MM/yy", CultureInfo.InvariantCulture)}" });
+            var groupedStatements = statements.Value.GroupBy(x => new { date = $"{x.Date.ToString("MM/yy", CultureInfo.InvariantCulture)}" });
 
             var minDate = statements.Value.Min(x => x.Date);
             var currentDate = DateTime.UtcNow;
