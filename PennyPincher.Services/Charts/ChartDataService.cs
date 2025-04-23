@@ -194,6 +194,7 @@ public class ChartDataService : IChartDataService
             var incomeResult = new List<GenericChartResponse>();
             var expensesResult = new List<GenericChartResponse>();
             var savingsResult = new List<GenericChartResponse>();
+            var yearlyAmounts = new List<SavingsChartYearlyAmountsResponse>();
 
             var excludedCategoryIds = new List<int>();
             if (ignoreInitsAndTransfers) //TODO oof
@@ -207,22 +208,22 @@ public class ChartDataService : IChartDataService
                 new StatementSortingRequest("date", "asc")
             );
 
-
             if (statements.IsError)
                 return statements.Errors;
 
-            var groupedStatements = statements.Value.GroupBy(x => new { date = $"{x.Date.ToString("MM/yy", CultureInfo.InvariantCulture)}" });
+            //monthly calculations
+            var statementsGroupedByMonth = statements.Value.GroupBy(x => new { date = $"{x.Date.ToString("MM/yy", CultureInfo.InvariantCulture)}" });
 
             var minDate = statements.Value.Min(x => x.Date);
             var currentDate = DateTime.UtcNow;
-            var monthList = _utils.GetMonthList(minDate, currentDate);
 
+            var monthList = _utils.GetMonthList(minDate, currentDate);
             foreach (var month in monthList.Value)
             {
                 var date = month.ToString("MM/yy", CultureInfo.InvariantCulture);
 
-                var incomeAmount = groupedStatements.FirstOrDefault(x => x.Key.date == date)?.Where(x => x.Amount > 0).Sum(x => Math.Abs(x.Amount));
-                var expensesAmount = groupedStatements.FirstOrDefault(x => x.Key.date == date)?.Where(x => x.Amount < 0).Sum(x => Math.Abs(x.Amount));
+                var incomeAmount = statementsGroupedByMonth.FirstOrDefault(x => x.Key.date == date)?.Where(x => x.Amount > 0).Sum(x => Math.Abs(x.Amount));
+                var expensesAmount = statementsGroupedByMonth.FirstOrDefault(x => x.Key.date == date)?.Where(x => x.Amount < 0).Sum(x => Math.Abs(x.Amount));
                 var savingsAmount = incomeAmount - expensesAmount;
 
                 incomeResult.Add(new GenericChartResponse(date, incomeAmount ?? 0));
@@ -230,7 +231,29 @@ public class ChartDataService : IChartDataService
                 savingsResult.Add(new GenericChartResponse(date, savingsAmount.HasValue ? Math.Abs(savingsAmount.Value) : 0));
             }
 
-            var result = new SavingsChartResponse(incomeResult, expensesResult, savingsResult);
+            //yearly calculations
+            var statementsGroupedByYear = statements.Value.GroupBy(x => new { date = $"{x.Date.ToString("yyyy", CultureInfo.InvariantCulture)}" });
+            var yearList = _utils.GetYearList(minDate, currentDate);
+            foreach (var year in yearList.Value)
+            {
+                var date = year.Year.ToString();
+
+                var incomeAmountForYear = statementsGroupedByYear.FirstOrDefault(x => x.Key.date == date)?.Where(x => x.Amount > 0).Sum(x => Math.Abs(x.Amount));
+                var expensesAmountForYear = statementsGroupedByYear.FirstOrDefault(x => x.Key.date == date)?.Where(x => x.Amount < 0).Sum(x => Math.Abs(x.Amount));
+                var savingsAmountForYear = incomeAmountForYear - expensesAmountForYear;
+                var savingsPercentForYear = incomeAmountForYear > 0 ? incomeAmountForYear.Value / Math.Abs(incomeAmountForYear.Value + expensesAmountForYear.Value) * 100 : 0;
+
+                yearlyAmounts.Add(new SavingsChartYearlyAmountsResponse(
+                        date,
+                        incomeAmountForYear.Value,
+                        expensesAmountForYear.Value,
+                        savingsAmountForYear.Value,
+                        savingsPercentForYear
+                    )
+                );
+            }
+
+            var result = new SavingsChartResponse(yearlyAmounts, incomeResult, expensesResult, savingsResult);
 
             return result;
         }

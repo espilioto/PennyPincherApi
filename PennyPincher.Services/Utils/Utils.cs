@@ -32,4 +32,24 @@ public class Utils : IUtils
             return Error.Unexpected(description: ex.Message);
         }
     }
+
+    public ErrorOr<List<DateTime>> GetYearList(DateTime start, DateTime end)
+    {
+        try
+        {
+            var result = new List<DateTime>();
+
+            for (var d = start; d <= end; d = d.AddYears(1))
+            {
+                result.Add(d);
+            }
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("{Message}", ex.Message);
+            return Error.Unexpected(description: ex.Message);
+        }
+    }
 }
