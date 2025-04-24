@@ -152,7 +152,7 @@ public class ChartDataService : IChartDataService
     {
         try
         {
-            var yearAverages = new List<GenericKeyValueResponse>();
+            var yearSums = new List<GenericKeyValueResponse>();
             var chartData = new List<GenericKeyValueResponse>();
 
             var statements = await _statementsService.GetAllAsync(
@@ -171,7 +171,7 @@ public class ChartDataService : IChartDataService
 
             foreach (var yearGroup in statementsGroupedByYear)
             {
-                yearAverages.Add(new GenericKeyValueResponse(yearGroup.Key.date, yearGroup.Sum(x => Math.Abs(x.Amount) / 12)));
+                yearSums.Add(new GenericKeyValueResponse(yearGroup.Key.date, yearGroup.Sum(x => Math.Abs(x.Amount))));
             }
 
             //chart data
@@ -183,7 +183,7 @@ public class ChartDataService : IChartDataService
                 chartData.Add(new GenericKeyValueResponse(monthGroup.Key.date, monthGroup.Sum(x => Math.Abs(x.Amount))));
             }
 
-            return new CategoryAnalyticsResponse(yearAverages, chartData);
+            return new CategoryAnalyticsResponse(yearSums, chartData);
         }
         catch (Exception ex)
         {
