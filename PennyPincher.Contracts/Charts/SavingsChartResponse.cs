@@ -2,7 +2,7 @@
 
 public record SavingsChartResponse(
         List<SavingsChartYearlyAmountsResponse> AveragesPerYear,
-        List<GenericChartResponse> IncomeChart,
-        List<GenericChartResponse> ExpensesChart,
-        List<GenericChartResponse> SavingsChart
+        List<GenericKeyValueResponse> IncomeChart,
+        List<GenericKeyValueResponse> ExpensesChart,
+        List<GenericKeyValueResponse> SavingsChart
     );

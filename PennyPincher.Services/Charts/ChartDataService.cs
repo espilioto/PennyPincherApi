@@ -53,7 +53,7 @@ public class ChartDataService : IChartDataService
             var donutData = statements.Value
                 .Where(x => x.Amount < 0)
                 .GroupBy(x => x.Category.Name)
-                .Select(x => new GenericChartResponse(x.Key, x.Sum(d => d.Amount)))
+                .Select(x => new GenericKeyValueResponse(x.Key, x.Sum(d => d.Amount)))
                 .ToList();
 
             var income = statements.Value.Where(x => x.Amount > 0).ToList();
@@ -119,12 +119,12 @@ public class ChartDataService : IChartDataService
         }
     }
 
-    public async Task<ErrorOr<List<GenericChartResponse>>> GetOverviewBalanceChartData()
+    public async Task<ErrorOr<List<GenericKeyValueResponse>>> GetOverviewBalanceChartData()
     {
         try
         {
             decimal balanceSum = 0;
-            var result = new List<GenericChartResponse>();
+            var result = new List<GenericKeyValueResponse>();
 
             var statements = await _statementsService.GetAllAsync(null, new StatementSortingRequest("date", "asc"));
 
@@ -136,7 +136,7 @@ public class ChartDataService : IChartDataService
             foreach (var item in groupedStatements)
             {
                 balanceSum += item.Sum(x => x.Amount);
-                result.Add(new GenericChartResponse(item.Key.date, balanceSum));
+                result.Add(new GenericKeyValueResponse(item.Key.date, balanceSum));
             }
 
             return result.Count > 0 ? result : Error.NotFound();
@@ -148,11 +148,11 @@ public class ChartDataService : IChartDataService
         }
     }
 
-    public async Task<ErrorOr<List<GenericChartResponse>>> GetCategoryAnalyticsChartData(int categoryId)
+    public async Task<ErrorOr<CategoryAnalyticsResponse>> GetCategoryAnalyticsChartData(int categoryId)
     {
         try
         {
-            var result = new List<GenericChartResponse>();
+            var chartData = new List<GenericKeyValueResponse>();
 
             var statements = await _statementsService.GetAllAsync(
                 new StatementFilterRequest(null, [categoryId], null, null, null, null, null, null, null),
@@ -175,10 +175,10 @@ public class ChartDataService : IChartDataService
                 var date = month.ToString("MM/yy", CultureInfo.InvariantCulture);
                 var amount = groupedStatements.FirstOrDefault(x => x.Key.date == date)?.Sum(x => Math.Abs(x.Amount));
 
-                result.Add(new GenericChartResponse(date, amount ?? 0));
+                chartData.Add(new GenericKeyValueResponse(date, amount ?? 0));
             }
 
-            return result.Count > 0 ? result : Error.NotFound();
+            return new CategoryAnalyticsResponse(yearAverages chartData);
         }
         catch (Exception ex)
         {
@@ -191,9 +191,9 @@ public class ChartDataService : IChartDataService
     {
         try
         {
-            var incomeResult = new List<GenericChartResponse>();
-            var expensesResult = new List<GenericChartResponse>();
-            var savingsResult = new List<GenericChartResponse>();
+            var incomeResult = new List<GenericKeyValueResponse>();
+            var expensesResult = new List<GenericKeyValueResponse>();
+            var savingsResult = new List<GenericKeyValueResponse>();
             var yearlyAmounts = new List<SavingsChartYearlyAmountsResponse>();
 
             var excludedCategoryIds = new List<int>();
@@ -226,9 +226,9 @@ public class ChartDataService : IChartDataService
                 var expensesAmount = statementsGroupedByMonth.First(x => x.Key.date == date)?.Where(x => x.Amount < 0).Sum(x => Math.Abs(x.Amount));
                 var savingsAmount = incomeAmount < expensesAmount ? 0 : incomeAmount - expensesAmount;
 
-                incomeResult.Add(new GenericChartResponse(date, incomeAmount ?? 0));
-                expensesResult.Add(new GenericChartResponse(date, expensesAmount ?? 0));
-                savingsResult.Add(new GenericChartResponse(date, savingsAmount.HasValue ? savingsAmount.Value : 0));
+                incomeResult.Add(new GenericKeyValueResponse(date, incomeAmount ?? 0));
+                expensesResult.Add(new GenericKeyValueResponse(date, expensesAmount ?? 0));
+                savingsResult.Add(new GenericKeyValueResponse(date, savingsAmount.HasValue ? savingsAmount.Value : 0));
             }
 
             //yearly calculations

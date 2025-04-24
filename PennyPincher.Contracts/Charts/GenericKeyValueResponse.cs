@@ -1,6 +1,6 @@
 ﻿namespace PennyPincher.Contracts.Charts;
 
-public record GenericChartResponse(
+public record GenericKeyValueResponse(
         string Key,
         decimal Value
     );
