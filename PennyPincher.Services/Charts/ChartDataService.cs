@@ -171,7 +171,7 @@ public class ChartDataService : IChartDataService
 
             foreach (var yearGroup in statementsGroupedByYear)
             {
-                yearAverages.Add(new GenericKeyValueResponse(yearGroup.Key.date, yearGroup.Average(x => Math.Abs(x.Amount))));
+                yearAverages.Add(new GenericKeyValueResponse(yearGroup.Key.date, yearGroup.Sum(x => Math.Abs(x.Amount) / 12)));
             }
 
             //chart data
