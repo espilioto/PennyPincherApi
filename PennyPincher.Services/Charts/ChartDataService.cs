@@ -152,6 +152,7 @@ public class ChartDataService : IChartDataService
     {
         try
         {
+            var yearAverages = new List<GenericKeyValueResponse>();
             var chartData = new List<GenericKeyValueResponse>();
 
             var statements = await _statementsService.GetAllAsync(
@@ -162,23 +163,27 @@ public class ChartDataService : IChartDataService
             if (statements.IsError)
                 return statements.Errors;
 
-            var groupedStatements = statements.Value
-                .Where(x => x.Amount < 0) //only expenses
-                .GroupBy(x => new { date = $"{x.Date.ToString("MM/yy", CultureInfo.InvariantCulture)}" });
-
             var minDate = statements.Value.Min(x => x.Date);
             var currentDate = DateTime.UtcNow;
-            var monthList = _utils.GetMonthList(minDate, currentDate);
 
-            foreach (var month in monthList.Value)
+            //yearly averages
+            var statementsGroupedByYear = statements.Value.GroupBy(x => new { date = $"{x.Date.ToString("yyyy", CultureInfo.InvariantCulture)}" });
+
+            foreach (var yearGroup in statementsGroupedByYear)
             {
-                var date = month.ToString("MM/yy", CultureInfo.InvariantCulture);
-                var amount = groupedStatements.FirstOrDefault(x => x.Key.date == date)?.Sum(x => Math.Abs(x.Amount));
-
-                chartData.Add(new GenericKeyValueResponse(date, amount ?? 0));
+                yearAverages.Add(new GenericKeyValueResponse(yearGroup.Key.date, yearGroup.Average(x => Math.Abs(x.Amount))));
             }
 
-            return new CategoryAnalyticsResponse(yearAverages chartData);
+            //chart data
+            var statementsGroupedByMonth = statements.Value
+                .GroupBy(x => new { date = $"{x.Date.ToString("MM/yy", CultureInfo.InvariantCulture)}" });
+
+            foreach (var monthGroup in statementsGroupedByMonth)
+            {
+                chartData.Add(new GenericKeyValueResponse(monthGroup.Key.date, monthGroup.Sum(x => Math.Abs(x.Amount))));
+            }
+
+            return new CategoryAnalyticsResponse(yearAverages, chartData);
         }
         catch (Exception ex)
         {
@@ -234,6 +239,7 @@ public class ChartDataService : IChartDataService
             //yearly calculations
             var statementsGroupedByYear = statements.Value.GroupBy(x => new { date = $"{x.Date.ToString("yyyy", CultureInfo.InvariantCulture)}" });
             var yearList = _utils.GetYearList(minDate, currentDate);
+
             foreach (var year in yearList.Value)
             {
                 var date = year.Year.ToString();
