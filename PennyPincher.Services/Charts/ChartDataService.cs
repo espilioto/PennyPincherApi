@@ -224,11 +224,11 @@ public class ChartDataService : IChartDataService
 
                 var incomeAmount = statementsGroupedByMonth.FirstOrDefault(x => x.Key.date == date)?.Where(x => x.Amount > 0).Sum(x => Math.Abs(x.Amount));
                 var expensesAmount = statementsGroupedByMonth.FirstOrDefault(x => x.Key.date == date)?.Where(x => x.Amount < 0).Sum(x => Math.Abs(x.Amount));
-                var savingsAmount = incomeAmount - expensesAmount;
+                var savingsAmount = incomeAmount < expensesAmount ? 0 : incomeAmount - expensesAmount;
 
                 incomeResult.Add(new GenericChartResponse(date, incomeAmount ?? 0));
                 expensesResult.Add(new GenericChartResponse(date, expensesAmount ?? 0));
-                savingsResult.Add(new GenericChartResponse(date, savingsAmount.HasValue ? Math.Abs(savingsAmount.Value) : 0));
+                savingsResult.Add(new GenericChartResponse(date, savingsAmount.HasValue ? savingsAmount.Value : 0));
             }
 
             //yearly calculations
