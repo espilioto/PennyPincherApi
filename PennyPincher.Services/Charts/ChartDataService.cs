@@ -222,8 +222,8 @@ public class ChartDataService : IChartDataService
             {
                 var date = month.ToString("MM/yy", CultureInfo.InvariantCulture);
 
-                var incomeAmount = statementsGroupedByMonth.FirstOrDefault(x => x.Key.date == date)?.Where(x => x.Amount > 0).Sum(x => Math.Abs(x.Amount));
-                var expensesAmount = statementsGroupedByMonth.FirstOrDefault(x => x.Key.date == date)?.Where(x => x.Amount < 0).Sum(x => Math.Abs(x.Amount));
+                var incomeAmount = statementsGroupedByMonth.First(x => x.Key.date == date)?.Where(x => x.Amount > 0).Sum(x => Math.Abs(x.Amount));
+                var expensesAmount = statementsGroupedByMonth.First(x => x.Key.date == date)?.Where(x => x.Amount < 0).Sum(x => Math.Abs(x.Amount));
                 var savingsAmount = incomeAmount < expensesAmount ? 0 : incomeAmount - expensesAmount;
 
                 incomeResult.Add(new GenericChartResponse(date, incomeAmount ?? 0));
@@ -238,10 +238,10 @@ public class ChartDataService : IChartDataService
             {
                 var date = year.Year.ToString();
 
-                var incomeAmountForYear = statementsGroupedByYear.FirstOrDefault(x => x.Key.date == date)?.Where(x => x.Amount > 0).Sum(x => Math.Abs(x.Amount));
-                var expensesAmountForYear = statementsGroupedByYear.FirstOrDefault(x => x.Key.date == date)?.Where(x => x.Amount < 0).Sum(x => Math.Abs(x.Amount));
-                var savingsAmountForYear = incomeAmountForYear - expensesAmountForYear;
-                var savingsPercentForYear = Math.Round((incomeAmountForYear > 0 ? incomeAmountForYear.Value / Math.Abs(incomeAmountForYear.Value + expensesAmountForYear.Value) * 100 : 0), 2);
+                var incomeAmountForYear = statementsGroupedByYear.First(x => x.Key.date == date)?.Where(x => x.Amount > 0).Sum(x => Math.Abs(x.Amount));
+                var expensesAmountForYear = statementsGroupedByYear.First(x => x.Key.date == date)?.Where(x => x.Amount < 0).Sum(x => Math.Abs(x.Amount));
+                var savingsAmountForYear = incomeAmountForYear < expensesAmountForYear ? 0 : incomeAmountForYear - expensesAmountForYear;
+                var savingsPercentForYear = Math.Round(savingsAmountForYear > 0 ? incomeAmountForYear.Value / Math.Abs(incomeAmountForYear.Value + expensesAmountForYear.Value) * 100 : 0, 0);
 
                 yearlyAmounts.Add(new SavingsChartYearlyAmountsResponse(
                         date,
