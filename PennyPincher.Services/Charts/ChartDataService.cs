@@ -169,18 +169,26 @@ public class ChartDataService : IChartDataService
             //yearly averages
             var statementsGroupedByYear = statements.Value.GroupBy(x => new { date = $"{x.Date.ToString("yyyy", CultureInfo.InvariantCulture)}" });
 
-            foreach (var yearGroup in statementsGroupedByYear)
+            var yearList = _utils.GetYearList(minDate, currentDate);
+            foreach (var year in yearList.Value)
             {
-                yearSums.Add(new GenericKeyValueResponse(yearGroup.Key.date, yearGroup.Sum(x => Math.Abs(x.Amount))));
+                var date = year.Year.ToString();
+                var amount = statementsGroupedByYear.FirstOrDefault(x => x.Key.date == date)?.Sum(x => Math.Abs(x.Amount));
+
+                yearSums.Add(new GenericKeyValueResponse(date, amount ?? 0));
             }
 
             //chart data
             var statementsGroupedByMonth = statements.Value
                 .GroupBy(x => new { date = $"{x.Date.ToString("MM/yy", CultureInfo.InvariantCulture)}" });
 
-            foreach (var monthGroup in statementsGroupedByMonth)
+            var monthList = _utils.GetMonthList(minDate, currentDate);
+            foreach (var month in monthList.Value)
             {
-                chartData.Add(new GenericKeyValueResponse(monthGroup.Key.date, monthGroup.Sum(x => Math.Abs(x.Amount))));
+                var date = month.ToString("MM/yy", CultureInfo.InvariantCulture);
+                var amount = statementsGroupedByMonth.FirstOrDefault(x => x.Key.date == date)?.Sum(x => Math.Abs(x.Amount));
+
+                chartData.Add(new GenericKeyValueResponse(date, amount ?? 0));
             }
 
             return new CategoryAnalyticsResponse(yearSums, chartData);
