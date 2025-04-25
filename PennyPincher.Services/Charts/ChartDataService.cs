@@ -247,13 +247,13 @@ public class ChartDataService : IChartDataService
                 var incomeAmountForYear = statementsGroupedByYear.FirstOrDefault(x => x.Key.date == date)?.Where(x => x.Amount > 0)?.Sum(x => Math.Abs(x.Amount));
                 var expensesAmountForYear = statementsGroupedByYear.FirstOrDefault(x => x.Key.date == date)?.Where(x => x.Amount < 0)?.Sum(x => Math.Abs(x.Amount));
                 var savingsAmountForYear = incomeAmountForYear < expensesAmountForYear ? 0 : incomeAmountForYear - expensesAmountForYear;
-                var savingsPercentForYear = Math.Round(savingsAmountForYear > 0 ? savingsAmountForYear.Value / Math.Abs(incomeAmountForYear.Value) * 100 : 0, 0);
+                var savingsPercentForYear = incomeAmountForYear.HasValue ? Math.Round(savingsAmountForYear > 0 ? savingsAmountForYear.Value / Math.Abs(incomeAmountForYear.Value) * 100 : 0, 0) : 0;
 
                 yearlyAmounts.Add(new SavingsChartYearlyAmountsResponse(
                         date,
-                        incomeAmountForYear.Value,
-                        expensesAmountForYear.Value,
-                        savingsAmountForYear.Value,
+                        incomeAmountForYear.GetValueOrDefault(),
+                        expensesAmountForYear.GetValueOrDefault(),
+                        savingsAmountForYear.GetValueOrDefault(),
                         savingsPercentForYear
                     )
                 );
