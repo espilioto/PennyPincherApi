@@ -39,9 +39,9 @@ public class Utils : IUtils
         {
             var result = new List<DateTime>();
 
-            for (var d = start; d <= end; d = d.AddYears(1))
+            for (int d = start.Year; d <= end.Year; d++)
             {
-                result.Add(d);
+                result.Add(new DateTime(d, 1, 1));
             }
 
             return result;
