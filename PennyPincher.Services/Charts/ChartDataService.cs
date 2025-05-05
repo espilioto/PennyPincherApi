@@ -21,7 +21,7 @@ public class ChartDataService : IChartDataService
         _utils = utils;
     }
 
-    public async Task<ErrorOr<BreakdownDetailsForMonthResponse>> GetBreakdownDataForMonth(int month, int year, bool ignoreInitsAndTransfers, bool ignoreLoans)
+    public async Task<ErrorOr<BreakdownDetailsForMonthResponse>> GetBreakdownDataForMonthAsync(int month, int year, bool ignoreInitsAndTransfers, bool ignoreLoans)
     {
         List<Error> errors = [];
 
@@ -72,7 +72,7 @@ public class ChartDataService : IChartDataService
         }
     }
 
-    public async Task<ErrorOr<List<MonthlyBreakdownResponse>>> GetMonthlyBreakdownData(bool ignoreInitsAndTransfers, bool ignoreLoans)
+    public async Task<ErrorOr<List<MonthlyBreakdownResponse>>> GetMonthlyBreakdownDataAsync(bool ignoreInitsAndTransfers, bool ignoreLoans)
     {
         try
         {
@@ -119,7 +119,7 @@ public class ChartDataService : IChartDataService
         }
     }
 
-    public async Task<ErrorOr<List<GenericKeyValueResponse>>> GetOverviewBalanceChartData()
+    public async Task<ErrorOr<List<GenericKeyValueResponse>>> GetOverviewBalanceChartDataAsync()
     {
         try
         {
@@ -148,7 +148,7 @@ public class ChartDataService : IChartDataService
         }
     }
 
-    public async Task<ErrorOr<CategoryAnalyticsResponse>> GetCategoryAnalyticsChartData(int categoryId)
+    public async Task<ErrorOr<CategoryAnalyticsResponse>> GetCategoryAnalyticsChartDataAsync(int categoryId)
     {
         try
         {
@@ -200,7 +200,7 @@ public class ChartDataService : IChartDataService
         }
     }
 
-    public async Task<ErrorOr<SavingsChartResponse>> GetSavingsRateChartData(bool ignoreInitsAndTransfers, bool ignoreLoans)
+    public async Task<ErrorOr<SavingsChartResponse>> GetSavingsRateChartDataAsync(bool ignoreInitsAndTransfers, bool ignoreLoans)
     {
         try
         {

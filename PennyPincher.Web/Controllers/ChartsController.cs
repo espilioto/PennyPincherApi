@@ -18,7 +18,7 @@ public class ChartsController : ErrorOrApiController
     [HttpGet("GetOverviewBalanceChartData")]
     public async Task<IActionResult> GetOverviewBalanceChartData()
     {
-        var result = await _chartDataService.GetOverviewBalanceChartData();
+        var result = await _chartDataService.GetOverviewBalanceChartDataAsync();
 
         return result.Match(
             chartData => Ok(chartData),
@@ -29,7 +29,7 @@ public class ChartsController : ErrorOrApiController
     [HttpGet("GetMonthlyBreakdownData")]
     public async Task<IActionResult> GetMonthlyBreakdownData(bool ignoreInitsAndTransfers, bool ignoreLoans)
     {
-        var result = await _chartDataService.GetMonthlyBreakdownData(ignoreInitsAndTransfers, ignoreLoans);
+        var result = await _chartDataService.GetMonthlyBreakdownDataAsync(ignoreInitsAndTransfers, ignoreLoans);
 
         return result.Match(
             chartData => Ok(chartData),
@@ -40,7 +40,7 @@ public class ChartsController : ErrorOrApiController
     [HttpGet("GetBreakdownDataForMonth")]
     public async Task<IActionResult> GetBreakdownDataForMonth(int month, int year, bool ignoreInitsAndTransfers, bool ignoreLoans)
     {
-        var result = await _chartDataService.GetBreakdownDataForMonth(month, year, ignoreInitsAndTransfers, ignoreLoans);
+        var result = await _chartDataService.GetBreakdownDataForMonthAsync(month, year, ignoreInitsAndTransfers, ignoreLoans);
 
         return result.Match(
             chartData => Ok(chartData),
@@ -51,7 +51,7 @@ public class ChartsController : ErrorOrApiController
     [HttpGet("GetCategoryAnalyticsChartData")]
     public async Task<IActionResult> GetCategoryAnalyticsChartData(int categoryId)
     {
-        var result = await _chartDataService.GetCategoryAnalyticsChartData(categoryId);
+        var result = await _chartDataService.GetCategoryAnalyticsChartDataAsync(categoryId);
 
         return result.Match(
             chartData => Ok(chartData),
@@ -62,7 +62,7 @@ public class ChartsController : ErrorOrApiController
     [HttpGet("GetSavingsRateChartData")]
     public async Task<IActionResult> GetSavingsRateChartData(bool ignoreInitsAndTransfers, bool ignoreLoans)
     {
-        var result = await _chartDataService.GetSavingsRateChartData(ignoreInitsAndTransfers, ignoreLoans);
+        var result = await _chartDataService.GetSavingsRateChartDataAsync(ignoreInitsAndTransfers, ignoreLoans);
 
         return result.Match(
             chartData => Ok(chartData),

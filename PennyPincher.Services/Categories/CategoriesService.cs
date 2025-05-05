@@ -73,7 +73,7 @@ namespace PennyPincher.Services.Categories
             throw new NotImplementedException();
         }
 
-        public async Task<ErrorOr<bool>> Delete(int categoryId)
+        public async Task<ErrorOr<bool>> DeleteAsync(int categoryId)
         {
             //TODO
             throw new NotImplementedException();
