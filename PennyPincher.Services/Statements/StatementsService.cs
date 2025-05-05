@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Data;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PennyPincher.Contracts.Statements;
+using PennyPincher.Data;
 using PennyPincher.Domain.Models;
 
 namespace PennyPincher.Services.Statements;

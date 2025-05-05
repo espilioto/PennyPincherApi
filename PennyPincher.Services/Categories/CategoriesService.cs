@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using Data;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PennyPincher.Contracts.Categories;
+using PennyPincher.Data;
 using PennyPincher.Domain.Models;
 
 namespace PennyPincher.Services.Categories
