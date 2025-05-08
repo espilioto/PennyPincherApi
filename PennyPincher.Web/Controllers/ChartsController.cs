@@ -81,4 +81,14 @@ public class ChartsController : ErrorOrApiController
         );
     }
 
+    [HttpGet("GetBreakdownDataForYearAsync")]
+    public async Task<IActionResult> GetBreakdownDataForYearAsync(int year, bool ignoreInitsAndTransfers, bool ignoreLoans)
+    {
+        var result = await _chartDataService.GetBreakdownDataForYearAsync(year, ignoreInitsAndTransfers, ignoreLoans);
+
+        return result.Match(
+            chartData => Ok(chartData),
+            errors => Problem(errors)
+        );
+    }
 }

@@ -11,6 +11,7 @@ public interface IChartDataService
     public Task<ErrorOr<CategoryAnalyticsResponse>> GetCategoryAnalyticsChartDataAsync(int categoryId);
     public Task<ErrorOr<SavingsChartResponse>> GetSavingsRateChartDataAsync(bool ignoreInitsAndTransfers, bool ignoreLoans);
     public Task<ErrorOr<List<YearlyBreakdownResponse>>> GetYearlyBreakdownDataAsync(bool ignoreInitsAndTransfers, bool ignoreLoans);
+    public Task<ErrorOr<BreakdownDetailsResponse>> GetBreakdownDataForYearAsync(int year, bool ignoreInitsAndTransfers, bool ignoreLoans);
 
 
 }

@@ -326,4 +326,54 @@ public class ChartDataService : IChartDataService
         }
     }
 
+    public async Task<ErrorOr<BreakdownDetailsResponse>> GetBreakdownDataForYearAsync(int year, bool ignoreInitsAndTransfers, bool ignoreLoans)
+    {
+        List<Error> errors = [];
+
+        if (year < 1 || year > DateTime.Now.Year)
+            errors.Add(Error.Validation(description: "wtf is that year bruh"));
+
+        if (errors.Count > 0)
+            return errors;
+
+        try
+        {
+            var requestDate = new DateTime(year, 1, 1);
+
+            var excludedCategoryIds = new List<int>();
+            if (ignoreInitsAndTransfers) //TODO oof
+                excludedCategoryIds.Add(1);
+
+            if (ignoreLoans) //TODO more oof
+                excludedCategoryIds.Add(29);
+
+            var statements = await _statementsService.GetAllAsync(
+                new StatementFilterRequest(null, null, null, excludedCategoryIds, requestDate, requestDate.AddYears(1).AddDays(-1), null, null, null),
+                new StatementSortingRequest("date", "asc")
+            );
+
+            if (statements.IsError)
+                return statements.Errors;
+
+            var donutData = statements.Value
+                .Where(x => x.Amount < 0)
+                .GroupBy(x => x.Category.Name)
+                .Select(x => new GenericKeyValueResponse(x.Key, x.Sum(d => d.Amount)))
+                .ToList();
+
+            var income = statements.Value.Where(x => x.Amount > 0).ToList();
+            var totalIncome = income.Sum(x => x.Amount);
+            var expenses = statements.Value.Where(x => x.Amount < 0).ToList();
+            var totalExpenses = expenses.Sum(x => x.Amount);
+            var balance = income.Sum(x => x.Amount) + expenses.Sum(x => x.Amount);
+
+            return new BreakdownDetailsResponse(requestDate.ToString("yyyy"), donutData, income, expenses, totalIncome, totalExpenses, balance);
+
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("{Message}", ex.Message);
+            return Error.Unexpected(description: ex.Message);
+        }
+    }
 }
