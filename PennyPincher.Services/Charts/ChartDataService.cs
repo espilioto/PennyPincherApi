@@ -21,7 +21,7 @@ public class ChartDataService : IChartDataService
         _utils = utils;
     }
 
-    public async Task<ErrorOr<BreakdownDetailsForMonthResponse>> GetBreakdownDataForMonthAsync(int month, int year, bool ignoreInitsAndTransfers, bool ignoreLoans)
+    public async Task<ErrorOr<BreakdownDetailsResponse>> GetBreakdownDataForMonthAsync(int month, int year, bool ignoreInitsAndTransfers, bool ignoreLoans)
     {
         List<Error> errors = [];
 
@@ -62,7 +62,7 @@ public class ChartDataService : IChartDataService
             var totalExpenses = expenses.Sum(x => x.Amount);
             var balance = income.Sum(x => x.Amount) + expenses.Sum(x => x.Amount);
 
-            return new BreakdownDetailsForMonthResponse(requestDate.ToString("MMMM yyyy"), donutData, income, expenses, totalIncome, totalExpenses, balance);
+            return new BreakdownDetailsResponse(requestDate.ToString("MMMM yyyy"), donutData, income, expenses, totalIncome, totalExpenses, balance);
 
         }
         catch (Exception ex)
@@ -280,4 +280,50 @@ public class ChartDataService : IChartDataService
             return Error.Unexpected(description: ex.Message);
         }
     }
+
+    public async Task<ErrorOr<List<YearlyBreakdownResponse>>> GetYearlyBreakdownDataAsync(bool ignoreInitsAndTransfers, bool ignoreLoans)
+    {
+        try
+        {
+            var result = new List<YearlyBreakdownResponse>();
+
+            var excludedCategoryIds = new List<int>();
+            if (ignoreInitsAndTransfers) //TODO oof
+                excludedCategoryIds.Add(1);
+
+            if (ignoreLoans) //TODO more oof
+                excludedCategoryIds.Add(29);
+
+            var statements = await _statementsService.GetAllAsync(
+                new StatementFilterRequest(null, null, null, excludedCategoryIds, null, null, null, null, null),
+                new StatementSortingRequest("date", "desc")
+            );
+
+            if (statements.IsError)
+                return statements.Errors;
+
+            var groupedStatements = statements.Value.GroupBy(x => x.Date.Year);
+
+            foreach (var item in groupedStatements)
+            {
+                var income = item.Where(x => x.Amount > 0).Sum(x => x.Amount);
+                var expenses = item.Where(x => x.Amount < 0).Sum(x => x.Amount);
+
+                result.Add(new YearlyBreakdownResponse(
+                    item.Key,
+                    income,
+                    expenses,
+                    income + expenses)
+                );
+            }
+
+            return result.Count > 0 ? result : Error.NotFound();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("{Message}", ex.Message);
+            return Error.Unexpected(description: ex.Message);
+        }
+    }
+
 }

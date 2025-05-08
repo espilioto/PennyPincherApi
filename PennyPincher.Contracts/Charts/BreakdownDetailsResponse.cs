@@ -2,7 +2,7 @@
 
 namespace PennyPincher.Contracts.Charts;
 
-public record BreakdownDetailsForMonthResponse(
+public record BreakdownDetailsResponse(
         string Title,
         List<GenericKeyValueResponse> DonutData,
         List<StatementResponse> IncomeStatements,
