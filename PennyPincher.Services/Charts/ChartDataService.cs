@@ -359,6 +359,7 @@ public class ChartDataService : IChartDataService
                 .Where(x => x.Amount < 0)
                 .GroupBy(x => x.Category.Name)
                 .Select(x => new GenericKeyValueResponse(x.Key, x.Sum(d => d.Amount)))
+                .Take(15)
                 .ToList();
 
             var income = statements.Value.Where(x => x.Amount > 0).ToList();
