@@ -71,7 +71,7 @@ public class ChartsController : ErrorOrApiController
     }
 
     [HttpGet("GetYearlyBreakdownDataAsync")]
-    public async Task<IActionResult> GetYearlyBreakdownDataAsync(bool ignoreInitsAndTransfers, bool ignoreLoans)
+    public async Task<IActionResult> GetYearlyBreakdownData(bool ignoreInitsAndTransfers, bool ignoreLoans)
     {
         var result = await _chartDataService.GetYearlyBreakdownDataAsync(ignoreInitsAndTransfers, ignoreLoans);
 
@@ -82,7 +82,7 @@ public class ChartsController : ErrorOrApiController
     }
 
     [HttpGet("GetBreakdownDataForYearAsync")]
-    public async Task<IActionResult> GetBreakdownDataForYearAsync(int year, bool ignoreInitsAndTransfers, bool ignoreLoans)
+    public async Task<IActionResult> GetBreakdownDataForYear(int year, bool ignoreInitsAndTransfers, bool ignoreLoans)
     {
         var result = await _chartDataService.GetBreakdownDataForYearAsync(year, ignoreInitsAndTransfers, ignoreLoans);
 
