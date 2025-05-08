@@ -364,7 +364,7 @@ public class ChartDataService : IChartDataService
 
             var income = statements.Value.Where(x => x.Amount > 0).OrderByDescending(x => x.Amount).ToList();
             var totalIncome = income.Sum(x => x.Amount);
-            var expenses = statements.Value.Where(x => x.Amount < 0).OrderByDescending(x => x.Amount).ToList();
+            var expenses = statements.Value.Where(x => x.Amount < 0).OrderBy(x => x.Amount).ToList();
             var totalExpenses = expenses.Sum(x => x.Amount);
             var balance = income.Sum(x => x.Amount) + expenses.Sum(x => x.Amount);
 
