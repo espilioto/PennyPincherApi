@@ -178,6 +178,9 @@ public class ChartDataService : IChartDataService
                 yearSums.Add(new GenericKeyValueResponse(date, amount ?? 0));
             }
 
+            //year sum
+            yearSums.Add(new GenericKeyValueResponse("Sum", yearSums.Sum(x => x.Value)));
+
             //chart data
             var statementsGroupedByMonth = statements.Value
                 .GroupBy(x => new { date = $"{x.Date.ToString("MM/yy", CultureInfo.InvariantCulture)}" });
