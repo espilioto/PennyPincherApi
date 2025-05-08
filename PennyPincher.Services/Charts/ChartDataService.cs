@@ -330,7 +330,7 @@ public class ChartDataService : IChartDataService
     {
         List<Error> errors = [];
 
-        if (year < 1 || year > DateTime.Now.Year)
+        if (year < 2000 || year > DateTime.Now.Year)
             errors.Add(Error.Validation(description: "wtf is that year bruh"));
 
         if (errors.Count > 0)
@@ -363,7 +363,7 @@ public class ChartDataService : IChartDataService
 
             var income = statements.Value.Where(x => x.Amount > 0).ToList();
             var totalIncome = income.Sum(x => x.Amount);
-            var expenses = statements.Value.Where(x => x.Amount < 0).ToList();
+            var expenses = statements.Value.Where(x => x.Amount < -10).ToList(); //hide the small change
             var totalExpenses = expenses.Sum(x => x.Amount);
             var balance = income.Sum(x => x.Amount) + expenses.Sum(x => x.Amount);
 
