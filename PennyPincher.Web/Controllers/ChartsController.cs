@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PennyPincher.Services.Charts;
 
 namespace PennyPincher.Web.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 

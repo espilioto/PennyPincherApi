@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using System.Text;
 
 namespace PennyPincher.Web.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 
@@ -37,6 +39,7 @@ public class UsersController : ControllerBase
     }
 
     // POST api/<UsersController>
+    [AllowAnonymous]
     [HttpPost]
     public async Task<ActionResult<User>> Post([FromBody] User user)
     {
@@ -54,6 +57,7 @@ public class UsersController : ControllerBase
     }
 
     // POST api/<UsersController>/login
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest user)
     {

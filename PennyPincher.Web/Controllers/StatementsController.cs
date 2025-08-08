@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PennyPincher.Contracts.Statements;
 using PennyPincher.Services.Statements;
 
 namespace PennyPincher.Web.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 

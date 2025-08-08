@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PennyPincher.Contracts.Accounts;
 using PennyPincher.Services.Accounts;
 
 namespace PennyPincher.Web.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class AccountsController : ErrorOrApiController
