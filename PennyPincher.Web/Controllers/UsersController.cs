@@ -1,7 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using PennyPincher.Services.User.Models;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace PennyPincher.Web.Controllers;
 
@@ -46,6 +51,38 @@ public class UsersController : ControllerBase
             return BadRequest(result.Errors);
 
         return Created(string.Empty, user);
+    }
+
+    // POST api/<UsersController>/login
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequest user)
+    {
+        var identityUser = await _userManager.FindByEmailAsync(user.Email);
+        if (identityUser == null || !await _userManager.CheckPasswordAsync(identityUser, user.Password))
+            return Unauthorized();
+
+        var jwtKey = HttpContext.RequestServices.GetRequiredService<IConfiguration>()["Jwt:Key"];
+        var jwtIssuer = HttpContext.RequestServices.GetRequiredService<IConfiguration>()["Jwt:Issuer"];
+        var jwtTtlHours = int.Parse(HttpContext.RequestServices.GetRequiredService<IConfiguration>()["Jwt:TtlHours"]!);
+
+        var claims = new[]
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, identityUser.UserName!),
+            new Claim(JwtRegisteredClaimNames.Email, identityUser.Email!),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        };
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var token = new JwtSecurityToken(
+            issuer: jwtIssuer,
+            audience: null,
+            claims: claims,
+            expires: DateTime.UtcNow.AddHours(jwtTtlHours),
+            signingCredentials: creds);
+
+        return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
     }
 
     // PUT api/<UsersController>/5
