@@ -8,6 +8,7 @@ public record StatementResponse(
         DateTime Date,
         decimal Amount,
         string Description,
+        DateTime? CheckedAt,
         CategoryResponse Category,
         AccountResponseLite Account
     );
