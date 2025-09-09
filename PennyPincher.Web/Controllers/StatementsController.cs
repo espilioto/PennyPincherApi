@@ -46,8 +46,8 @@ public class StatementsController : ErrorOrApiController
         var result = await _statementsService.UpdateAsync(statementId, request);
 
         return result.Match(
-          _ => Ok(),
-          errors => Problem(errors)
+            _ => Ok(),
+            errors => Problem(errors)
         );
     }
 
@@ -57,8 +57,18 @@ public class StatementsController : ErrorOrApiController
         var result = await _statementsService.DeleteAsync(id);
 
         return result.Match(
-         _ => NoContent(),
-         errors => Problem(errors)
-     );
+            _ => NoContent(),
+            errors => Problem(errors)
+        );
+    }
+
+    [HttpPatch("markAllUncheckedNow")]
+    public async Task<IActionResult> Patch()
+    {
+        var result = await _statementsService.MarkAllUncheckedNowAsync();
+        return result.Match(
+            _ => Ok(),
+            errors => Problem(errors)
+        );
     }
 }

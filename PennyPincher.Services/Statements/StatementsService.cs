@@ -132,4 +132,33 @@ public class StatementsService : IStatementsService
             return Error.Unexpected(description: ex.Message);
         }
     }
+
+    /// <summary>
+    /// Marks all statements where CheckedAt is null with the given datetime.
+    /// </summary>
+    /// <param name="dateTime"></param>
+    /// <returns></returns>
+    public async Task<ErrorOr<bool>> MarkAllUncheckedNowAsync()
+    {
+        try
+        {
+            var now = DateTime.Now;
+
+            var statementsToUpdate = await _context.Statements
+                .Where(x => x.CheckedAt == null)
+                .ToListAsync();
+
+            foreach (var statement in statementsToUpdate)
+                statement.CheckedAt = now;
+
+            var success = await _context.SaveChangesAsync();
+
+            return success > 0 ? true : Error.Failure(description: "Error marking statements as checked");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("{Message}", ex.Message);
+            return Error.Unexpected(description: ex.Message);
+        }
+    }
 }
