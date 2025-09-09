@@ -136,8 +136,6 @@ public class StatementsService : IStatementsService
     /// <summary>
     /// Marks all statements where CheckedAt is null with the given datetime.
     /// </summary>
-    /// <param name="dateTime"></param>
-    /// <returns></returns>
     public async Task<ErrorOr<bool>> MarkAllUncheckedNowAsync()
     {
         try

@@ -62,8 +62,8 @@ public class StatementsController : ErrorOrApiController
         );
     }
 
-    [HttpPatch("markAllUncheckedNow")]
-    public async Task<IActionResult> Patch()
+    [HttpPut("markAllUncheckedNow")]
+    public async Task<IActionResult> MarkAllUncheckedNowAsync()
     {
         var result = await _statementsService.MarkAllUncheckedNowAsync();
         return result.Match(
