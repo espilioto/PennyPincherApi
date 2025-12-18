@@ -22,11 +22,12 @@ public class StatementsService : IStatementsService
         _logger = logger;
     }
 
-    public async Task<ErrorOr<bool>> InsertAsync(StatementRequest request)
+    public async Task<ErrorOr<bool>> InsertAsync(StatementRequest request, string userId)
     {
         try
         {
             var statement = _mapper.Map<Statement>(request);
+            statement.UserId = userId;
             _ = await _context.Statements.AddAsync(statement);
             var success = await _context.SaveChangesAsync();
 

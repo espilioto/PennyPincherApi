@@ -71,9 +71,8 @@ public class UsersController : ControllerBase
 
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, identityUser.UserName!),
-            new Claim(JwtRegisteredClaimNames.Email, identityUser.Email!),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Sub, identityUser.Id),
+            new Claim(JwtRegisteredClaimNames.Email, identityUser.Email!)
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));

@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using ErrorOr;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PennyPincher.Contracts.Statements;
 using PennyPincher.Services.Statements;
+using PennyPincher.Web.Extensions;
 
 namespace PennyPincher.Web.Controllers;
 
@@ -32,7 +34,13 @@ public class StatementsController : ErrorOrApiController
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] StatementRequest request)
     {
-        var result = await _statementsService.InsertAsync(request);
+        var userId = User.GetUserId();
+        if (userId is null)
+        {
+            return Problem(Error.Forbidden());
+        }
+
+        var result = await _statementsService.InsertAsync(request, userId);
 
         return result.Match(
             statement => Created(string.Empty, statement),

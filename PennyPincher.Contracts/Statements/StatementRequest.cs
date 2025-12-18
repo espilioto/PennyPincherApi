@@ -5,6 +5,5 @@ public record StatementRequest(
         int AccountId,
         double Amount,
         string Description,
-        int CategoryId,
-        int UserId
+        int CategoryId
     );
