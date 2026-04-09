@@ -75,10 +75,13 @@ public class StatementsService : IStatementsService
                     statementsQuery = statementsQuery.Where(s => Math.Abs(s.Amount) <= filters.MaxAmount.Value);
             }
 
-            statementsQuery = sorting.SortBy.ToLower() switch
+            var sortBy = sorting?.SortBy?.ToLower() ?? "date";
+            var sortDir = sorting?.Direction ?? "desc";
+
+            statementsQuery = sortBy switch
             {
-                "amount" => sorting.Direction == "asc" ? statementsQuery.OrderBy(s => s.Amount) : statementsQuery.OrderByDescending(s => s.Amount),
-                _ => sorting.Direction == "asc" ? statementsQuery.OrderBy(s => s.Date) : statementsQuery.OrderByDescending(s => s.Date)
+                "amount" => sortDir == "asc" ? statementsQuery.OrderBy(s => s.Amount) : statementsQuery.OrderByDescending(s => s.Amount),
+                _ => sortDir == "asc" ? statementsQuery.OrderBy(s => s.Date) : statementsQuery.OrderByDescending(s => s.Date)
             };
 
             var statements = await statementsQuery
