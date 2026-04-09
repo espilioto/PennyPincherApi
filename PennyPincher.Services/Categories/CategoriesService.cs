@@ -67,16 +67,44 @@ namespace PennyPincher.Services.Categories
             }
         }
 
-        public async Task<ErrorOr<bool>> UpdateAsync(CategoryRequest categoryRequest)
+        public async Task<ErrorOr<bool>> UpdateAsync(int categoryId, CategoryRequest request)
         {
-            //TODO
-            throw new NotImplementedException();
+            try
+            {
+                var category = await _context.Categories.FirstOrDefaultAsync(x => x.Id == categoryId);
+                if (category is null)
+                    return Error.NotFound(description: "Category not found");
+
+                category.Name = request.Name;
+                var success = await _context.SaveChangesAsync();
+
+                return success == 1 ? true : Error.Failure(description: "Error updating category");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("{Message}", ex.Message);
+                return Error.Unexpected(description: ex.Message);
+            }
         }
 
         public async Task<ErrorOr<bool>> DeleteAsync(int categoryId)
         {
-            //TODO
-            throw new NotImplementedException();
+            try
+            {
+                var category = await _context.Categories.FirstOrDefaultAsync(x => x.Id == categoryId);
+                if (category is null)
+                    return Error.NotFound(description: "Category not found");
+
+                _context.Categories.Remove(category);
+                var success = await _context.SaveChangesAsync();
+
+                return success == 1 ? true : Error.Failure(description: "Error deleting category");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("{Message}", ex.Message);
+                return Error.Unexpected(description: ex.Message);
+            }
         }
     }
 }

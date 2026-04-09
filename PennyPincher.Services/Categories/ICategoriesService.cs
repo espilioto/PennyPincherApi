@@ -8,6 +8,6 @@ namespace PennyPincher.Services.Categories
         public Task<ErrorOr<bool>> DeleteAsync(int categoryId);
         public Task<ErrorOr<IEnumerable<CategoryResponse>>> GetAllAsync();
         public Task<ErrorOr<bool>> InsertAsync(CategoryRequest categoryRequest);
-        public Task<ErrorOr<bool>> UpdateAsync(CategoryRequest categoryRequest);
+        public Task<ErrorOr<bool>> UpdateAsync(int categoryId, CategoryRequest categoryRequest);
     }
 }

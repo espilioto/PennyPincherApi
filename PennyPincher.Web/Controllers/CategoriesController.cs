@@ -39,4 +39,26 @@ public class CategoriesController : ErrorOrApiController
             errors => Problem(errors)
         );
     }
+
+    [HttpPut("{categoryId}")]
+    public async Task<IActionResult> Put(int categoryId, [FromBody] CategoryRequest request)
+    {
+        var result = await _categoriesService.UpdateAsync(categoryId, request);
+
+        return result.Match(
+            _ => Ok(),
+            errors => Problem(errors)
+        );
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var result = await _categoriesService.DeleteAsync(id);
+
+        return result.Match(
+            _ => NoContent(),
+            errors => Problem(errors)
+        );
+    }
 }
