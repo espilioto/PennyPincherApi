@@ -3,7 +3,7 @@
 public record StatementRequest(
         DateTime Date,
         int AccountId,
-        double Amount,
+        decimal Amount,
         string Description,
         int CategoryId
     );
