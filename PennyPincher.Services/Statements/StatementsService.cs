@@ -40,13 +40,14 @@ public class StatementsService : IStatementsService
         }
     }
 
-    public async Task<ErrorOr<IEnumerable<StatementResponse>>> GetAllAsync(StatementFilterRequest? filters = null, StatementSortingRequest? sorting = null)
+    public async Task<ErrorOr<IEnumerable<StatementResponse>>> GetAllAsync(string userId, StatementFilterRequest? filters = null, StatementSortingRequest? sorting = null)
     {
         try
         {
             var statementsQuery = _context.Statements
                 .AsQueryable()
-                .AsNoTracking();
+                .AsNoTracking()
+                .Where(s => s.UserId == userId);
 
             if (filters is not null)
             {

@@ -23,7 +23,11 @@ public class StatementsController : ErrorOrApiController
     [HttpGet]
     public async Task<IActionResult> Get([FromQuery] StatementFilterRequest filters, [FromQuery] StatementSortingRequest sorting)
     {
-        var result = await _statementsService.GetAllAsync(filters, sorting);
+        var userId = User.GetUserId();
+        if (userId is null)
+            return Problem(Error.Forbidden());
+
+        var result = await _statementsService.GetAllAsync(userId, filters, sorting);
 
         return result.Match(
             statements => Ok(statements),

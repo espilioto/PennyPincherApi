@@ -1,4 +1,4 @@
-﻿using ErrorOr;
+using ErrorOr;
 using Microsoft.Extensions.Logging;
 using PennyPincher.Contracts.Charts;
 using PennyPincher.Contracts.Statements;
@@ -21,7 +21,7 @@ public class ChartDataService : IChartDataService
         _utils = utils;
     }
 
-    public async Task<ErrorOr<BreakdownDetailsResponse>> GetBreakdownDataForMonthAsync(int month, int year, bool ignoreInitsAndTransfers, bool ignoreLoans)
+    public async Task<ErrorOr<BreakdownDetailsResponse>> GetBreakdownDataForMonthAsync(string userId, int month, int year, bool ignoreInitsAndTransfers, bool ignoreLoans)
     {
         List<Error> errors = [];
 
@@ -43,6 +43,7 @@ public class ChartDataService : IChartDataService
                 excludedCategoryIds.Add(29);
 
             var statements = await _statementsService.GetAllAsync(
+                userId,
                 new StatementFilterRequest(null, null, null, excludedCategoryIds, requestDate, requestDate.AddMonths(1).AddDays(-1), null, null, null),
                 new StatementSortingRequest("date", "asc")
             );
@@ -72,7 +73,7 @@ public class ChartDataService : IChartDataService
         }
     }
 
-    public async Task<ErrorOr<List<MonthlyBreakdownResponse>>> GetMonthlyBreakdownDataAsync(bool ignoreInitsAndTransfers, bool ignoreLoans)
+    public async Task<ErrorOr<List<MonthlyBreakdownResponse>>> GetMonthlyBreakdownDataAsync(string userId, bool ignoreInitsAndTransfers, bool ignoreLoans)
     {
         try
         {
@@ -86,6 +87,7 @@ public class ChartDataService : IChartDataService
                 excludedCategoryIds.Add(29);
 
             var statements = await _statementsService.GetAllAsync(
+                userId,
                 new StatementFilterRequest(null, null, null, excludedCategoryIds, null, null, null, null, null),
                 new StatementSortingRequest("date", "desc")
             );
@@ -119,14 +121,14 @@ public class ChartDataService : IChartDataService
         }
     }
 
-    public async Task<ErrorOr<List<GenericKeyValueResponse>>> GetOverviewBalanceChartDataAsync()
+    public async Task<ErrorOr<List<GenericKeyValueResponse>>> GetOverviewBalanceChartDataAsync(string userId)
     {
         try
         {
             decimal balanceSum = 0;
             var result = new List<GenericKeyValueResponse>();
 
-            var statements = await _statementsService.GetAllAsync(null, new StatementSortingRequest("date", "asc"));
+            var statements = await _statementsService.GetAllAsync(userId, null, new StatementSortingRequest("date", "asc"));
 
             if (statements.IsError)
                 return statements.Errors;
@@ -148,7 +150,7 @@ public class ChartDataService : IChartDataService
         }
     }
 
-    public async Task<ErrorOr<CategoryAnalyticsResponse>> GetCategoryAnalyticsChartDataAsync(int categoryId)
+    public async Task<ErrorOr<CategoryAnalyticsResponse>> GetCategoryAnalyticsChartDataAsync(string userId, int categoryId)
     {
         try
         {
@@ -156,6 +158,7 @@ public class ChartDataService : IChartDataService
             var chartData = new List<GenericKeyValueResponse>();
 
             var statements = await _statementsService.GetAllAsync(
+                userId,
                 new StatementFilterRequest(null, [categoryId], null, null, null, null, null, null, null),
                 new StatementSortingRequest("date", "asc")
             );
@@ -203,7 +206,7 @@ public class ChartDataService : IChartDataService
         }
     }
 
-    public async Task<ErrorOr<SavingsChartResponse>> GetSavingsRateChartDataAsync(bool ignoreInitsAndTransfers, bool ignoreLoans)
+    public async Task<ErrorOr<SavingsChartResponse>> GetSavingsRateChartDataAsync(string userId, bool ignoreInitsAndTransfers, bool ignoreLoans)
     {
         try
         {
@@ -220,6 +223,7 @@ public class ChartDataService : IChartDataService
                 excludedCategoryIds.Add(29);
 
             var statements = await _statementsService.GetAllAsync(
+                userId,
                 new StatementFilterRequest(null, null, null, excludedCategoryIds, null, null, null, null, null),
                 new StatementSortingRequest("date", "asc")
             );
@@ -281,7 +285,7 @@ public class ChartDataService : IChartDataService
         }
     }
 
-    public async Task<ErrorOr<List<YearlyBreakdownResponse>>> GetYearlyBreakdownDataAsync(bool ignoreInitsAndTransfers, bool ignoreLoans)
+    public async Task<ErrorOr<List<YearlyBreakdownResponse>>> GetYearlyBreakdownDataAsync(string userId, bool ignoreInitsAndTransfers, bool ignoreLoans)
     {
         try
         {
@@ -295,6 +299,7 @@ public class ChartDataService : IChartDataService
                 excludedCategoryIds.Add(29);
 
             var statements = await _statementsService.GetAllAsync(
+                userId,
                 new StatementFilterRequest(null, null, null, excludedCategoryIds, null, null, null, null, null),
                 new StatementSortingRequest("date", "desc")
             );
@@ -326,7 +331,7 @@ public class ChartDataService : IChartDataService
         }
     }
 
-    public async Task<ErrorOr<BreakdownDetailsResponse>> GetBreakdownDataForYearAsync(int year, bool ignoreInitsAndTransfers, bool ignoreLoans)
+    public async Task<ErrorOr<BreakdownDetailsResponse>> GetBreakdownDataForYearAsync(string userId, int year, bool ignoreInitsAndTransfers, bool ignoreLoans)
     {
         List<Error> errors = [];
 
@@ -348,6 +353,7 @@ public class ChartDataService : IChartDataService
                 excludedCategoryIds.Add(29);
 
             var statements = await _statementsService.GetAllAsync(
+                userId,
                 new StatementFilterRequest(null, null, null, excludedCategoryIds, requestDate, requestDate.AddYears(1).AddDays(-1), null, null, null),
                 new StatementSortingRequest("date", "asc")
             );
