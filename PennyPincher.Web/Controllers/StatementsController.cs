@@ -27,7 +27,7 @@ public class StatementsController : ErrorOrApiController
         if (userId is null)
             return Problem(Error.Forbidden());
 
-        var result = await _statementsService.GetAllAsync(userId, filters, sorting);
+        var result = await _statementsService.GetByUserAsync(userId, filters, sorting);
 
         return result.Match(
             statements => Ok(statements),
@@ -83,4 +83,17 @@ public class StatementsController : ErrorOrApiController
             errors => Problem(errors)
         );
     }
+
+#if DEBUG
+    [HttpGet("all")]
+    public async Task<IActionResult> GetAll()
+    {
+        var result = await _statementsService.GetAllAsync();
+
+        return result.Match(
+            statements => Ok(statements),
+            errors => Problem(errors)
+        );
+    }
+#endif
 }

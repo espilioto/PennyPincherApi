@@ -23,7 +23,32 @@ public class AccountService : IAccountService
         _logger = logger;
     }
 
-    public async Task<ErrorOr<List<AccountResponse>>> GetAllAsync(string userId)
+    public async Task<ErrorOr<List<AccountResponse>>> GetAllAsync()
+    {
+        try
+        {
+            var accounts = await _context.Accounts
+                .Select(a => new AccountResponse
+                (
+                    a.Id,
+                    a.Name,
+                    _context.Statements
+                        .Where(x => x.AccountId == a.Id)
+                        .Sum(x => x.Amount),
+                    a.ColorHex
+                ))
+                .ToListAsync();
+
+            return accounts.Count == 0 ? Error.NotFound() : accounts;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("{Message}", ex.Message);
+            return Error.Unexpected(description: ex.Message);
+        }
+    }
+
+    public async Task<ErrorOr<List<AccountResponse>>> GetByUserAsync(string userId)
     {
         try
         {

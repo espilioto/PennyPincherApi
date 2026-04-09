@@ -40,7 +40,26 @@ public class StatementsService : IStatementsService
         }
     }
 
-    public async Task<ErrorOr<IEnumerable<StatementResponse>>> GetAllAsync(string userId, StatementFilterRequest? filters = null, StatementSortingRequest? sorting = null)
+    public async Task<ErrorOr<IEnumerable<StatementResponse>>> GetAllAsync()
+    {
+        try
+        {
+            var statements = await _context.Statements
+                .AsNoTracking()
+                .OrderByDescending(s => s.Date)
+                .ProjectTo<StatementResponse>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return statements.Count != 0 ? statements : Error.NotFound();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("{Message}", ex.Message);
+            return Error.Unexpected(description: ex.Message);
+        }
+    }
+
+    public async Task<ErrorOr<IEnumerable<StatementResponse>>> GetByUserAsync(string userId, StatementFilterRequest? filters = null, StatementSortingRequest? sorting = null)
     {
         try
         {

@@ -25,7 +25,7 @@ public class AccountsController : ErrorOrApiController
         if (userId is null)
             return Problem(ErrorOr.Error.Forbidden());
 
-        var result = await _accountService.GetAllAsync(userId);
+        var result = await _accountService.GetByUserAsync(userId);
 
         return result.Match(
             accounts => Ok(accounts),
@@ -65,4 +65,17 @@ public class AccountsController : ErrorOrApiController
          errors => Problem(errors)
      );
     }
+
+#if DEBUG
+    [HttpGet("all")]
+    public async Task<IActionResult> GetAll()
+    {
+        var result = await _accountService.GetAllAsync();
+
+        return result.Match(
+            accounts => Ok(accounts),
+            errors => Problem(errors)
+        );
+    }
+#endif
 }

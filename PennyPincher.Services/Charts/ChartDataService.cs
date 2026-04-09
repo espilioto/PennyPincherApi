@@ -42,7 +42,7 @@ public class ChartDataService : IChartDataService
             if (ignoreLoans) //TODO more oof
                 excludedCategoryIds.Add(29);
 
-            var statements = await _statementsService.GetAllAsync(
+            var statements = await _statementsService.GetByUserAsync(
                 userId,
                 new StatementFilterRequest(null, null, null, excludedCategoryIds, requestDate, requestDate.AddMonths(1).AddDays(-1), null, null, null),
                 new StatementSortingRequest("date", "asc")
@@ -86,7 +86,7 @@ public class ChartDataService : IChartDataService
             if (ignoreLoans) //TODO more oof
                 excludedCategoryIds.Add(29);
 
-            var statements = await _statementsService.GetAllAsync(
+            var statements = await _statementsService.GetByUserAsync(
                 userId,
                 new StatementFilterRequest(null, null, null, excludedCategoryIds, null, null, null, null, null),
                 new StatementSortingRequest("date", "desc")
@@ -128,7 +128,7 @@ public class ChartDataService : IChartDataService
             decimal balanceSum = 0;
             var result = new List<GenericKeyValueResponse>();
 
-            var statements = await _statementsService.GetAllAsync(userId, null, new StatementSortingRequest("date", "asc"));
+            var statements = await _statementsService.GetByUserAsync(userId, null, new StatementSortingRequest("date", "asc"));
 
             if (statements.IsError)
                 return statements.Errors;
@@ -157,7 +157,7 @@ public class ChartDataService : IChartDataService
             var yearSums = new List<GenericKeyValueResponse>();
             var chartData = new List<GenericKeyValueResponse>();
 
-            var statements = await _statementsService.GetAllAsync(
+            var statements = await _statementsService.GetByUserAsync(
                 userId,
                 new StatementFilterRequest(null, [categoryId], null, null, null, null, null, null, null),
                 new StatementSortingRequest("date", "asc")
@@ -222,7 +222,7 @@ public class ChartDataService : IChartDataService
             if (ignoreLoans) //TODO more oof
                 excludedCategoryIds.Add(29);
 
-            var statements = await _statementsService.GetAllAsync(
+            var statements = await _statementsService.GetByUserAsync(
                 userId,
                 new StatementFilterRequest(null, null, null, excludedCategoryIds, null, null, null, null, null),
                 new StatementSortingRequest("date", "asc")
@@ -298,7 +298,7 @@ public class ChartDataService : IChartDataService
             if (ignoreLoans) //TODO more oof
                 excludedCategoryIds.Add(29);
 
-            var statements = await _statementsService.GetAllAsync(
+            var statements = await _statementsService.GetByUserAsync(
                 userId,
                 new StatementFilterRequest(null, null, null, excludedCategoryIds, null, null, null, null, null),
                 new StatementSortingRequest("date", "desc")
@@ -352,7 +352,7 @@ public class ChartDataService : IChartDataService
             if (ignoreLoans) //TODO more oof
                 excludedCategoryIds.Add(29);
 
-            var statements = await _statementsService.GetAllAsync(
+            var statements = await _statementsService.GetByUserAsync(
                 userId,
                 new StatementFilterRequest(null, null, null, excludedCategoryIds, requestDate, requestDate.AddYears(1).AddDays(-1), null, null, null),
                 new StatementSortingRequest("date", "asc")
