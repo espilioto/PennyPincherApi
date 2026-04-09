@@ -144,7 +144,7 @@ public class StatementsService : IStatementsService
     {
         try
         {
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             var statementsToUpdate = await _context.Statements
                 .Where(x => x.CheckedAt == null)
