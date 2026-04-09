@@ -23,11 +23,12 @@ public class AccountService : IAccountService
         _logger = logger;
     }
 
-    public async Task<ErrorOr<List<AccountResponse>>> GetAllAsync()
+    public async Task<ErrorOr<List<AccountResponse>>> GetAllAsync(string userId)
     {
         try
         {
             var accounts = await _context.Accounts
+                .Where(a => a.UserId == userId)
                 .Select(a => new AccountResponse
                 (
                     a.Id,

@@ -6,7 +6,7 @@ namespace PennyPincher.Services.Accounts;
 public interface IAccountService
 {
     public Task<ErrorOr<bool>> DeleteAsync(int accountId);
-    public Task<ErrorOr<List<AccountResponse>>> GetAllAsync();
+    public Task<ErrorOr<List<AccountResponse>>> GetAllAsync(string userId);
     public Task<ErrorOr<bool>> InsertAsync(AccountRequest request);
     public Task<ErrorOr<bool>> UpdateAsync(int accountId, AccountRequest request);
 }

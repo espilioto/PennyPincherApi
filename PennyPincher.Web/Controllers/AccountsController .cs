@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PennyPincher.Contracts.Accounts;
 using PennyPincher.Services.Accounts;
+using PennyPincher.Web.Extensions;
 
 namespace PennyPincher.Web.Controllers;
 
@@ -20,7 +21,11 @@ public class AccountsController : ErrorOrApiController
     [HttpGet]
     public async Task<IActionResult> Get()
     {
-        var result = await _accountService.GetAllAsync();
+        var userId = User.GetUserId();
+        if (userId is null)
+            return Problem(ErrorOr.Error.Forbidden());
+
+        var result = await _accountService.GetAllAsync(userId);
 
         return result.Match(
             accounts => Ok(accounts),
