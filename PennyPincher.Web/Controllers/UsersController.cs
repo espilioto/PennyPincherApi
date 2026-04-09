@@ -31,13 +31,6 @@ public class UsersController : ControllerBase
         return await _userManager.Users.Select(x => new User { Username = x.UserName }).ToListAsync();
     }
 
-    // GET api/<UsersController>/5
-    [HttpGet("{id}")]
-    public string Get(int id)
-    {
-        return "value";
-    }
-
     // POST api/<UsersController>
     [AllowAnonymous]
     [HttpPost]
@@ -88,15 +81,4 @@ public class UsersController : ControllerBase
         return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
     }
 
-    // PUT api/<UsersController>/5
-    [HttpPut("{id}")]
-    public void Put(int id, [FromBody] string value)
-    {
-    }
-
-    // DELETE api/<UsersController>/5
-    [HttpDelete("{id}")]
-    public void Delete(int id)
-    {
-    }
 }
