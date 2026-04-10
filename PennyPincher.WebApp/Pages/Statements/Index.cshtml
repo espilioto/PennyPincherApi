@@ -19,7 +19,7 @@
     <form id="filter-form"
           hx-get="/Statements?handler=Table"
           hx-target="#statement-table-body"
-          hx-trigger="change from:select, change from:input[type='date'], change from:input[type='number'], change from:input[type='checkbox']"
+          hx-trigger="change from:find select, change from:find input[type='date'], change from:find input[type='number'], change from:find input[type='checkbox']"
           hx-include="#filter-form">
 
         <div class="row g-2 align-items-end">
