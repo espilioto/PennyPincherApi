@@ -76,15 +76,12 @@ public class AccountService : IAccountService
         }
     }
 
-    public async Task<ErrorOr<bool>> InsertAsync(AccountRequest request)
+    public async Task<ErrorOr<bool>> InsertAsync(AccountRequest request, string userId)
     {
         List<Error> errors = [];
 
         try
         {
-            if (!await _context.Users.AnyAsync(x => x.Id == request.UserId))
-                errors.Add(Error.Validation(description: "User does not exist"));
-
             if (!Regex.IsMatch(request.ColorHex, @"[#][0-9A-Fa-f]{6}\b"))
                 errors.Add(Error.Validation(description: "Color value incorrect"));
 
@@ -92,6 +89,7 @@ public class AccountService : IAccountService
                 return errors;
 
             var account = _mapper.Map<Account>(request);
+            account.UserId = userId;
             _ = await _context.Accounts.AddAsync(account);
             var success = await _context.SaveChangesAsync();
 
@@ -104,18 +102,15 @@ public class AccountService : IAccountService
         }
     }
 
-    public async Task<ErrorOr<bool>> UpdateAsync(int accountId, AccountRequest request)
+    public async Task<ErrorOr<bool>> UpdateAsync(string userId, int accountId, AccountRequest request)
     {
         List<Error> errors = [];
 
         try
         {
-            var account = await _context.Accounts.AsNoTracking().FirstOrDefaultAsync(x => x.Id == accountId);
+            var account = await _context.Accounts.FirstOrDefaultAsync(x => x.Id == accountId && x.UserId == userId);
             if (account is null)
                 return Error.NotFound(description: "Account not found");
-
-            if (!await _context.Users.AnyAsync(x => x.Id == request.UserId))
-                errors.Add(Error.Validation(description: "User does not exist"));
 
             if (!Regex.IsMatch(request.ColorHex, @"[#][0-9A-Fa-f]{6}\b"))
                 errors.Add(Error.Validation(description: "Color value incorrect"));
@@ -123,7 +118,8 @@ public class AccountService : IAccountService
             if (errors.Count > 0)
                 return errors;
 
-            _ = _context.Accounts.Update(_mapper.Map<Account>(request));
+            account.Name = request.Name;
+            account.ColorHex = request.ColorHex;
             var success = await _context.SaveChangesAsync();
 
             return success == 1 ? true : Error.Failure(description: "Error updating account");
@@ -135,11 +131,11 @@ public class AccountService : IAccountService
         }
     }
 
-    public async Task<ErrorOr<bool>> DeleteAsync(int accountId)
+    public async Task<ErrorOr<bool>> DeleteAsync(string userId, int accountId)
     {
         try
         {
-            var account = await _context.Accounts.FirstOrDefaultAsync(x => x.Id == accountId);
+            var account = await _context.Accounts.FirstOrDefaultAsync(x => x.Id == accountId && x.UserId == userId);
             if (account is null)
                 return Error.NotFound(description: "Account not found");
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PennyPincher.Contracts.Accounts;
 using PennyPincher.Services.Accounts;
@@ -36,7 +36,11 @@ public class AccountsController : ErrorOrApiController
     [HttpPost]
     public async Task<IActionResult> Post(AccountRequest request)
     {
-        var result = await _accountService.InsertAsync(request);
+        var userId = User.GetUserId();
+        if (userId is null)
+            return Problem(ErrorOr.Error.Forbidden());
+
+        var result = await _accountService.InsertAsync(request, userId);
 
         return result.Match(
             account => Created(string.Empty, account),
@@ -47,7 +51,11 @@ public class AccountsController : ErrorOrApiController
     [HttpPut("{accountId}")]
     public async Task<IActionResult> Put(int accountId, [FromBody] AccountRequest request)
     {
-        var result = await _accountService.UpdateAsync(accountId, request);
+        var userId = User.GetUserId();
+        if (userId is null)
+            return Problem(ErrorOr.Error.Forbidden());
+
+        var result = await _accountService.UpdateAsync(userId, accountId, request);
 
         return result.Match(
           _ => Ok(),
@@ -58,7 +66,11 @@ public class AccountsController : ErrorOrApiController
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var result = await _accountService.DeleteAsync(id);
+        var userId = User.GetUserId();
+        if (userId is null)
+            return Problem(ErrorOr.Error.Forbidden());
+
+        var result = await _accountService.DeleteAsync(userId, id);
 
         return result.Match(
          _ => NoContent(),

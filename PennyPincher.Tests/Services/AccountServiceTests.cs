@@ -88,20 +88,7 @@ public class AccountServiceTests
         await TestDbContextFactory.SeedUserAsync(context, "user1");
 
         var request = new AccountRequest("Bad Color", "user1", "not-a-color");
-        var result = await service.InsertAsync(request);
-
-        Assert.True(result.IsError);
-    }
-
-    [Fact]
-    public async Task InsertAsync_RejectsNonexistentUser()
-    {
-        var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new AccountService(context, mapper, _logger);
-
-        var request = new AccountRequest("Test", "ghost", "#FF0000");
-        var result = await service.InsertAsync(request);
+        var result = await service.InsertAsync(request, "user1");
 
         Assert.True(result.IsError);
     }
@@ -116,7 +103,7 @@ public class AccountServiceTests
         await TestDbContextFactory.SeedUserAsync(context, "user1");
 
         var request = new AccountRequest("Savings", "user1", "#00FF00");
-        var result = await service.InsertAsync(request);
+        var result = await service.InsertAsync(request, "user1");
 
         Assert.False(result.IsError);
         Assert.Single(context.Accounts);
@@ -131,7 +118,7 @@ public class AccountServiceTests
 
         await TestDbContextFactory.SeedUserAsync(context, "user1");
         var request = new AccountRequest("Test", "user1", "#FF0000");
-        var result = await service.UpdateAsync(999, request);
+        var result = await service.UpdateAsync("user1", 999, request);
 
         Assert.True(result.IsError);
     }
@@ -143,7 +130,7 @@ public class AccountServiceTests
         var mapper = TestDbContextFactory.CreateMapper();
         var service = new AccountService(context, mapper, _logger);
 
-        var result = await service.DeleteAsync(999);
+        var result = await service.DeleteAsync("user1", 999);
 
         Assert.True(result.IsError);
     }
