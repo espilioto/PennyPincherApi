@@ -71,6 +71,43 @@ public class IndexModel : PageModel
         return Partial("_StatementRows", this);
     }
 
+    public async Task<IActionResult> OnPostCreateAsync(
+        DateTime date, decimal amount, int accountId, int categoryId, string description)
+    {
+        var client = _httpClientFactory.CreateClient("PennyPincherApi");
+        var request = new StatementRequest(date, accountId, amount, description ?? "", categoryId);
+        var response = await client.PostAsJsonAsync("api/statements", request);
+
+        if (!response.IsSuccessStatusCode)
+            return BadRequest();
+
+        return new JsonResult(new { success = true });
+    }
+
+    public async Task<IActionResult> OnPostEditAsync(
+        int id, DateTime date, decimal amount, int accountId, int categoryId, string description)
+    {
+        var client = _httpClientFactory.CreateClient("PennyPincherApi");
+        var request = new StatementRequest(date, accountId, amount, description ?? "", categoryId);
+        var response = await client.PutAsJsonAsync($"api/statements/{id}", request);
+
+        if (!response.IsSuccessStatusCode)
+            return BadRequest();
+
+        return new JsonResult(new { success = true });
+    }
+
+    public async Task<IActionResult> OnPostDeleteAsync(int id)
+    {
+        var client = _httpClientFactory.CreateClient("PennyPincherApi");
+        var response = await client.DeleteAsync($"api/statements/{id}");
+
+        if (!response.IsSuccessStatusCode)
+            return BadRequest();
+
+        return new JsonResult(new { success = true });
+    }
+
     private async Task<List<StatementResponse>> FetchStatementsAsync(HttpClient client)
     {
         var queryParts = new List<string>

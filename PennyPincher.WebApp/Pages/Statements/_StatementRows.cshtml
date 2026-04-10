@@ -2,6 +2,9 @@
 
 @foreach (var s in Model.Statements)
 {
+    var dateLocal = s.Date.ToString("yyyy-MM-ddTHH:mm");
+    var descEscaped = s.Description.Replace("'", "\\'").Replace("\"", "&quot;");
+
     <tr>
         <td>@s.Date.ToString("yyyy-MM-dd")</td>
         <td>@s.Description</td>
@@ -16,12 +19,26 @@
                 <span class="checked-badge">@s.CheckedAt.Value.ToString("yyyy-MM-dd HH:mm")</span>
             }
         </td>
+        <td class="text-nowrap">
+            <button class="btn btn-sm btn-link p-0 me-1" title="Edit"
+                    onclick="openEditModal(@s.Id, '@dateLocal', '@s.Amount', @s.Account.Id, @s.Category.Id, '@descEscaped')">
+                &#9998;
+            </button>
+            <button class="btn btn-sm btn-link p-0 me-1" title="Duplicate"
+                    onclick="openDuplicateModal('@dateLocal', '@s.Amount', @s.Account.Id, @s.Category.Id, '@descEscaped')">
+                &#10697;
+            </button>
+            <button class="btn btn-sm btn-link p-0 text-danger" title="Delete"
+                    onclick="openDeleteModal(@s.Id)">
+                &#10005;
+            </button>
+        </td>
     </tr>
 }
 
 @if (Model.Statements.Count == 0)
 {
     <tr>
-        <td colspan="6" class="text-center text-muted py-4">No statements found.</td>
+        <td colspan="7" class="text-center text-muted py-4">No statements found.</td>
     </tr>
 }
