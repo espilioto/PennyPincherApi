@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33414.496
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PennyPincher.Web", "PennyPincher.Web\PennyPincher.Web.csproj", "{72E676AF-CFA6-47D4-A979-D5F4C947346C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PennyPincher.Api", "PennyPincher.Api\PennyPincher.Api.csproj", "{72E676AF-CFA6-47D4-A979-D5F4C947346C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PennyPincher.Domain", "PennyPincher.Domain\PennyPincher.Domain.csproj", "{FA07F00F-7F68-42D3-8847-820C68B400D5}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PennyPincher.Contracts", "PennyPincher.Contracts\PennyPincher.Contracts.csproj", "{D922FDFD-8712-4E22-AA8A-9C05E43737BC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PennyPincher.Tests", "PennyPincher.Tests\PennyPincher.Tests.csproj", "{3749EF02-32DC-495C-8D4C-8E6116020C1F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PennyPincher.WebApp", "PennyPincher.WebApp\PennyPincher.WebApp.csproj", "{3E1D6B99-44C5-459B-B893-42D474784229}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,6 +99,18 @@ Global
 		{3749EF02-32DC-495C-8D4C-8E6116020C1F}.Release|x64.Build.0 = Release|Any CPU
 		{3749EF02-32DC-495C-8D4C-8E6116020C1F}.Release|x86.ActiveCfg = Release|Any CPU
 		{3749EF02-32DC-495C-8D4C-8E6116020C1F}.Release|x86.Build.0 = Release|Any CPU
+		{3E1D6B99-44C5-459B-B893-42D474784229}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E1D6B99-44C5-459B-B893-42D474784229}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E1D6B99-44C5-459B-B893-42D474784229}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3E1D6B99-44C5-459B-B893-42D474784229}.Debug|x64.Build.0 = Debug|Any CPU
+		{3E1D6B99-44C5-459B-B893-42D474784229}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3E1D6B99-44C5-459B-B893-42D474784229}.Debug|x86.Build.0 = Debug|Any CPU
+		{3E1D6B99-44C5-459B-B893-42D474784229}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E1D6B99-44C5-459B-B893-42D474784229}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E1D6B99-44C5-459B-B893-42D474784229}.Release|x64.ActiveCfg = Release|Any CPU
+		{3E1D6B99-44C5-459B-B893-42D474784229}.Release|x64.Build.0 = Release|Any CPU
+		{3E1D6B99-44C5-459B-B893-42D474784229}.Release|x86.ActiveCfg = Release|Any CPU
+		{3E1D6B99-44C5-459B-B893-42D474784229}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

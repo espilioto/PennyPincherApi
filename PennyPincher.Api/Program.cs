@@ -14,7 +14,7 @@ using PennyPincher.Services.Statements;
 using PennyPincher.Services.Utils;
 using System.Text;
 
-namespace PennyPincher.Web
+namespace PennyPincher.Api
 {
     public class Program
     {

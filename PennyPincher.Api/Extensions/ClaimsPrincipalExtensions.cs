@@ -1,7 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace PennyPincher.Web.Extensions;
+namespace PennyPincher.Api.Extensions;
 
 public static class ClaimsPrincipalExtensions
 {

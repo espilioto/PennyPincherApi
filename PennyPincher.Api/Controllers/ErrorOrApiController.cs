@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc;
 
-namespace PennyPincher.Web.Controllers;
+namespace PennyPincher.Api.Controllers;
 
 public class ErrorOrApiController : ControllerBase
 {

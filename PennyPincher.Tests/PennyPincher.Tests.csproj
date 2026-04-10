@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PennyPincher.Services\PennyPincher.Services.csproj" />
-    <ProjectReference Include="..\PennyPincher.Web\PennyPincher.Web.csproj" />
+    <ProjectReference Include="..\PennyPincher.Api\PennyPincher.Api.csproj" />
     <ProjectReference Include="..\PennyPincher.Data\PennyPincher.Data.csproj" />
     <ProjectReference Include="..\PennyPincher.Contracts\PennyPincher.Contracts.csproj" />
     <ProjectReference Include="..\PennyPincher.Domain\PennyPincher.Domain.csproj" />

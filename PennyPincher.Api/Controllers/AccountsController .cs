@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PennyPincher.Contracts.Accounts;
 using PennyPincher.Services.Accounts;
-using PennyPincher.Web.Extensions;
+using PennyPincher.Api.Extensions;
 
-namespace PennyPincher.Web.Controllers;
+namespace PennyPincher.Api.Controllers;
 
 [Authorize]
 [ApiController]
