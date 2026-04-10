@@ -108,6 +108,17 @@ public class IndexModel : PageModel
         return new JsonResult(new { success = true });
     }
 
+    public async Task<IActionResult> OnPostMarkCheckedAsync()
+    {
+        var client = _httpClientFactory.CreateClient("PennyPincherApi");
+        var response = await client.PutAsync("api/statements/markAllUncheckedNow", null);
+
+        if (!response.IsSuccessStatusCode)
+            return BadRequest();
+
+        return new JsonResult(new { success = true });
+    }
+
     private async Task<List<StatementResponse>> FetchStatementsAsync(HttpClient client)
     {
         var queryParts = new List<string>

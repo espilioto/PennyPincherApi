@@ -10,6 +10,7 @@
     <h4 class="mb-0">Statements</h4>
     <div class="d-flex align-items-center gap-3">
         <span class="text-muted small" id="statement-count">@Model.Statements.Count entries</span>
+        <button class="btn btn-sm btn-outline-success" onclick="markAllChecked()">Mark all checked</button>
         <button class="btn btn-sm btn-primary" onclick="openCreateModal()">+ Add</button>
     </div>
 </div>
@@ -237,6 +238,25 @@
     </div>
 </div>
 
+<!-- Mark checked confirmation modal -->
+<div class="modal fade" id="markCheckedModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Mark All Checked</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Mark all unchecked statements as checked?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="confirmMarkChecked()">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Delete confirmation modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1">
     <div class="modal-dialog modal-sm">
@@ -261,6 +281,7 @@
 <script>
     var statementModal = new bootstrap.Modal(document.getElementById('statementModal'));
     var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    var markCheckedModal = new bootstrap.Modal(document.getElementById('markCheckedModal'));
 
     function openCreateModal() {
         document.getElementById('statementModalTitle').textContent = 'Add Statement';
@@ -341,6 +362,22 @@
             body: body
         }).then(function() {
             deleteModal.hide();
+            window.location.reload();
+        });
+    }
+
+    function markAllChecked() {
+        markCheckedModal.show();
+    }
+
+    function confirmMarkChecked() {
+        fetch('/Statements?handler=MarkChecked', {
+            method: 'POST',
+            headers: {
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            }
+        }).then(function() {
+            markCheckedModal.hide();
             window.location.reload();
         });
     }
