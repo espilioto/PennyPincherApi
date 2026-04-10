@@ -1,0 +1,176 @@
+@page
+@model PennyPincher.WebApp.Pages.Accounts.IndexModel
+@{
+    ViewData["Title"] = "Accounts";
+}
+
+@Html.AntiForgeryToken()
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">Accounts</h4>
+    <div class="d-flex align-items-center gap-3">
+        <span class="text-muted small">@Model.Accounts.Count accounts</span>
+        <button class="btn btn-sm btn-primary" onclick="openCreateModal()">+ Add</button>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover table-statements">
+        <thead>
+            <tr>
+                <th style="width: 50px;">Color</th>
+                <th>Name</th>
+                <th class="text-end" style="width: 140px;">Balance</th>
+                <th style="width: 90px;"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var a in Model.Accounts)
+            {
+                var nameEscaped = a.Name.Replace("'", "\\'").Replace("\"", "&quot;");
+                <tr>
+                    <td>
+                        <span class="d-inline-block rounded-circle" style="width: 20px; height: 20px; background-color: @a.ColorHex;"></span>
+                    </td>
+                    <td>@a.Name</td>
+                    <td class="text-end text-nowrap @(a.Balance > 0 ? "amount-positive" : a.Balance < 0 ? "amount-negative" : "")">
+                        @a.Balance.ToString("N2") &euro;
+                    </td>
+                    <td class="text-nowrap">
+                        <button class="btn btn-sm btn-link p-0 me-1" title="Edit"
+                                onclick="openEditModal(@a.Id, '@nameEscaped', '@a.ColorHex')">
+                            &#9998;
+                        </button>
+                        <button class="btn btn-sm btn-link p-0 text-danger" title="Delete"
+                                onclick="openDeleteModal(@a.Id)">
+                            &#10005;
+                        </button>
+                    </td>
+                </tr>
+            }
+            @if (Model.Accounts.Count == 0)
+            {
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-4">No accounts found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Account modal -->
+<div class="modal fade" id="accountModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="accountModalTitle">Add Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="acct-id" />
+                <input type="hidden" id="acct-action" />
+                <div class="mb-3">
+                    <label for="acct-name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="acct-name" required />
+                </div>
+                <div class="mb-3">
+                    <label for="acct-color" class="form-label">Color</label>
+                    <input type="color" class="form-control form-control-color" id="acct-color" value="#6c757d" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveAccount()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete confirmation modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure?</p>
+                <input type="hidden" id="delete-id" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    var accountModal = new bootstrap.Modal(document.getElementById('accountModal'));
+    var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+
+    function openCreateModal() {
+        document.getElementById('accountModalTitle').textContent = 'Add Account';
+        document.getElementById('acct-action').value = 'create';
+        document.getElementById('acct-id').value = '';
+        document.getElementById('acct-name').value = '';
+        document.getElementById('acct-color').value = '#6c757d';
+        accountModal.show();
+    }
+
+    function openEditModal(id, name, colorHex) {
+        document.getElementById('accountModalTitle').textContent = 'Edit Account';
+        document.getElementById('acct-action').value = 'edit';
+        document.getElementById('acct-id').value = id;
+        document.getElementById('acct-name').value = name;
+        document.getElementById('acct-color').value = colorHex;
+        accountModal.show();
+    }
+
+    function openDeleteModal(id) {
+        document.getElementById('delete-id').value = id;
+        deleteModal.show();
+    }
+
+    function saveAccount() {
+        var action = document.getElementById('acct-action').value;
+        var handler = action === 'edit' ? 'Edit' : 'Create';
+        var body = new URLSearchParams();
+        body.append('name', document.getElementById('acct-name').value);
+        body.append('colorHex', document.getElementById('acct-color').value);
+        if (action === 'edit') {
+            body.append('id', document.getElementById('acct-id').value);
+        }
+
+        fetch('/Accounts?handler=' + handler, {
+            method: 'POST',
+            headers: {
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: body
+        }).then(function() {
+            accountModal.hide();
+            window.location.reload();
+        });
+    }
+
+    function confirmDelete() {
+        var id = document.getElementById('delete-id').value;
+        var body = new URLSearchParams();
+        body.append('id', id);
+
+        fetch('/Accounts?handler=Delete', {
+            method: 'POST',
+            headers: {
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: body
+        }).then(function() {
+            deleteModal.hide();
+            window.location.reload();
+        });
+    }
+</script>
+}
