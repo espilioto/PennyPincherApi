@@ -1,8 +1,158 @@
 @page
 @model IndexModel
+@using System.Text.Json
+@{
+    var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+}
 @{
     ViewData["Title"] = "Overview";
 }
 
-<h4>Overview</h4>
-<p class="text-muted">Dashboard coming soon — charts and account summaries will go here.</p>
+<h4 class="mb-3">Overview</h4>
+
+<!-- Top row: donut chart + accounts table -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Account Balances</h6>
+                <div id="donut-chart"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Accounts</h6>
+                <table class="table table-hover table-sm mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 30px;"></th>
+                            <th>Name</th>
+                            <th class="text-end">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var a in Model.Accounts)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="d-inline-block rounded-circle"
+                                          style="width: 14px; height: 14px; background-color: @a.ColorHex;"></span>
+                                </td>
+                                <td>@a.Name</td>
+                                <td class="text-end text-nowrap @(a.Balance > 0 ? "amount-positive" : a.Balance < 0 ? "amount-negative" : "")">
+                                    @a.Balance.ToString("N2") &euro;
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr class="fw-bold">
+                            <td></td>
+                            <td>Total</td>
+                            <td class="text-end text-nowrap">
+                                @Model.Accounts.Sum(a => a.Balance).ToString("N2") &euro;
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom row: balance line chart -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Balance Over Time</h6>
+                <div id="balance-chart"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    (function () {
+        // Donut chart — account balances
+        var accounts = @Html.Raw(JsonSerializer.Serialize(Model.Accounts, jsonOptions));
+        if (accounts.length > 0) {
+            var donutOptions = {
+                chart: { type: 'donut', height: 300, background: 'transparent' },
+                theme: { mode: 'dark' },
+                series: accounts.map(function (a) { return Math.abs(a.balance); }),
+                labels: accounts.map(function (a) { return a.name; }),
+                colors: accounts.map(function (a) { return a.colorHex; }),
+                legend: { position: 'bottom' },
+                tooltip: {
+                    y: {
+                        formatter: function (val) { return val.toFixed(2) + ' \u20ac'; }
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            labels: {
+                                show: true,
+                                total: {
+                                    show: true,
+                                    label: 'Total',
+                                    formatter: function (w) {
+                                        var total = accounts.reduce(function (sum, a) { return sum + a.balance; }, 0);
+                                        return total.toFixed(2) + ' \u20ac';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            new ApexCharts(document.getElementById('donut-chart'), donutOptions).render();
+        }
+
+        // Line chart — balance over time
+        var chartData = @Html.Raw(JsonSerializer.Serialize(Model.BalanceChartData, jsonOptions));
+        if (chartData.length > 0) {
+            var lineOptions = {
+                chart: {
+                    type: 'area',
+                    height: 350,
+                    zoom: { enabled: true },
+                    toolbar: { show: true },
+                    background: 'transparent'
+                },
+                theme: { mode: 'dark' },
+                series: [{
+                    name: 'Balance',
+                    data: chartData.map(function (d) { return d.value; })
+                }],
+                xaxis: {
+                    categories: chartData.map(function (d) { return d.key; }),
+                    labels: { rotate: -45, rotateAlways: true, style: { fontSize: '11px' } },
+                    tickAmount: Math.min(chartData.length, 24)
+                },
+                yaxis: {
+                    labels: {
+                        formatter: function (val) { return val.toFixed(0) + ' \u20ac'; }
+                    }
+                },
+                tooltip: {
+                    y: {
+                        formatter: function (val) { return val.toFixed(2) + ' \u20ac'; }
+                    }
+                },
+                dataLabels: { enabled: false },
+                stroke: { curve: 'smooth', width: 2 },
+                fill: {
+                    type: 'gradient',
+                    gradient: { opacityFrom: 0.4, opacityTo: 0.05 }
+                }
+            };
+            new ApexCharts(document.getElementById('balance-chart'), lineOptions).render();
+        }
+    })();
+</script>
+}
