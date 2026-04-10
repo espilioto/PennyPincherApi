@@ -1,0 +1,150 @@
+using Microsoft.Extensions.Logging;
+using PennyPincher.Contracts.Accounts;
+using PennyPincher.Services.Accounts;
+using PennyPincher.Services.Statements;
+using PennyPincher.Tests.Helpers;
+
+namespace PennyPincher.Tests.Services;
+
+public class AccountServiceTests
+{
+    private readonly ILogger<StatementsService> _logger = LoggerFactory.Create(b => { }).CreateLogger<StatementsService>();
+
+    [Fact]
+    public async Task GetByUserAsync_ReturnsOnlyUserAccounts()
+    {
+        var context = TestDbContextFactory.Create();
+        var mapper = TestDbContextFactory.CreateMapper();
+        var service = new AccountService(context, mapper, _logger);
+
+        await TestDbContextFactory.SeedUserAsync(context, "user1");
+        await TestDbContextFactory.SeedUserAsync(context, "user2", "other@test.com");
+        await TestDbContextFactory.SeedAccountAsync(context, 1, "user1", "My Account");
+        await TestDbContextFactory.SeedAccountAsync(context, 2, "user2", "Not My Account");
+
+        var result = await service.GetByUserAsync("user1");
+
+        Assert.False(result.IsError);
+        Assert.Single(result.Value);
+        Assert.Equal("My Account", result.Value[0].Name);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_ReturnsAllUsersAccounts()
+    {
+        var context = TestDbContextFactory.Create();
+        var mapper = TestDbContextFactory.CreateMapper();
+        var service = new AccountService(context, mapper, _logger);
+
+        await TestDbContextFactory.SeedUserAsync(context, "user1");
+        await TestDbContextFactory.SeedUserAsync(context, "user2", "other@test.com");
+        await TestDbContextFactory.SeedAccountAsync(context, 1, "user1", "Account 1");
+        await TestDbContextFactory.SeedAccountAsync(context, 2, "user2", "Account 2");
+
+        var result = await service.GetAllAsync();
+
+        Assert.False(result.IsError);
+        Assert.Equal(2, result.Value.Count);
+    }
+
+    [Fact]
+    public async Task GetByUserAsync_CalculatesBalanceFromStatements()
+    {
+        var context = TestDbContextFactory.Create();
+        var mapper = TestDbContextFactory.CreateMapper();
+        var service = new AccountService(context, mapper, _logger);
+
+        await TestDbContextFactory.SeedUserAsync(context, "user1");
+        await TestDbContextFactory.SeedAccountAsync(context, 1, "user1");
+        await TestDbContextFactory.SeedCategoryAsync(context, 1, "user1");
+        await TestDbContextFactory.SeedStatementAsync(context, "user1", 1, 1, 1000m);
+        await TestDbContextFactory.SeedStatementAsync(context, "user1", 1, 1, -250m);
+
+        var result = await service.GetByUserAsync("user1");
+
+        Assert.False(result.IsError);
+        Assert.Equal(750m, result.Value[0].Balance);
+    }
+
+    [Fact]
+    public async Task GetByUserAsync_ReturnsNotFound_WhenNoAccounts()
+    {
+        var context = TestDbContextFactory.Create();
+        var mapper = TestDbContextFactory.CreateMapper();
+        var service = new AccountService(context, mapper, _logger);
+
+        var result = await service.GetByUserAsync("nonexistent");
+
+        Assert.True(result.IsError);
+    }
+
+    [Fact]
+    public async Task InsertAsync_RejectsInvalidColorHex()
+    {
+        var context = TestDbContextFactory.Create();
+        var mapper = TestDbContextFactory.CreateMapper();
+        var service = new AccountService(context, mapper, _logger);
+
+        await TestDbContextFactory.SeedUserAsync(context, "user1");
+
+        var request = new AccountRequest("Bad Color", "user1", "not-a-color");
+        var result = await service.InsertAsync(request);
+
+        Assert.True(result.IsError);
+    }
+
+    [Fact]
+    public async Task InsertAsync_RejectsNonexistentUser()
+    {
+        var context = TestDbContextFactory.Create();
+        var mapper = TestDbContextFactory.CreateMapper();
+        var service = new AccountService(context, mapper, _logger);
+
+        var request = new AccountRequest("Test", "ghost", "#FF0000");
+        var result = await service.InsertAsync(request);
+
+        Assert.True(result.IsError);
+    }
+
+    [Fact]
+    public async Task InsertAsync_AcceptsValidRequest()
+    {
+        var context = TestDbContextFactory.Create();
+        var mapper = TestDbContextFactory.CreateMapper();
+        var service = new AccountService(context, mapper, _logger);
+
+        await TestDbContextFactory.SeedUserAsync(context, "user1");
+
+        var request = new AccountRequest("Savings", "user1", "#00FF00");
+        var result = await service.InsertAsync(request);
+
+        Assert.False(result.IsError);
+        Assert.Single(context.Accounts);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ReturnsNotFound_WhenMissing()
+    {
+        var context = TestDbContextFactory.Create();
+        var mapper = TestDbContextFactory.CreateMapper();
+        var service = new AccountService(context, mapper, _logger);
+
+        await TestDbContextFactory.SeedUserAsync(context, "user1");
+        var request = new AccountRequest("Test", "user1", "#FF0000");
+        var result = await service.UpdateAsync(999, request);
+
+        Assert.True(result.IsError);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ReturnsNotFound_WhenMissing()
+    {
+        var context = TestDbContextFactory.Create();
+        var mapper = TestDbContextFactory.CreateMapper();
+        var service = new AccountService(context, mapper, _logger);
+
+        var result = await service.DeleteAsync(999);
+
+        Assert.True(result.IsError);
+    }
+}
