@@ -19,17 +19,25 @@
 
         <div class="row g-2 align-items-end">
             <!-- Account filter -->
+            @{
+                var selectedAccounts = Model.Accounts.Where(a => Model.AccountIds?.Contains(a.Id) == true);
+                var unselectedAccounts = Model.Accounts.Where(a => Model.AccountIds?.Contains(a.Id) != true);
+            }
             <div class="col-auto">
                 <label>Account</label>
                 <div class="dropdown">
                     <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
                             data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                        @(Model.AccountIds?.Count > 0 ? $"{Model.AccountIds.Count} selected" : "All")
+                        @(Model.AccountIds?.Count > 0 ? $"{Model.AccountIds.Count} accounts" : "All accounts")
                     </button>
                     <div class="dropdown-menu p-2" style="max-height: 300px; overflow-y: auto;">
-                        <input type="text" class="form-control form-control-sm mb-2 dropdown-search"
-                               placeholder="Search..." onclick="event.stopPropagation()" />
-                        @foreach (var account in Model.Accounts)
+                        <div class="d-flex gap-1 mb-2">
+                            <input type="text" class="form-control form-control-sm dropdown-search"
+                                   placeholder="Search..." onclick="event.stopPropagation()" />
+                            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-clear"
+                                    onclick="event.stopPropagation()" title="Clear">&#x2715;</button>
+                        </div>
+                        @foreach (var account in selectedAccounts.Concat(unselectedAccounts))
                         {
                             <div class="form-check dropdown-item-check">
                                 <input class="form-check-input" type="checkbox" name="AccountIds"
@@ -43,17 +51,25 @@
             </div>
 
             <!-- Category filter -->
+            @{
+                var selectedCategories = Model.Categories.Where(c => Model.CategoryIds?.Contains(c.Id) == true);
+                var unselectedCategories = Model.Categories.Where(c => Model.CategoryIds?.Contains(c.Id) != true);
+            }
             <div class="col-auto">
                 <label>Category</label>
                 <div class="dropdown">
                     <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
                             data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                        @(Model.CategoryIds?.Count > 0 ? $"{Model.CategoryIds.Count} selected" : "All")
+                        @(Model.CategoryIds?.Count > 0 ? $"{Model.CategoryIds.Count} categories" : "All categories")
                     </button>
                     <div class="dropdown-menu p-2" style="max-height: 300px; overflow-y: auto;">
-                        <input type="text" class="form-control form-control-sm mb-2 dropdown-search"
-                               placeholder="Search..." onclick="event.stopPropagation()" />
-                        @foreach (var category in Model.Categories)
+                        <div class="d-flex gap-1 mb-2">
+                            <input type="text" class="form-control form-control-sm dropdown-search"
+                                   placeholder="Search..." onclick="event.stopPropagation()" />
+                            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-clear"
+                                    onclick="event.stopPropagation()" title="Clear">&#x2715;</button>
+                        </div>
+                        @foreach (var category in selectedCategories.Concat(unselectedCategories))
                         {
                             <div class="form-check dropdown-item-check">
                                 <input class="form-check-input" type="checkbox" name="CategoryIds"
