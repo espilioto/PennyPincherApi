@@ -92,8 +92,8 @@
     font-size: 0.85rem;
 }
 
-.dropdown-search {
-    min-width: 140px;
+.dropdown-menu.p-2 {
+    min-width: 250px;
 }
 
 /* Login page */
