@@ -83,10 +83,18 @@
             var donutOptions = {
                 chart: { type: 'donut', height: 300, background: 'transparent' },
                 theme: { mode: 'dark' },
+                stroke: { show: false },
                 series: accounts.map(function (a) { return Math.abs(a.balance); }),
                 labels: accounts.map(function (a) { return a.name; }),
                 colors: accounts.map(function (a) { return a.colorHex; }),
                 legend: { position: 'bottom' },
+                dataLabels: {
+                    enabled: true,
+                    formatter: function (val, opts) {
+                        var amount = opts.w.config.series[opts.seriesIndex];
+                        return [amount.toFixed(0) + ' \u20ac', '(' + val.toFixed(1) + '%)'];
+                    }
+                },
                 tooltip: {
                     y: {
                         formatter: function (val) { return val.toFixed(2) + ' \u20ac'; }
@@ -95,6 +103,7 @@
                 plotOptions: {
                     pie: {
                         donut: {
+                            size: '55%',
                             labels: {
                                 show: true,
                                 total: {
