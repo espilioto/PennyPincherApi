@@ -4,7 +4,7 @@ document.body.addEventListener('htmx:configRequest', function (evt) {
         document.querySelector('input[name="__RequestVerificationToken"]')?.value;
 });
 
-// Searchable dropdown checkboxes
+// Searchable dropdown checkboxes — filter items as you type
 document.addEventListener('input', function (e) {
     if (!e.target.classList.contains('dropdown-search')) return;
     var query = e.target.value.toLowerCase();
@@ -12,5 +12,55 @@ document.addEventListener('input', function (e) {
     items.forEach(function (item) {
         var label = item.querySelector('.form-check-label').textContent.toLowerCase();
         item.style.display = label.includes(query) ? '' : 'none';
+    });
+});
+
+// Clear search text button
+document.addEventListener('mousedown', function (e) {
+    var btn = e.target.closest('.dropdown-clear');
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    var menu = btn.closest('.dropdown-menu');
+    var search = menu.querySelector('.dropdown-search');
+    search.value = '';
+    // Show all items again
+    menu.querySelectorAll('.dropdown-item-check').forEach(function (item) {
+        item.style.display = '';
+    });
+});
+
+// When a checkbox changes: update button text + move checked to top
+document.addEventListener('change', function (e) {
+    if (!e.target.classList.contains('form-check-input')) return;
+    var dropdown = e.target.closest('.dropdown');
+    if (!dropdown) return;
+
+    var menu = dropdown.querySelector('.dropdown-menu');
+    var button = dropdown.querySelector('.dropdown-toggle');
+    var checkboxes = menu.querySelectorAll('.form-check-input[type="checkbox"]');
+    var items = menu.querySelectorAll('.dropdown-item-check');
+
+    // Update button text
+    var checked = Array.from(checkboxes).filter(function (cb) { return cb.checked; });
+    var label = button.dataset.label || '';
+    if (!label) {
+        // Detect label from the current text ("All accounts" -> "accounts", "All categories" -> "categories")
+        var current = button.textContent.trim();
+        var match = current.match(/(?:All |^\d+ )(.+)$/);
+        label = match ? match[1] : 'selected';
+        button.dataset.label = label;
+    }
+    button.textContent = checked.length > 0 ? checked.length + ' ' + label : 'All ' + label;
+
+    // Move checked items to top (after the search row)
+    var searchRow = menu.querySelector('.d-flex');
+    var sorted = Array.from(items).sort(function (a, b) {
+        var aChecked = a.querySelector('input').checked ? 0 : 1;
+        var bChecked = b.querySelector('input').checked ? 0 : 1;
+        return aChecked - bChecked;
+    });
+    sorted.forEach(function (item) {
+        menu.appendChild(item);
     });
 });
