@@ -8,7 +8,7 @@
     <tr>
         <td>@s.Date.ToString("yyyy-MM-dd")</td>
         <td>@s.Description</td>
-        <td class="text-end text-nowrap @(s.Amount >= 0 ? "amount-positive" : "amount-negative")">
+        <td class="text-end text-nowrap @(s.Amount > 0 ? "amount-positive" : s.Amount < 0 ? "amount-negative" : "")">
             @s.Amount.ToString("N2") &euro;
         </td>
         <td>@s.Account.Name</td>
