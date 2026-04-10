@@ -32,9 +32,9 @@ public static class TestDbContextFactory
         await context.SaveChangesAsync();
     }
 
-    public static async Task SeedAccountAsync(PennyPincherApiDbContext context, int id, string userId, string name = "Test Account", string colorHex = "#FF0000")
+    public static async Task SeedAccountAsync(PennyPincherApiDbContext context, int id, string userId, string name = "Test Account", string colorHex = "#FF0000", int sortOrder = 0)
     {
-        context.Accounts.Add(new Account { Id = id, Name = name, UserId = userId, ColorHex = colorHex });
+        context.Accounts.Add(new Account { Id = id, Name = name, UserId = userId, ColorHex = colorHex, SortOrder = sortOrder });
         await context.SaveChangesAsync();
     }
 

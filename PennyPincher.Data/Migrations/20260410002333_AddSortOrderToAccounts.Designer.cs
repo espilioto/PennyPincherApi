@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PennyPincher.Data;
 
@@ -11,9 +12,11 @@ using PennyPincher.Data;
 namespace PennyPincher.Data.Migrations
 {
     [DbContext(typeof(PennyPincherApiDbContext))]
-    partial class PennyPincherApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260410002333_AddSortOrderToAccounts")]
+    partial class AddSortOrderToAccounts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -28,6 +28,7 @@ public class AccountService : IAccountService
         try
         {
             var accounts = await _context.Accounts
+                .OrderBy(a => a.SortOrder)
                 .Select(a => new AccountResponse
                 (
                     a.Id,
@@ -54,6 +55,7 @@ public class AccountService : IAccountService
         {
             var accounts = await _context.Accounts
                 .Where(a => a.UserId == userId)
+                .OrderBy(a => a.SortOrder)
                 .Select(a => new AccountResponse
                 (
                     a.Id,

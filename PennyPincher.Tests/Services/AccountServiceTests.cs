@@ -147,4 +147,24 @@ public class AccountServiceTests
 
         Assert.True(result.IsError);
     }
+
+    [Fact]
+    public async Task GetByUserAsync_ReturnsAccountsOrderedBySortOrder()
+    {
+        var context = TestDbContextFactory.Create();
+        var mapper = TestDbContextFactory.CreateMapper();
+        var service = new AccountService(context, mapper, _logger);
+
+        await TestDbContextFactory.SeedUserAsync(context, "user1");
+        await TestDbContextFactory.SeedAccountAsync(context, 1, "user1", "Last", sortOrder: 2);
+        await TestDbContextFactory.SeedAccountAsync(context, 2, "user1", "First", sortOrder: 0);
+        await TestDbContextFactory.SeedAccountAsync(context, 3, "user1", "Middle", sortOrder: 1);
+
+        var result = await service.GetByUserAsync("user1");
+
+        Assert.False(result.IsError);
+        Assert.Equal("First", result.Value[0].Name);
+        Assert.Equal("Middle", result.Value[1].Name);
+        Assert.Equal("Last", result.Value[2].Name);
+    }
 }

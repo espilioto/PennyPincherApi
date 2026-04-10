@@ -9,6 +9,7 @@ namespace PennyPincher.Domain.Models
         [Required] public string Name { get; set; } = null!;
         [Required] public string UserId { get; set; } = null!;
         [Required] public string ColorHex { get; set; } = "#000000";
+        public int SortOrder { get; set; } = 0;
 
         public virtual IdentityUser? User { get; set; }
     }
