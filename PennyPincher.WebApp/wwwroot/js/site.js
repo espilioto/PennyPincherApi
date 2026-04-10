@@ -30,6 +30,21 @@ document.addEventListener('mousedown', function (e) {
     });
 });
 
+// Deselect all checkboxes in a dropdown
+document.addEventListener('mousedown', function (e) {
+    var btn = e.target.closest('.dropdown-deselect-all');
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    var menu = btn.closest('.dropdown-menu');
+    menu.querySelectorAll('.form-check-input[type="checkbox"]').forEach(function (cb) {
+        cb.checked = false;
+    });
+    // Trigger change on one checkbox to update button text + reorder
+    var first = menu.querySelector('.form-check-input[type="checkbox"]');
+    if (first) first.dispatchEvent(new Event('change', { bubbles: true }));
+});
+
 // When a checkbox changes: update button text + move checked to top
 document.addEventListener('change', function (e) {
     if (!e.target.classList.contains('form-check-input')) return;
@@ -52,6 +67,12 @@ document.addEventListener('change', function (e) {
         button.dataset.label = label;
     }
     button.textContent = checked.length > 0 ? checked.length + ' ' + label : 'All ' + label;
+
+    // Trigger HTMX table refresh for filter checkboxes
+    var form = document.getElementById('filter-form');
+    if (form && form.contains(dropdown)) {
+        htmx.trigger(form, 'filterChanged');
+    }
 
     // Stamp original order on first interaction
     items.forEach(function (item, i) {

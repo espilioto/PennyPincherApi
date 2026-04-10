@@ -19,7 +19,7 @@
     <form id="filter-form"
           hx-get="/Statements?handler=Table"
           hx-target="#statement-table-body"
-          hx-trigger="change from:find select, change from:find input[type='date'], change from:find input[type='number'], change from:find input[type='checkbox']"
+          hx-trigger="change from:find select, change from:find input[type='date'], change from:find input[type='number'], filterChanged"
           hx-include="#filter-form">
 
         <div class="row g-2 align-items-end">
@@ -40,7 +40,9 @@
                             <input type="text" class="form-control form-control-sm dropdown-search"
                                    placeholder="Search..." onclick="event.stopPropagation()" />
                             <button type="button" class="btn btn-sm btn-outline-secondary dropdown-clear"
-                                    onclick="event.stopPropagation()" title="Clear">&#x2715;</button>
+                                    onclick="event.stopPropagation()" title="Clear search">&#x2715;</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-deselect-all"
+                                    onclick="event.stopPropagation()" title="Deselect all">&#x2205;</button>
                         </div>
                         @foreach (var account in selectedAccounts.Concat(unselectedAccounts))
                         {
@@ -72,7 +74,9 @@
                             <input type="text" class="form-control form-control-sm dropdown-search"
                                    placeholder="Search..." onclick="event.stopPropagation()" />
                             <button type="button" class="btn btn-sm btn-outline-secondary dropdown-clear"
-                                    onclick="event.stopPropagation()" title="Clear">&#x2715;</button>
+                                    onclick="event.stopPropagation()" title="Clear search">&#x2715;</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-deselect-all"
+                                    onclick="event.stopPropagation()" title="Deselect all">&#x2205;</button>
                         </div>
                         @foreach (var category in selectedCategories.Concat(unselectedCategories))
                         {

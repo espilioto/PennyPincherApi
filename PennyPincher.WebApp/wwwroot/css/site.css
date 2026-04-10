@@ -92,6 +92,10 @@
     font-size: 0.85rem;
 }
 
+.dropdown-search {
+    min-width: 140px;
+}
+
 /* Login page */
 .login-container {
     max-width: 400px;
