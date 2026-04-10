@@ -32,6 +32,8 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseMiddleware<ApiUnauthorizedMiddleware>();
+
 app.MapStaticAssets();
 app.MapRazorPages()
    .WithStaticAssets();
