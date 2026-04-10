@@ -1,3 +1,19 @@
+// Convert UTC timestamps to local time
+function convertUtcDates(root) {
+    root.querySelectorAll('[data-utc]').forEach(function (el) {
+        var d = new Date(el.dataset.utc);
+        el.textContent = d.getFullYear() + '-' +
+            String(d.getMonth() + 1).padStart(2, '0') + '-' +
+            String(d.getDate()).padStart(2, '0') + ' ' +
+            String(d.getHours()).padStart(2, '0') + ':' +
+            String(d.getMinutes()).padStart(2, '0');
+    });
+}
+convertUtcDates(document);
+document.body.addEventListener('htmx:afterSettle', function (evt) {
+    convertUtcDates(evt.detail.target);
+});
+
 // HTMX configuration
 document.body.addEventListener('htmx:configRequest', function (evt) {
     evt.detail.headers['RequestVerificationToken'] =

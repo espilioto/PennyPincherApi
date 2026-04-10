@@ -16,7 +16,7 @@
         <td class="text-nowrap">
             @if (s.CheckedAt.HasValue)
             {
-                <span class="checked-badge">@s.CheckedAt.Value.ToString("yyyy-MM-dd HH:mm")</span>
+                <span class="checked-badge" data-utc="@(s.CheckedAt.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"))"></span>
             }
         </td>
         <td class="text-nowrap">
