@@ -23,7 +23,8 @@
                        asp-page="/Statements/Index">Statements</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link disabled">Stats</a>
+                    <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/Stats") == true ? "active" : "")"
+                       asp-page="/Stats/Index">Stats</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/Accounts") == true ? "active" : "")"

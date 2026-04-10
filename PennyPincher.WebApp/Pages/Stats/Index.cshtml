@@ -1,0 +1,75 @@
+@page
+@model PennyPincher.WebApp.Pages.Stats.IndexModel
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Stats";
+    var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+}
+
+<h4 class="mb-3">Stats</h4>
+
+<!-- Monthly Breakdown master-detail -->
+<div class="row">
+    <!-- Month list (left panel) -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body p-0">
+                <h6 class="card-title text-muted px-3 pt-3 mb-2">Monthly Breakdown</h6>
+                <div style="max-height: calc(100vh - 140px); overflow-y: auto;">
+                    @foreach (var m in Model.Months)
+                    {
+                        var isSelected = m.Month == Model.SelectedMonth && m.Year == Model.SelectedYear;
+                        var total = m.Income + Math.Abs(m.Expenses);
+                        var incomePct = total > 0 ? (double)(m.Income / total) * 100 : 50;
+                        <a class="d-block px-3 py-3 text-decoration-none border-bottom month-item @(isSelected ? "active" : "")"
+                           style="cursor: pointer; @(isSelected ? "background-color: var(--bs-tertiary-bg);" : "")"
+                           hx-get="/Stats?handler=Detail&month=@m.Month&year=@m.Year&IgnoreInitsAndTransfers=@Model.IgnoreInitsAndTransfers&IgnoreLoans=@Model.IgnoreLoans"
+                           hx-target="#detail-panel"
+                           hx-swap="innerHTML">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-light fw-semibold">@m.MonthYear</span>
+                                <span class="badge @(m.Balance >= 0 ? "bg-success" : "bg-danger")">
+                                    @m.Balance.ToString("N0") &euro;
+                                </span>
+                            </div>
+                            @if (m.Income > 0 || m.Expenses < 0)
+                            {
+                                <div class="progress mb-2" style="height: 6px;">
+                                    <div class="progress-bar bg-success" style="width: @incomePct.ToString("F0")%"></div>
+                                    <div class="progress-bar bg-danger" style="width: @((100 - incomePct).ToString("F0"))%"></div>
+                                </div>
+                            }
+                            <div class="d-flex justify-content-between">
+                                <small class="amount-positive">+@m.Income.ToString("N0") &euro;</small>
+                                <small class="amount-negative">@m.Expenses.ToString("N0") &euro;</small>
+                            </div>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail panel (right) -->
+    <div class="col-md-8">
+        <div id="detail-panel" style="max-height: calc(100vh - 140px); overflow-y: auto; overflow-x: hidden; scrollbar-gutter: stable;">
+            <partial name="_MonthlyDetail" model="Model" />
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // Update active state on month click
+    document.addEventListener('click', function (e) {
+        var item = e.target.closest('.month-item');
+        if (!item) return;
+        document.querySelectorAll('.month-item').forEach(function (el) {
+            el.classList.remove('active');
+            el.style.backgroundColor = '';
+        });
+        item.classList.add('active');
+        item.style.backgroundColor = 'var(--bs-tertiary-bg)';
+    });
+</script>
+}

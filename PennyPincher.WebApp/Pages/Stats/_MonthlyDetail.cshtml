@@ -1,0 +1,150 @@
+@model PennyPincher.WebApp.Pages.Stats.IndexModel
+@using System.Text.Json
+
+@if (Model.Detail == null)
+{
+    <p class="text-muted">Select a month to view details.</p>
+}
+else
+{
+    var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
+    <h5 class="mb-3">@Model.Detail.Title</h5>
+
+    <!-- Donut chart -->
+    <div id="detail-donut-chart" class="mb-3"></div>
+
+    <!-- Summary cards -->
+    <div class="row g-2 mb-3">
+        <div class="col-4">
+            <div class="card text-center border-success">
+                <div class="card-body py-2">
+                    <div class="small amount-positive">Income</div>
+                    <div class="fw-bold amount-positive">@Model.Detail.TotalIncome.ToString("N2") &euro;</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card text-center @(Model.Detail.Balance >= 0 ? "border-success" : "border-danger")">
+                <div class="card-body py-2">
+                    <div class="small @(Model.Detail.Balance >= 0 ? "amount-positive" : "amount-negative")">Balance</div>
+                    <div class="fw-bold @(Model.Detail.Balance >= 0 ? "amount-positive" : "amount-negative")">
+                        @Model.Detail.Balance.ToString("N2") &euro;
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card text-center border-danger">
+                <div class="card-body py-2">
+                    <div class="small amount-negative">Expenses</div>
+                    <div class="fw-bold amount-negative">@Model.Detail.TotalExpenses.ToString("N2") &euro;</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transactions -->
+    <div class="row">
+        <div class="col-md-6">
+            <h6 class="text-muted">Income (@Model.Detail.IncomeStatements.Count)</h6>
+            <table class="table table-sm table-hover">
+                <tbody>
+                    @foreach (var s in Model.Detail.IncomeStatements)
+                    {
+                        <tr>
+                            <td>
+                                <div>@s.Description</div>
+                                <small class="text-muted">@s.Date.ToString("yyyy-MM-dd")</small>
+                            </td>
+                            <td class="text-end text-nowrap align-middle">
+                                <div class="text-muted" style="font-size: 0.8rem;">@s.Category.Name</div>
+                                <div class="amount-positive">@s.Amount.ToString("N2") &euro;</div>
+                                <div class="text-muted" style="font-size: 0.8rem;">@s.Account.Name</div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <h6 class="text-muted">Expenses (@Model.Detail.ExpenseStatements.Count)</h6>
+            <table class="table table-sm table-hover">
+                <tbody>
+                    @foreach (var s in Model.Detail.ExpenseStatements)
+                    {
+                        <tr>
+                            <td>
+                                <div>@s.Description</div>
+                                <small class="text-muted">@s.Date.ToString("yyyy-MM-dd")</small>
+                            </td>
+                            <td class="text-end text-nowrap align-middle">
+                                <div class="text-muted" style="font-size: 0.8rem;">@s.Category.Name</div>
+                                <div class="amount-negative">@s.Amount.ToString("N2") &euro;</div>
+                                <div class="text-muted" style="font-size: 0.8rem;">@s.Account.Name</div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function initDetailDonut() {
+            var rawData = @Html.Raw(JsonSerializer.Serialize(Model.Detail.DonutData, jsonOptions));
+            var el = document.getElementById('detail-donut-chart');
+            if (rawData.length > 0 && el) {
+                // Filter: top 10, minimum 5%, group rest into "Other"
+                var totalAbs = rawData.reduce(function (s, d) { return s + Math.abs(d.value); }, 0);
+                var sorted = rawData.slice().sort(function (a, b) { return Math.abs(b.value) - Math.abs(a.value); });
+                var donutData = [];
+                var otherSum = 0;
+                sorted.forEach(function (d, i) {
+                    var pct = totalAbs > 0 ? (Math.abs(d.value) / totalAbs) * 100 : 0;
+                    if (i < 10 && pct >= 5) {
+                        donutData.push(d);
+                    } else {
+                        otherSum += Math.abs(d.value);
+                    }
+                });
+                if (otherSum > 0) {
+                    donutData.push({ key: 'Other', value: otherSum });
+                }
+
+                var materialColors = [
+                    '#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5',
+                    '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50',
+                    '#8BC34A', '#FF9800', '#FF5722', '#795548', '#607D8B'
+                ];
+                new ApexCharts(el, {
+                    chart: { type: 'donut', height: 280, background: 'transparent' },
+                    stroke: { show: false },
+                    theme: { mode: 'dark' },
+                    colors: materialColors,
+                    series: donutData.map(function (d) { return Math.abs(d.value); }),
+                    labels: donutData.map(function (d) { return d.key; }),
+                    legend: { position: 'bottom' },
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function (val, opts) {
+                            var amount = opts.w.config.series[opts.seriesIndex];
+                            return [amount.toFixed(0) + ' \u20ac', '(' + val.toFixed(1) + '%)'];
+                        }
+                    },
+                    plotOptions: {
+                        pie: { donut: { size: '55%' } }
+                    },
+                    tooltip: {
+                        y: { formatter: function (val) { return val.toFixed(2) + ' \u20ac'; } }
+                    }
+                }).render();
+            }
+        }
+        if (typeof ApexCharts !== 'undefined') {
+            requestAnimationFrame(initDetailDonut);
+        } else {
+            window.addEventListener('load', initDetailDonut);
+        }
+    </script>
+}
