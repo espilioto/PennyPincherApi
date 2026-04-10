@@ -14,38 +14,56 @@
     <form id="filter-form"
           hx-get="/Statements?handler=Table"
           hx-target="#statement-table-body"
-          hx-trigger="change from:select, change from:input[type='date'], change from:input[type='number']"
+          hx-trigger="change from:select, change from:input[type='date'], change from:input[type='number'], change from:input[type='checkbox']"
           hx-include="#filter-form">
 
         <div class="row g-2 align-items-end">
             <!-- Account filter -->
             <div class="col-auto">
                 <label>Account</label>
-                <select class="form-select form-select-sm" name="AccountIds" multiple size="1"
-                        title="All accounts">
-                    @foreach (var account in Model.Accounts)
-                    {
-                        <option value="@account.Id"
-                                selected="@(Model.AccountIds?.Contains(account.Id) == true)">
-                            @account.Name
-                        </option>
-                    }
-                </select>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                        @(Model.AccountIds?.Count > 0 ? $"{Model.AccountIds.Count} selected" : "All")
+                    </button>
+                    <div class="dropdown-menu p-2" style="max-height: 300px; overflow-y: auto;">
+                        <input type="text" class="form-control form-control-sm mb-2 dropdown-search"
+                               placeholder="Search..." onclick="event.stopPropagation()" />
+                        @foreach (var account in Model.Accounts)
+                        {
+                            <div class="form-check dropdown-item-check">
+                                <input class="form-check-input" type="checkbox" name="AccountIds"
+                                       value="@account.Id" id="acc-@account.Id"
+                                       checked="@(Model.AccountIds?.Contains(account.Id) == true)" />
+                                <label class="form-check-label" for="acc-@account.Id">@account.Name</label>
+                            </div>
+                        }
+                    </div>
+                </div>
             </div>
 
             <!-- Category filter -->
             <div class="col-auto">
                 <label>Category</label>
-                <select class="form-select form-select-sm" name="CategoryIds" multiple size="1"
-                        title="All categories">
-                    @foreach (var category in Model.Categories)
-                    {
-                        <option value="@category.Id"
-                                selected="@(Model.CategoryIds?.Contains(category.Id) == true)">
-                            @category.Name
-                        </option>
-                    }
-                </select>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                        @(Model.CategoryIds?.Count > 0 ? $"{Model.CategoryIds.Count} selected" : "All")
+                    </button>
+                    <div class="dropdown-menu p-2" style="max-height: 300px; overflow-y: auto;">
+                        <input type="text" class="form-control form-control-sm mb-2 dropdown-search"
+                               placeholder="Search..." onclick="event.stopPropagation()" />
+                        @foreach (var category in Model.Categories)
+                        {
+                            <div class="form-check dropdown-item-check">
+                                <input class="form-check-input" type="checkbox" name="CategoryIds"
+                                       value="@category.Id" id="cat-@category.Id"
+                                       checked="@(Model.CategoryIds?.Contains(category.Id) == true)" />
+                                <label class="form-check-label" for="cat-@category.Id">@category.Name</label>
+                            </div>
+                        }
+                    </div>
+                </div>
             </div>
 
             <!-- Date range -->
@@ -115,12 +133,12 @@
     <table class="table table-hover table-statements">
         <thead>
             <tr>
-                <th>Date</th>
+                <th style="width: 100px;">Date</th>
                 <th>Description</th>
-                <th class="text-end">Amount</th>
-                <th>Account</th>
-                <th>Category</th>
-                <th>Checked</th>
+                <th class="text-end" style="width: 110px;">Amount</th>
+                <th style="width: 130px;">Account</th>
+                <th style="width: 130px;">Category</th>
+                <th style="width: 140px;">Checked</th>
             </tr>
         </thead>
         <tbody id="statement-table-body">

@@ -5,17 +5,15 @@
     <tr>
         <td>@s.Date.ToString("yyyy-MM-dd")</td>
         <td>@s.Description</td>
-        <td class="text-end @(s.Amount >= 0 ? "amount-positive" : "amount-negative")">
+        <td class="text-end text-nowrap @(s.Amount >= 0 ? "amount-positive" : "amount-negative")">
             @s.Amount.ToString("N2") &euro;
         </td>
         <td>@s.Account.Name</td>
         <td>@s.Category.Name</td>
-        <td>
+        <td class="text-nowrap">
             @if (s.CheckedAt.HasValue)
             {
-                <span class="checked-badge" title="@s.CheckedAt.Value.ToString("yyyy-MM-dd HH:mm")">
-                    &#10003;
-                </span>
+                <span class="checked-badge">@s.CheckedAt.Value.ToString("yyyy-MM-dd HH:mm")</span>
             }
         </td>
     </tr>

@@ -59,12 +59,12 @@
     vertical-align: middle;
 }
 
-.amount-positive {
-    color: #198754;
+.table-statements td.amount-positive {
+    color: #47d17a;
 }
 
-.amount-negative {
-    color: #dc3545;
+.table-statements td.amount-negative {
+    color: #e66a7a;
 }
 
 .checked-badge {
