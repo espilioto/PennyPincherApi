@@ -53,12 +53,17 @@ document.addEventListener('change', function (e) {
     }
     button.textContent = checked.length > 0 ? checked.length + ' ' + label : 'All ' + label;
 
-    // Move checked items to top (after the search row)
-    var searchRow = menu.querySelector('.d-flex');
+    // Stamp original order on first interaction
+    items.forEach(function (item, i) {
+        if (!item.dataset.order) item.dataset.order = i;
+    });
+
+    // Move checked items to top, unchecked back to original order
     var sorted = Array.from(items).sort(function (a, b) {
         var aChecked = a.querySelector('input').checked ? 0 : 1;
         var bChecked = b.querySelector('input').checked ? 0 : 1;
-        return aChecked - bChecked;
+        if (aChecked !== bChecked) return aChecked - bChecked;
+        return parseInt(a.dataset.order) - parseInt(b.dataset.order);
     });
     sorted.forEach(function (item) {
         menu.appendChild(item);
