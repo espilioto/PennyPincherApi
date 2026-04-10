@@ -178,7 +178,7 @@ public class StatementsServiceTests
         var service = new StatementsService(context, mapper, _logger);
 
         var request = new StatementRequest(DateTime.UtcNow, 1, 50m, "Test", 1);
-        var result = await service.UpdateAsync(999, request);
+        var result = await service.UpdateAsync("user1", 999, request);
 
         Assert.True(result.IsError);
     }
@@ -190,7 +190,7 @@ public class StatementsServiceTests
         var mapper = TestDbContextFactory.CreateMapper();
         var service = new StatementsService(context, mapper, _logger);
 
-        var result = await service.DeleteAsync(999);
+        var result = await service.DeleteAsync("user1", 999);
 
         Assert.True(result.IsError);
     }
@@ -214,7 +214,7 @@ public class StatementsServiceTests
         checkedStatement.CheckedAt = alreadyChecked;
         await context.SaveChangesAsync();
 
-        await service.MarkAllUncheckedNowAsync();
+        await service.MarkAllUncheckedNowAsync("user1");
 
         var wasUnchecked = context.Statements.First(s => s.Description == "Unchecked");
         var stillChecked = context.Statements.First(s => s.Description == "Already checked");

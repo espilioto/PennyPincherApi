@@ -117,11 +117,11 @@ public class StatementsService : IStatementsService
         }
     }
 
-    public async Task<ErrorOr<bool>> UpdateAsync(int statementId, StatementRequest request)
+    public async Task<ErrorOr<bool>> UpdateAsync(string userId, int statementId, StatementRequest request)
     {
         try
         {
-            var statement = await _context.Statements.FirstOrDefaultAsync(x => x.Id == statementId);
+            var statement = await _context.Statements.FirstOrDefaultAsync(x => x.Id == statementId && x.UserId == userId);
             if (statement is null)
                 return Error.NotFound(description: "Statement not found");
 
@@ -137,11 +137,11 @@ public class StatementsService : IStatementsService
         }
     }
 
-    public async Task<ErrorOr<bool>> DeleteAsync(int statementId)
+    public async Task<ErrorOr<bool>> DeleteAsync(string userId, int statementId)
     {
         try
         {
-            var statementToRemove = await _context.Statements.FirstOrDefaultAsync(x => x.Id == statementId);
+            var statementToRemove = await _context.Statements.FirstOrDefaultAsync(x => x.Id == statementId && x.UserId == userId);
             if (statementToRemove is null)
                 return Error.NotFound(description: "Statement not found");
 
@@ -160,14 +160,14 @@ public class StatementsService : IStatementsService
     /// <summary>
     /// Marks all statements where CheckedAt is null with the given datetime.
     /// </summary>
-    public async Task<ErrorOr<bool>> MarkAllUncheckedNowAsync()
+    public async Task<ErrorOr<bool>> MarkAllUncheckedNowAsync(string userId)
     {
         try
         {
             var now = DateTime.UtcNow;
 
             var statementsToUpdate = await _context.Statements
-                .Where(x => x.CheckedAt == null)
+                .Where(x => x.CheckedAt == null && x.UserId == userId)
                 .ToListAsync();
 
             foreach (var statement in statementsToUpdate)

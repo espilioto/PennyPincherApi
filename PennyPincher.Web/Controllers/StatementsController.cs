@@ -1,4 +1,4 @@
-﻿using ErrorOr;
+using ErrorOr;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PennyPincher.Contracts.Statements;
@@ -40,9 +40,7 @@ public class StatementsController : ErrorOrApiController
     {
         var userId = User.GetUserId();
         if (userId is null)
-        {
             return Problem(Error.Forbidden());
-        }
 
         var result = await _statementsService.InsertAsync(request, userId);
 
@@ -55,7 +53,11 @@ public class StatementsController : ErrorOrApiController
     [HttpPut("{statementId}")]
     public async Task<IActionResult> Put(int statementId, [FromBody] StatementRequest request)
     {
-        var result = await _statementsService.UpdateAsync(statementId, request);
+        var userId = User.GetUserId();
+        if (userId is null)
+            return Problem(Error.Forbidden());
+
+        var result = await _statementsService.UpdateAsync(userId, statementId, request);
 
         return result.Match(
             _ => Ok(),
@@ -66,7 +68,11 @@ public class StatementsController : ErrorOrApiController
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var result = await _statementsService.DeleteAsync(id);
+        var userId = User.GetUserId();
+        if (userId is null)
+            return Problem(Error.Forbidden());
+
+        var result = await _statementsService.DeleteAsync(userId, id);
 
         return result.Match(
             _ => NoContent(),
@@ -77,7 +83,11 @@ public class StatementsController : ErrorOrApiController
     [HttpPut("markAllUncheckedNow")]
     public async Task<IActionResult> MarkAllUncheckedNowAsync()
     {
-        var result = await _statementsService.MarkAllUncheckedNowAsync();
+        var userId = User.GetUserId();
+        if (userId is null)
+            return Problem(Error.Forbidden());
+
+        var result = await _statementsService.MarkAllUncheckedNowAsync(userId);
         return result.Match(
             _ => Ok(),
             errors => Problem(errors)
