@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -21,19 +21,12 @@ namespace PennyPincher.Services.Categories
             _context = context;
         }
 
-        public async Task<ErrorOr<bool>> InsertAsync(CategoryRequest request)
+        public async Task<ErrorOr<bool>> InsertAsync(CategoryRequest request, string userId)
         {
-            List<Error> errors = [];
-
             try
             {
-                if (!await _context.Users.AnyAsync(x => x.Id == request.UserId))
-                    errors.Add(Error.Validation(description: "User does not exist"));
-
-                if (errors.Count > 0)
-                    return errors;
-
                 var category = _mapper.Map<Category>(request);
+                category.UserId = userId;
                 _ = await _context.Categories.AddAsync(category);
                 var success = await _context.SaveChangesAsync();
 
@@ -46,11 +39,12 @@ namespace PennyPincher.Services.Categories
             }
         }
 
-        public async Task<ErrorOr<IEnumerable<CategoryResponse>>> GetAllAsync()
+        public async Task<ErrorOr<IEnumerable<CategoryResponse>>> GetByUserAsync(string userId)
         {
             try
             {
                 var categories = await _context.Categories
+                .Where(x => x.UserId == userId)
                 .Select(x => new CategoryResponse
                 (
                     x.Id,
@@ -67,11 +61,11 @@ namespace PennyPincher.Services.Categories
             }
         }
 
-        public async Task<ErrorOr<bool>> UpdateAsync(int categoryId, CategoryRequest request)
+        public async Task<ErrorOr<bool>> UpdateAsync(string userId, int categoryId, CategoryRequest request)
         {
             try
             {
-                var category = await _context.Categories.FirstOrDefaultAsync(x => x.Id == categoryId);
+                var category = await _context.Categories.FirstOrDefaultAsync(x => x.Id == categoryId && x.UserId == userId);
                 if (category is null)
                     return Error.NotFound(description: "Category not found");
 
@@ -87,11 +81,11 @@ namespace PennyPincher.Services.Categories
             }
         }
 
-        public async Task<ErrorOr<bool>> DeleteAsync(int categoryId)
+        public async Task<ErrorOr<bool>> DeleteAsync(string userId, int categoryId)
         {
             try
             {
-                var category = await _context.Categories.FirstOrDefaultAsync(x => x.Id == categoryId);
+                var category = await _context.Categories.FirstOrDefaultAsync(x => x.Id == categoryId && x.UserId == userId);
                 if (category is null)
                     return Error.NotFound(description: "Category not found");
 

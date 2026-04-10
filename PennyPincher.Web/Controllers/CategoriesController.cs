@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PennyPincher.Contracts.Categories;
 using PennyPincher.Services.Categories;
+using PennyPincher.Web.Extensions;
 
 namespace PennyPincher.Web.Controllers;
 
@@ -21,7 +22,11 @@ public class CategoriesController : ErrorOrApiController
     [HttpGet]
     public async Task<IActionResult> Get()
     {
-        var result = await _categoriesService.GetAllAsync();
+        var userId = User.GetUserId();
+        if (userId is null)
+            return Problem(ErrorOr.Error.Forbidden());
+
+        var result = await _categoriesService.GetByUserAsync(userId);
 
         return result.Match(
             categories => Ok(categories),
@@ -32,7 +37,11 @@ public class CategoriesController : ErrorOrApiController
     [HttpPost]
     public async Task<IActionResult> Post(CategoryRequest request)
     {
-        var result = await _categoriesService.InsertAsync(request);
+        var userId = User.GetUserId();
+        if (userId is null)
+            return Problem(ErrorOr.Error.Forbidden());
+
+        var result = await _categoriesService.InsertAsync(request, userId);
 
         return result.Match(
             category => Created(string.Empty, category),
@@ -43,7 +52,11 @@ public class CategoriesController : ErrorOrApiController
     [HttpPut("{categoryId}")]
     public async Task<IActionResult> Put(int categoryId, [FromBody] CategoryRequest request)
     {
-        var result = await _categoriesService.UpdateAsync(categoryId, request);
+        var userId = User.GetUserId();
+        if (userId is null)
+            return Problem(ErrorOr.Error.Forbidden());
+
+        var result = await _categoriesService.UpdateAsync(userId, categoryId, request);
 
         return result.Match(
             _ => Ok(),
@@ -54,7 +67,11 @@ public class CategoriesController : ErrorOrApiController
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var result = await _categoriesService.DeleteAsync(id);
+        var userId = User.GetUserId();
+        if (userId is null)
+            return Problem(ErrorOr.Error.Forbidden());
+
+        var result = await _categoriesService.DeleteAsync(userId, id);
 
         return result.Match(
             _ => NoContent(),
