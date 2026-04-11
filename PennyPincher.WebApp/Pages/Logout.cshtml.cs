@@ -6,6 +6,8 @@ namespace PennyPincher.WebApp.Pages;
 
 public class LogoutModel : PageModel
 {
+    public IActionResult OnGet() => RedirectToPage("/Login");
+
     public async Task<IActionResult> OnPostAsync()
     {
         await HttpContext.SignOutAsync("Cookies");
