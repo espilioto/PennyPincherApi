@@ -23,8 +23,29 @@
                        asp-page="/Statements/Index">Statements</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/Stats") == true ? "active" : "")"
+                    <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString() == "/Stats/Index" ? "active" : "")"
                        asp-page="/Stats/Index">Stats</a>
+                    @if (ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/Stats") == true)
+                    {
+                        <ul class="nav flex-column ms-3">
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-sub @(ViewContext.RouteData.Values["page"]?.ToString() == "/Stats/Monthly" ? "active" : "")"
+                                   asp-page="/Stats/Monthly">Monthly</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-sub @(ViewContext.RouteData.Values["page"]?.ToString() == "/Stats/Yearly" ? "active" : "")"
+                                   asp-page="/Stats/Yearly">Yearly</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-sub @(ViewContext.RouteData.Values["page"]?.ToString() == "/Stats/Savings" ? "active" : "")"
+                                   asp-page="/Stats/Savings">Savings</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-sub @(ViewContext.RouteData.Values["page"]?.ToString() == "/Stats/Categories" ? "active" : "")"
+                                   asp-page="/Stats/Categories">Categories</a>
+                            </li>
+                        </ul>
+                    }
                 </li>
                 <li class="nav-item">
                     <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/Accounts") == true ? "active" : "")"

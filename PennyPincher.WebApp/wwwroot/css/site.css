@@ -39,6 +39,32 @@
     opacity: 0.4;
 }
 
+.sidebar .nav-link-sub {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.75rem;
+}
+
+/* Stats landing cards */
+.stats-card {
+    transition: border-color 0.15s ease, transform 0.15s ease;
+    cursor: pointer;
+}
+
+.stats-card:hover {
+    border-color: var(--bs-primary);
+    transform: translateY(-2px);
+}
+
+.stats-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
 /* Main content offset */
 .main-content {
     margin-left: 220px;
@@ -59,11 +85,11 @@
     vertical-align: middle;
 }
 
-.table-statements td.amount-positive {
+.amount-positive {
     color: #47d17a;
 }
 
-.table-statements td.amount-negative {
+.amount-negative {
     color: #e66a7a;
 }
 
