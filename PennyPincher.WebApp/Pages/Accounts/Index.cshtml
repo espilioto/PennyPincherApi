@@ -150,7 +150,8 @@
                 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
             },
             body: body
-        }).then(function() {
+        }).then(function(r) {
+            if (!r.ok) { alert('Operation failed.'); return; }
             accountModal.hide();
             window.location.reload();
         });
@@ -167,7 +168,8 @@
                 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
             },
             body: body
-        }).then(function() {
+        }).then(function(r) {
+            if (!r.ok) { alert('Delete failed.'); return; }
             deleteModal.hide();
             window.location.reload();
         });

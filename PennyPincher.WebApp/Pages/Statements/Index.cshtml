@@ -343,7 +343,8 @@
                 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
             },
             body: body
-        }).then(function() {
+        }).then(function(r) {
+            if (!r.ok) { alert('Operation failed.'); return; }
             statementModal.hide();
             window.location.reload();
         });
@@ -360,7 +361,8 @@
                 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
             },
             body: body
-        }).then(function() {
+        }).then(function(r) {
+            if (!r.ok) { alert('Delete failed.'); return; }
             deleteModal.hide();
             window.location.reload();
         });
@@ -376,7 +378,8 @@
             headers: {
                 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
             }
-        }).then(function() {
+        }).then(function(r) {
+            if (!r.ok) { alert('Operation failed.'); return; }
             markCheckedModal.hide();
             window.location.reload();
         });
