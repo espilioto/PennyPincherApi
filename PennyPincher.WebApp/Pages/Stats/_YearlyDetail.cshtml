@@ -127,20 +127,8 @@ else
             var el = document.getElementById('detail-donut-chart');
             if (rawData.length > 0 && el) {
                 var totalAbs = rawData.reduce(function (s, d) { return s + Math.abs(d.value); }, 0);
-                var sorted = rawData.slice().sort(function (a, b) { return Math.abs(b.value) - Math.abs(a.value); });
-                var donutData = [];
-                var otherSum = 0;
-                sorted.forEach(function (d, i) {
-                    var pct = totalAbs > 0 ? (Math.abs(d.value) / totalAbs) * 100 : 0;
-                    if (i < 10 && pct >= 5) {
-                        donutData.push(d);
-                    } else {
-                        otherSum += Math.abs(d.value);
-                    }
-                });
-                if (otherSum > 0) {
-                    donutData.push({ key: 'Other', value: otherSum });
-                }
+                var donutData = rawData.filter(function (d) { return Math.abs(d.value) > 0; })
+                    .sort(function (a, b) { return Math.abs(b.value) - Math.abs(a.value); });
 
                 var materialColors = [
                     '#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5',
@@ -172,6 +160,7 @@ else
                     dataLabels: {
                         enabled: true,
                         formatter: function (val, opts) {
+                            if (val < 5) return '';
                             var amount = opts.w.config.series[opts.seriesIndex];
                             return [amount.toFixed(0) + ' \u20ac', '(' + val.toFixed(1) + '%)'];
                         }
@@ -180,7 +169,12 @@ else
                         pie: { donut: { size: '55%' } }
                     },
                     tooltip: {
-                        y: { formatter: function (val) { return val.toFixed(2) + ' \u20ac'; } }
+                        y: {
+                            formatter: function (val) {
+                                var pct = totalAbs > 0 ? (val / totalAbs) * 100 : 0;
+                                return val.toFixed(2) + ' \u20ac (' + pct.toFixed(1) + '%)';
+                            }
+                        }
                     }
                 }).render();
             }
