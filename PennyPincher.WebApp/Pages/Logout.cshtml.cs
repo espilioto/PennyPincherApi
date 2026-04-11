@@ -6,7 +6,7 @@ namespace PennyPincher.WebApp.Pages;
 
 public class LogoutModel : PageModel
 {
-    public async Task<IActionResult> OnGetAsync()
+    public async Task<IActionResult> OnPostAsync()
     {
         await HttpContext.SignOutAsync("Cookies");
         Response.Cookies.Delete("jwt");

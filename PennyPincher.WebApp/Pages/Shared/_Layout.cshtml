@@ -59,7 +59,9 @@
 
             <div class="mt-auto">
                 <span class="nav-link text-muted small">@User.Identity?.Name</span>
-                <a class="nav-link text-danger" asp-page="/Logout">Logout</a>
+                <form method="post" asp-page="/Logout">
+                    <button type="submit" class="nav-link text-danger bg-transparent border-0 p-0">Logout</button>
+                </form>
             </div>
         </nav>
     }
