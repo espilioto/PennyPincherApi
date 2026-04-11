@@ -30,7 +30,12 @@ public class LoginModel : PageModel
 
     public string? ErrorMessage { get; set; }
 
-    public void OnGet() { }
+    public IActionResult OnGet()
+    {
+        if (User.Identity?.IsAuthenticated == true)
+            return RedirectToPage("/Index");
+        return Page();
+    }
 
     public async Task<IActionResult> OnPostAsync()
     {
