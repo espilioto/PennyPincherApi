@@ -14,8 +14,7 @@ public class ChartDataServiceTests
     private (ChartDataService chartService, StatementsService statementsService) CreateServices(string? dbName = null)
     {
         var context = TestDbContextFactory.Create(dbName);
-        var mapper = TestDbContextFactory.CreateMapper();
-        var statementsService = new StatementsService(context, mapper, _statementsLogger);
+        var statementsService = new StatementsService(context, _statementsLogger);
         var utils = new Utils(_statementsLogger);
         var chartService = new ChartDataService(statementsService, _statementsLogger, utils);
         return (chartService, statementsService);

@@ -1,9 +1,7 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PennyPincher.Data;
 using PennyPincher.Domain.Models;
-using PennyPincher.Services;
 
 namespace PennyPincher.Tests.Helpers;
 
@@ -18,12 +16,6 @@ public static class TestDbContextFactory
         var context = new PennyPincherApiDbContext(options);
         context.Database.EnsureCreated();
         return context;
-    }
-
-    public static IMapper CreateMapper()
-    {
-        var config = new MapperConfiguration(cfg => cfg.AddProfile<AutomapperProfiles>());
-        return config.CreateMapper();
     }
 
     public static async Task SeedUserAsync(PennyPincherApiDbContext context, string userId, string email = "test@test.com")

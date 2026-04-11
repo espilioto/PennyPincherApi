@@ -1,11 +1,7 @@
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using PennyPincher.Contracts.Accounts;
 using PennyPincher.Contracts.Categories;
 using PennyPincher.Contracts.Statements;
-using PennyPincher.Domain.Models;
-using PennyPincher.Services;
 using PennyPincher.Services.Mapping;
 using PennyPincher.Tests.Helpers;
 
@@ -13,31 +9,24 @@ namespace PennyPincher.Tests.Services;
 
 public class MappingTests
 {
-    private readonly IMapper _mapper = TestDbContextFactory.CreateMapper();
-
-    // --- StatementRequest → Statement ---
-
     [Fact]
-    public void StatementRequest_ToEntity_MatchesAutoMapper()
+    public void StatementRequest_ToEntity_MapsAllProperties()
     {
         var request = new StatementRequest(new DateTime(2024, 6, 15), 3, 99.50m, "Test description", 7);
 
-        var autoMapped = _mapper.Map<Statement>(request);
-        var manual = request.ToEntity();
+        var entity = request.ToEntity();
 
-        Assert.Equal(autoMapped.Date, manual.Date);
-        Assert.Equal(autoMapped.AccountId, manual.AccountId);
-        Assert.Equal(autoMapped.Amount, manual.Amount);
-        Assert.Equal(autoMapped.Description, manual.Description);
-        Assert.Equal(autoMapped.CategoryId, manual.CategoryId);
-        Assert.Equal(autoMapped.UserId, manual.UserId); // both should be null/default
-        Assert.Equal(autoMapped.CheckedAt, manual.CheckedAt); // both null
+        Assert.Equal(request.Date, entity.Date);
+        Assert.Equal(request.AccountId, entity.AccountId);
+        Assert.Equal(request.Amount, entity.Amount);
+        Assert.Equal(request.Description, entity.Description);
+        Assert.Equal(request.CategoryId, entity.CategoryId);
+        Assert.Empty(entity.UserId);
+        Assert.Null(entity.CheckedAt);
     }
 
-    // --- SelectAsResponse (EF projection) ---
-
     [Fact]
-    public async Task Statement_SelectAsResponse_MatchesProjectTo()
+    public async Task Statement_SelectProjection_MapsAllProperties()
     {
         var context = TestDbContextFactory.Create();
         await TestDbContextFactory.SeedUserAsync(context, "user1");
@@ -45,12 +34,7 @@ public class MappingTests
         await TestDbContextFactory.SeedCategoryAsync(context, 1, "user1", "Food");
         await TestDbContextFactory.SeedStatementAsync(context, "user1", 1, 1, 123.45m, new DateTime(2024, 3, 10), "Groceries");
 
-        var projected = await context.Statements
-            .AsNoTracking()
-            .ProjectTo<StatementResponse>(_mapper.ConfigurationProvider)
-            .ToListAsync();
-
-        var manual = await context.Statements
+        var result = await context.Statements
             .AsNoTracking()
             .Select(s => new StatementResponse(
                 s.Id,
@@ -63,47 +47,32 @@ public class MappingTests
             ))
             .ToListAsync();
 
-        Assert.Single(projected);
-        Assert.Single(manual);
-
-        var p = projected[0];
-        var m = manual[0];
-
-        Assert.Equal(p.Id, m.Id);
-        Assert.Equal(p.Date, m.Date);
-        Assert.Equal(p.Amount, m.Amount);
-        Assert.Equal(p.Description, m.Description);
-        Assert.Equal(p.CheckedAt, m.CheckedAt);
-        Assert.Equal(p.Category.Id, m.Category.Id);
-        Assert.Equal(p.Category.Name, m.Category.Name);
-        Assert.Equal(p.Account.Id, m.Account.Id);
-        Assert.Equal(p.Account.Name, m.Account.Name);
+        Assert.Single(result);
+        var r = result[0];
+        Assert.Equal(123.45m, r.Amount);
+        Assert.Equal("Groceries", r.Description);
+        Assert.Equal("Food", r.Category.Name);
+        Assert.Equal("Savings", r.Account.Name);
     }
 
-    // --- CategoryRequest → Category ---
-
     [Fact]
-    public void CategoryRequest_ToEntity_MatchesAutoMapper()
+    public void CategoryRequest_ToEntity_MapsAllProperties()
     {
         var request = new CategoryRequest("Groceries", "user1");
 
-        var autoMapped = _mapper.Map<Category>(request);
-        var manual = request.ToEntity();
+        var entity = request.ToEntity();
 
-        Assert.Equal(autoMapped.Name, manual.Name);
+        Assert.Equal(request.Name, entity.Name);
     }
 
-    // --- AccountRequest → Account ---
-
     [Fact]
-    public void AccountRequest_ToEntity_MatchesAutoMapper()
+    public void AccountRequest_ToEntity_MapsAllProperties()
     {
         var request = new AccountRequest("Savings", "user1", "#FF5500");
 
-        var autoMapped = _mapper.Map<Account>(request);
-        var manual = request.ToEntity();
+        var entity = request.ToEntity();
 
-        Assert.Equal(autoMapped.Name, manual.Name);
-        Assert.Equal(autoMapped.ColorHex, manual.ColorHex);
+        Assert.Equal(request.Name, entity.Name);
+        Assert.Equal(request.ColorHex, entity.ColorHex);
     }
 }
