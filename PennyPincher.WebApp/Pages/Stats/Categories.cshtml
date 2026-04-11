@@ -1,0 +1,57 @@
+@page
+@model PennyPincher.WebApp.Pages.Stats.CategoriesModel
+@{
+    ViewData["Title"] = "Category Analytics";
+}
+
+<h4 class="mb-3">Category Analytics</h4>
+
+<div class="row">
+    <!-- Category selector (left) -->
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body p-0">
+                <h6 class="card-title text-muted px-3 pt-3 mb-2">Categories</h6>
+                <div style="max-height: calc(100vh - 140px); overflow-y: auto;">
+                    @foreach (var cat in Model.Categories)
+                    {
+                        var isSelected = cat.Id == Model.SelectedCategoryId;
+                        <a class="d-block px-3 py-2 text-decoration-none border-bottom category-item @(isSelected ? "active" : "")"
+                           style="cursor: pointer; @(isSelected ? "background-color: var(--bs-tertiary-bg);" : "")"
+                           hx-get="/Stats/Categories?handler=Analytics&categoryId=@cat.Id"
+                           hx-target="#analytics-panel"
+                           hx-swap="innerHTML">
+                            <span class="@(isSelected ? "text-light fw-semibold" : "text-secondary")">@cat.Name</span>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics panel (right) -->
+    <div class="col-md-9">
+        <div id="analytics-panel">
+            <partial name="_CategoryAnalytics" model="Model" />
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    document.addEventListener('click', function (e) {
+        var item = e.target.closest('.category-item');
+        if (!item) return;
+        document.querySelectorAll('.category-item').forEach(function (el) {
+            el.classList.remove('active');
+            el.style.backgroundColor = '';
+            el.querySelector('span').classList.remove('text-light', 'fw-semibold');
+            el.querySelector('span').classList.add('text-secondary');
+        });
+        item.classList.add('active');
+        item.style.backgroundColor = 'var(--bs-tertiary-bg)';
+        item.querySelector('span').classList.remove('text-secondary');
+        item.querySelector('span').classList.add('text-light', 'fw-semibold');
+    });
+</script>
+}
