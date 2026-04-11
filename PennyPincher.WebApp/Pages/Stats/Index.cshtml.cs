@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using PennyPincher.Contracts.Charts;
 using PennyPincher.Contracts.Categories;
@@ -20,16 +21,22 @@ public class IndexModel : PageModel
     public SavingsChartResponse? Savings { get; set; }
     public List<CategoryResponse> Categories { get; set; } = [];
 
+    [BindProperty(SupportsGet = true)]
+    public bool IgnoreInitsAndTransfers { get; set; } = true;
+
+    [BindProperty(SupportsGet = true)]
+    public bool IgnoreLoans { get; set; } = true;
+
     public async Task OnGetAsync()
     {
         var client = _httpClientFactory.CreateClient("PennyPincherApi");
 
         var monthsTask = client.GetFromJsonAsync<List<MonthlyBreakdownResponse>>(
-            "api/charts/GetMonthlyBreakdownData?ignoreInitsAndTransfers=true&ignoreLoans=true");
+            $"api/charts/GetMonthlyBreakdownData?ignoreInitsAndTransfers={IgnoreInitsAndTransfers}&ignoreLoans={IgnoreLoans}");
         var yearsTask = client.GetFromJsonAsync<List<YearlyBreakdownResponse>>(
-            "api/charts/GetYearlyBreakdownData?ignoreInitsAndTransfers=true&ignoreLoans=true");
+            $"api/charts/GetYearlyBreakdownData?ignoreInitsAndTransfers={IgnoreInitsAndTransfers}&ignoreLoans={IgnoreLoans}");
         var savingsTask = client.GetFromJsonAsync<SavingsChartResponse>(
-            "api/charts/GetSavingsRateChartData?ignoreInitsAndTransfers=true&ignoreLoans=true");
+            $"api/charts/GetSavingsRateChartData?ignoreInitsAndTransfers={IgnoreInitsAndTransfers}&ignoreLoans={IgnoreLoans}");
         var categoriesTask = client.GetFromJsonAsync<List<CategoryResponse>>("api/categories");
 
         await Task.WhenAll(monthsTask, yearsTask, savingsTask, categoriesTask);
