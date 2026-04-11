@@ -85,11 +85,15 @@
     vertical-align: middle;
 }
 
-.amount-positive {
+.amount-positive,
+.table td.amount-positive,
+.table .amount-positive {
     color: #47d17a;
 }
 
-.amount-negative {
+.amount-negative,
+.table td.amount-negative,
+.table .amount-negative {
     color: #e66a7a;
 }
 
