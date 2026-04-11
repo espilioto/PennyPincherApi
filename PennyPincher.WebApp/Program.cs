@@ -21,6 +21,11 @@ builder.Services.AddHttpClient("PennyPincherApi", client =>
     client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]!);
 }).AddHttpMessageHandler<JwtCookieDelegatingHandler>();
 
+builder.Services.AddHttpClient("Turnstile", client =>
+{
+    client.BaseAddress = new Uri("https://challenges.cloudflare.com");
+});
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())

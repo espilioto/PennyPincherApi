@@ -91,7 +91,7 @@ public class LoginModel : PageModel
         if (string.IsNullOrEmpty(TurnstileToken))
             return false;
 
-        using var httpClient = new HttpClient();
+        var client = _httpClientFactory.CreateClient("Turnstile");
         var content = new FormUrlEncodedContent(new Dictionary<string, string>
         {
             ["secret"] = secretKey,
@@ -99,8 +99,7 @@ public class LoginModel : PageModel
             ["remoteip"] = HttpContext.Connection.RemoteIpAddress?.ToString() ?? ""
         });
 
-        var response = await httpClient.PostAsync(
-            "https://challenges.cloudflare.com/turnstile/v0/siteverify", content);
+        var response = await client.PostAsync("/turnstile/v0/siteverify", content);
 
         if (!response.IsSuccessStatusCode)
             return false;
