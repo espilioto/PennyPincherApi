@@ -201,7 +201,7 @@ public class StatementsServiceTests
 
         var checkedStatement = context.Statements.First(s => s.Description == "Already checked");
         checkedStatement.CheckedAt = alreadyChecked;
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         await service.MarkAllUncheckedNowAsync("user1");
 
