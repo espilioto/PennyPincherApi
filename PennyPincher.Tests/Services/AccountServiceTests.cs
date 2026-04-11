@@ -14,8 +14,7 @@ public class AccountServiceTests
     public async Task GetByUserAsync_ReturnsOnlyUserAccounts()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new AccountService(context, mapper, _logger);
+        var service = new AccountService(context, _logger);
 
         await TestDbContextFactory.SeedUserAsync(context, "user1");
         await TestDbContextFactory.SeedUserAsync(context, "user2", "other@test.com");
@@ -33,8 +32,7 @@ public class AccountServiceTests
     public async Task GetAllAsync_ReturnsAllUsersAccounts()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new AccountService(context, mapper, _logger);
+        var service = new AccountService(context, _logger);
 
         await TestDbContextFactory.SeedUserAsync(context, "user1");
         await TestDbContextFactory.SeedUserAsync(context, "user2", "other@test.com");
@@ -51,8 +49,7 @@ public class AccountServiceTests
     public async Task GetByUserAsync_CalculatesBalanceFromStatements()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new AccountService(context, mapper, _logger);
+        var service = new AccountService(context, _logger);
 
         await TestDbContextFactory.SeedUserAsync(context, "user1");
         await TestDbContextFactory.SeedAccountAsync(context, 1, "user1");
@@ -70,8 +67,7 @@ public class AccountServiceTests
     public async Task GetByUserAsync_ReturnsNotFound_WhenNoAccounts()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new AccountService(context, mapper, _logger);
+        var service = new AccountService(context, _logger);
 
         var result = await service.GetByUserAsync("nonexistent");
 
@@ -82,8 +78,7 @@ public class AccountServiceTests
     public async Task InsertAsync_RejectsInvalidColorHex()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new AccountService(context, mapper, _logger);
+        var service = new AccountService(context, _logger);
 
         await TestDbContextFactory.SeedUserAsync(context, "user1");
 
@@ -97,8 +92,7 @@ public class AccountServiceTests
     public async Task InsertAsync_AcceptsValidRequest()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new AccountService(context, mapper, _logger);
+        var service = new AccountService(context, _logger);
 
         await TestDbContextFactory.SeedUserAsync(context, "user1");
 
@@ -113,8 +107,7 @@ public class AccountServiceTests
     public async Task UpdateAsync_ReturnsNotFound_WhenMissing()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new AccountService(context, mapper, _logger);
+        var service = new AccountService(context, _logger);
 
         await TestDbContextFactory.SeedUserAsync(context, "user1");
         var request = new AccountRequest("Test", "user1", "#FF0000");
@@ -127,8 +120,7 @@ public class AccountServiceTests
     public async Task DeleteAsync_ReturnsNotFound_WhenMissing()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new AccountService(context, mapper, _logger);
+        var service = new AccountService(context, _logger);
 
         var result = await service.DeleteAsync("user1", 999);
 
@@ -139,8 +131,7 @@ public class AccountServiceTests
     public async Task GetByUserAsync_ReturnsAccountsOrderedBySortOrder()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new AccountService(context, mapper, _logger);
+        var service = new AccountService(context, _logger);
 
         await TestDbContextFactory.SeedUserAsync(context, "user1");
         await TestDbContextFactory.SeedAccountAsync(context, 1, "user1", "Last", sortOrder: 2);

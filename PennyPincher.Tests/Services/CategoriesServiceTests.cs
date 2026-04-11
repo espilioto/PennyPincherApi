@@ -13,8 +13,7 @@ public class CategoriesServiceTests
     public async Task GetAllAsync_ReturnsAllCategories()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new CategoriesService(context, mapper, _logger);
+        var service = new CategoriesService(context, _logger);
 
         await TestDbContextFactory.SeedUserAsync(context, "user1");
         await TestDbContextFactory.SeedCategoryAsync(context, 1, "user1", "Food");
@@ -30,8 +29,7 @@ public class CategoriesServiceTests
     public async Task GetAllAsync_ReturnsNotFound_WhenEmpty()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new CategoriesService(context, mapper, _logger);
+        var service = new CategoriesService(context, _logger);
 
         var result = await service.GetByUserAsync("user1");
 
@@ -42,8 +40,7 @@ public class CategoriesServiceTests
     public async Task InsertAsync_AcceptsValidRequest()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new CategoriesService(context, mapper, _logger);
+        var service = new CategoriesService(context, _logger);
 
         await TestDbContextFactory.SeedUserAsync(context, "user1");
 
@@ -58,8 +55,7 @@ public class CategoriesServiceTests
     public async Task UpdateAsync_UpdatesName()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new CategoriesService(context, mapper, _logger);
+        var service = new CategoriesService(context, _logger);
 
         await TestDbContextFactory.SeedUserAsync(context, "user1");
         await TestDbContextFactory.SeedCategoryAsync(context, 1, "user1", "Old Name");
@@ -75,8 +71,7 @@ public class CategoriesServiceTests
     public async Task UpdateAsync_ReturnsNotFound_WhenMissing()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new CategoriesService(context, mapper, _logger);
+        var service = new CategoriesService(context, _logger);
 
         var request = new CategoryRequest("Test", "user1");
         var result = await service.UpdateAsync("user1", 999, request);
@@ -88,8 +83,7 @@ public class CategoriesServiceTests
     public async Task DeleteAsync_RemovesCategory()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new CategoriesService(context, mapper, _logger);
+        var service = new CategoriesService(context, _logger);
 
         await TestDbContextFactory.SeedUserAsync(context, "user1");
         await TestDbContextFactory.SeedCategoryAsync(context, 1, "user1", "Food");
@@ -104,8 +98,7 @@ public class CategoriesServiceTests
     public async Task DeleteAsync_ReturnsNotFound_WhenMissing()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new CategoriesService(context, mapper, _logger);
+        var service = new CategoriesService(context, _logger);
 
         var result = await service.DeleteAsync("user1", 999);
 

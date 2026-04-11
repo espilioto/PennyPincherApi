@@ -1,23 +1,20 @@
-using AutoMapper;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PennyPincher.Contracts.Categories;
 using PennyPincher.Data;
-using PennyPincher.Domain.Models;
+using PennyPincher.Services.Mapping;
 
 namespace PennyPincher.Services.Categories
 {
     public class CategoriesService : ICategoriesService
     {
         private readonly ILogger<CategoriesService> _logger;
-        private readonly IMapper _mapper;
         private readonly PennyPincherApiDbContext _context;
 
-        public CategoriesService(PennyPincherApiDbContext context, IMapper mapper, ILogger<CategoriesService> logger)
+        public CategoriesService(PennyPincherApiDbContext context, ILogger<CategoriesService> logger)
         {
             _logger = logger;
-            _mapper = mapper;
             _context = context;
         }
 
@@ -25,7 +22,7 @@ namespace PennyPincher.Services.Categories
         {
             try
             {
-                var category = _mapper.Map<Category>(request);
+                var category = request.ToEntity();
                 category.UserId = userId;
                 _ = await _context.Categories.AddAsync(category);
                 var success = await _context.SaveChangesAsync();

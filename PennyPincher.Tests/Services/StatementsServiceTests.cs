@@ -13,8 +13,7 @@ public class StatementsServiceTests
     public async Task GetByUserAsync_ReturnsOnlyUserStatements()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new StatementsService(context, mapper, _logger);
+        var service = new StatementsService(context, _logger);
 
         await TestDbContextFactory.SeedUserAsync(context, "user1");
         await TestDbContextFactory.SeedUserAsync(context, "user2", "other@test.com");
@@ -35,8 +34,7 @@ public class StatementsServiceTests
     public async Task GetByUserAsync_WithNullSorting_DefaultsToDateDesc()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new StatementsService(context, mapper, _logger);
+        var service = new StatementsService(context, _logger);
 
         await TestDbContextFactory.SeedUserAsync(context, "user1");
         await TestDbContextFactory.SeedAccountAsync(context, 1, "user1");
@@ -56,8 +54,7 @@ public class StatementsServiceTests
     public async Task GetByUserAsync_SortByAmountAsc()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new StatementsService(context, mapper, _logger);
+        var service = new StatementsService(context, _logger);
 
         await TestDbContextFactory.SeedUserAsync(context, "user1");
         await TestDbContextFactory.SeedAccountAsync(context, 1, "user1");
@@ -77,8 +74,7 @@ public class StatementsServiceTests
     public async Task GetByUserAsync_FilterByDateRange()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new StatementsService(context, mapper, _logger);
+        var service = new StatementsService(context, _logger);
 
         await TestDbContextFactory.SeedUserAsync(context, "user1");
         await TestDbContextFactory.SeedAccountAsync(context, 1, "user1");
@@ -100,8 +96,7 @@ public class StatementsServiceTests
     public async Task GetByUserAsync_FilterByExcludedCategory()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new StatementsService(context, mapper, _logger);
+        var service = new StatementsService(context, _logger);
 
         await TestDbContextFactory.SeedUserAsync(context, "user1");
         await TestDbContextFactory.SeedAccountAsync(context, 1, "user1");
@@ -123,8 +118,7 @@ public class StatementsServiceTests
     public async Task GetByUserAsync_ReturnsNotFound_WhenNoStatements()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new StatementsService(context, mapper, _logger);
+        var service = new StatementsService(context, _logger);
 
         var result = await service.GetByUserAsync("nonexistent");
 
@@ -135,8 +129,7 @@ public class StatementsServiceTests
     public async Task GetAllAsync_ReturnsAllUsersStatements()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new StatementsService(context, mapper, _logger);
+        var service = new StatementsService(context, _logger);
 
         await TestDbContextFactory.SeedUserAsync(context, "user1");
         await TestDbContextFactory.SeedUserAsync(context, "user2", "other@test.com");
@@ -155,8 +148,7 @@ public class StatementsServiceTests
     public async Task InsertAsync_SetsUserId()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new StatementsService(context, mapper, _logger);
+        var service = new StatementsService(context, _logger);
 
         await TestDbContextFactory.SeedUserAsync(context, "user1");
         await TestDbContextFactory.SeedAccountAsync(context, 1, "user1");
@@ -174,8 +166,7 @@ public class StatementsServiceTests
     public async Task UpdateAsync_ReturnsNotFound_WhenMissing()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new StatementsService(context, mapper, _logger);
+        var service = new StatementsService(context, _logger);
 
         var request = new StatementRequest(DateTime.UtcNow, 1, 50m, "Test", 1);
         var result = await service.UpdateAsync("user1", 999, request);
@@ -187,8 +178,7 @@ public class StatementsServiceTests
     public async Task DeleteAsync_ReturnsNotFound_WhenMissing()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new StatementsService(context, mapper, _logger);
+        var service = new StatementsService(context, _logger);
 
         var result = await service.DeleteAsync("user1", 999);
 
@@ -199,8 +189,7 @@ public class StatementsServiceTests
     public async Task MarkAllUncheckedNowAsync_OnlyUpdatesNullCheckedAt()
     {
         var context = TestDbContextFactory.Create();
-        var mapper = TestDbContextFactory.CreateMapper();
-        var service = new StatementsService(context, mapper, _logger);
+        var service = new StatementsService(context, _logger);
 
         await TestDbContextFactory.SeedUserAsync(context, "user1");
         await TestDbContextFactory.SeedAccountAsync(context, 1, "user1");
