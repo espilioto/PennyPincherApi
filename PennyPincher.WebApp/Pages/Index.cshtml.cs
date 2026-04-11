@@ -27,7 +27,7 @@ public class IndexModel : PageModel
 
         await Task.WhenAll(accountsTask, chartTask);
 
-        Accounts = accountsTask.Result ?? [];
-        BalanceChartData = chartTask.Result ?? [];
+        Accounts = await accountsTask ?? [];
+        BalanceChartData = await chartTask ?? [];
     }
 }

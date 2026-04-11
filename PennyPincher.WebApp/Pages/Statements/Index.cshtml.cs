@@ -59,9 +59,9 @@ public class IndexModel : PageModel
 
         await Task.WhenAll(accountsTask, categoriesTask, statementsTask);
 
-        Accounts = accountsTask.Result ?? [];
-        Categories = categoriesTask.Result ?? [];
-        Statements = statementsTask.Result;
+        Accounts = await accountsTask ?? [];
+        Categories = await categoriesTask ?? [];
+        Statements = await statementsTask;
     }
 
     public async Task<IActionResult> OnGetTableAsync()

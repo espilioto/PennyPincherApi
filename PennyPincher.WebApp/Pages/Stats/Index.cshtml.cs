@@ -41,12 +41,12 @@ public class IndexModel : PageModel
 
         await Task.WhenAll(monthsTask, yearsTask, savingsTask, categoriesTask);
 
-        var months = monthsTask.Result ?? [];
-        var years = yearsTask.Result ?? [];
+        var months = await monthsTask ?? [];
+        var years = await yearsTask ?? [];
 
         LatestMonth = months.FirstOrDefault();
         CurrentYear = years.FirstOrDefault();
-        Savings = savingsTask.Result;
-        Categories = categoriesTask.Result ?? [];
+        Savings = await savingsTask;
+        Categories = await categoriesTask ?? [];
     }
 }
