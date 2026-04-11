@@ -52,7 +52,15 @@ public class MappingTests
 
         var manual = await context.Statements
             .AsNoTracking()
-            .SelectAsResponse()
+            .Select(s => new StatementResponse(
+                s.Id,
+                s.Date,
+                s.Amount,
+                s.Description,
+                s.CheckedAt,
+                new CategoryResponse(s.Category!.Id, s.Category.Name),
+                new AccountResponseLite(s.Account!.Id, s.Account.Name)
+            ))
             .ToListAsync();
 
         Assert.Single(projected);

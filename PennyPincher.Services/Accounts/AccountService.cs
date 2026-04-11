@@ -1,10 +1,9 @@
-﻿using AutoMapper;
-using ErrorOr;
+﻿using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PennyPincher.Contracts.Accounts;
 using PennyPincher.Data;
-using PennyPincher.Domain.Models;
+using PennyPincher.Services.Mapping;
 using PennyPincher.Services.Statements;
 using System.Text.RegularExpressions;
 
@@ -13,13 +12,11 @@ namespace PennyPincher.Services.Accounts;
 public class AccountService : IAccountService
 {
     private readonly PennyPincherApiDbContext _context;
-    private readonly IMapper _mapper;
     private readonly ILogger<StatementsService> _logger;
 
-    public AccountService(PennyPincherApiDbContext context, IMapper mapper, ILogger<StatementsService> logger)
+    public AccountService(PennyPincherApiDbContext context, ILogger<StatementsService> logger)
     {
         _context = context;
-        _mapper = mapper;
         _logger = logger;
     }
 
@@ -88,7 +85,7 @@ public class AccountService : IAccountService
             if (errors.Count > 0)
                 return errors;
 
-            var account = _mapper.Map<Account>(request);
+            var account = request.ToEntity();
             account.UserId = userId;
             _ = await _context.Accounts.AddAsync(account);
             var success = await _context.SaveChangesAsync();

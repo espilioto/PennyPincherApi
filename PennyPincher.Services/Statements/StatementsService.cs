@@ -1,24 +1,22 @@
-﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using ErrorOr;
+﻿using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using PennyPincher.Contracts.Accounts;
+using PennyPincher.Contracts.Categories;
 using PennyPincher.Contracts.Statements;
 using PennyPincher.Data;
-using PennyPincher.Domain.Models;
+using PennyPincher.Services.Mapping;
 
 namespace PennyPincher.Services.Statements;
 
 public class StatementsService : IStatementsService
 {
     private readonly ILogger<StatementsService> _logger;
-    private readonly IMapper _mapper;
     private readonly PennyPincherApiDbContext _context;
 
-    public StatementsService(PennyPincherApiDbContext context, IMapper mapper, ILogger<StatementsService> logger)
+    public StatementsService(PennyPincherApiDbContext context, ILogger<StatementsService> logger)
     {
         _context = context;
-        _mapper = mapper;
         _logger = logger;
     }
 
@@ -26,7 +24,7 @@ public class StatementsService : IStatementsService
     {
         try
         {
-            var statement = _mapper.Map<Statement>(request);
+            var statement = request.ToEntity();
             statement.UserId = userId;
             _ = await _context.Statements.AddAsync(statement);
             var success = await _context.SaveChangesAsync();
@@ -47,7 +45,15 @@ public class StatementsService : IStatementsService
             var statements = await _context.Statements
                 .AsNoTracking()
                 .OrderByDescending(s => s.Date)
-                .ProjectTo<StatementResponse>(_mapper.ConfigurationProvider)
+                .Select(s => new StatementResponse(
+                    s.Id,
+                    s.Date,
+                    s.Amount,
+                    s.Description,
+                    s.CheckedAt,
+                    new CategoryResponse(s.Category!.Id, s.Category.Name),
+                    new AccountResponseLite(s.Account!.Id, s.Account.Name)
+                ))
                 .ToListAsync();
 
             return statements.Count != 0 ? statements : Error.NotFound();
@@ -105,7 +111,15 @@ public class StatementsService : IStatementsService
             };
 
             var statements = await statementsQuery
-                .ProjectTo<StatementResponse>(_mapper.ConfigurationProvider)
+                .Select(s => new StatementResponse(
+                    s.Id,
+                    s.Date,
+                    s.Amount,
+                    s.Description,
+                    s.CheckedAt,
+                    new CategoryResponse(s.Category!.Id, s.Category.Name),
+                    new AccountResponseLite(s.Account!.Id, s.Account.Name)
+                ))
                 .ToListAsync();
 
             return statements.Count != 0 ? statements : Error.NotFound();
@@ -125,7 +139,11 @@ public class StatementsService : IStatementsService
             if (statement is null)
                 return Error.NotFound(description: "Statement not found");
 
-            _mapper.Map(request, statement);
+            statement.Date = request.Date;
+            statement.AccountId = request.AccountId;
+            statement.Amount = request.Amount;
+            statement.Description = request.Description;
+            statement.CategoryId = request.CategoryId;
             var success = await _context.SaveChangesAsync();
 
             return success == 1 ? true : Error.Failure(description: "Error updating statement");
