@@ -45,7 +45,7 @@ public class MappingTests
                 new CategoryResponse(s.Category!.Id, s.Category.Name),
                 new AccountResponseLite(s.Account!.Id, s.Account.Name)
             ))
-            .ToListAsync();
+            .ToListAsync(TestContext.Current.CancellationToken);
 
         Assert.Single(result);
         var r = result[0];
