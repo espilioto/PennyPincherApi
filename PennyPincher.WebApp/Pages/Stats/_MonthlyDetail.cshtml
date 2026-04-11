@@ -14,6 +14,14 @@ else
     <!-- Donut chart -->
     <div id="detail-donut-chart" class="mb-3"></div>
 
+    <!-- Category filter badge -->
+    <div id="category-filter-badge" class="mb-3" style="visibility: hidden;">
+        <span class="badge bg-primary fs-6">
+            Filtered: <span id="filter-category-name"></span>
+            <button type="button" class="btn-close btn-close-white ms-2" style="font-size: 0.6rem;" onclick="clearCategoryFilter()"></button>
+        </span>
+    </div>
+
     <!-- Summary cards -->
     <div class="row g-2 mb-3">
         <div class="col-4">
@@ -47,12 +55,12 @@ else
     <!-- Transactions -->
     <div class="row">
         <div class="col-md-6">
-            <h6 class="text-muted">Income (@Model.Detail.IncomeStatements.Count)</h6>
+            <h6 class="text-muted">Income (<span id="income-count">@Model.Detail.IncomeStatements.Count</span>)</h6>
             <table class="table table-sm table-hover">
-                <tbody>
+                <tbody id="income-tbody">
                     @foreach (var s in Model.Detail.IncomeStatements)
                     {
-                        <tr>
+                        <tr data-category="@s.Category.Name">
                             <td>
                                 <div>@s.Description</div>
                                 <small class="text-muted">@s.Date.ToString("yyyy-MM-dd")</small>
@@ -68,12 +76,12 @@ else
             </table>
         </div>
         <div class="col-md-6">
-            <h6 class="text-muted">Expenses (@Model.Detail.ExpenseStatements.Count)</h6>
+            <h6 class="text-muted">Expenses (<span id="expense-count">@Model.Detail.ExpenseStatements.Count</span>)</h6>
             <table class="table table-sm table-hover">
-                <tbody>
+                <tbody id="expense-tbody">
                     @foreach (var s in Model.Detail.ExpenseStatements)
                     {
-                        <tr>
+                        <tr data-category="@s.Category.Name">
                             <td>
                                 <div>@s.Description</div>
                                 <small class="text-muted">@s.Date.ToString("yyyy-MM-dd")</small>
@@ -91,11 +99,33 @@ else
     </div>
 
     <script>
+        var activeCategory = null;
+
+        function filterByCategory(category) {
+            activeCategory = category;
+            document.querySelectorAll('#income-tbody tr, #expense-tbody tr').forEach(function (row) {
+                row.style.display = row.dataset.category === category ? '' : 'none';
+            });
+            document.getElementById('filter-category-name').textContent = category;
+            document.getElementById('category-filter-badge').style.visibility = 'visible';
+            document.getElementById('income-count').textContent = document.querySelectorAll('#income-tbody tr[data-category="' + category + '"]').length;
+            document.getElementById('expense-count').textContent = document.querySelectorAll('#expense-tbody tr[data-category="' + category + '"]').length;
+        }
+
+        function clearCategoryFilter() {
+            activeCategory = null;
+            document.querySelectorAll('#income-tbody tr, #expense-tbody tr').forEach(function (row) {
+                row.style.display = '';
+            });
+            document.getElementById('category-filter-badge').style.visibility = 'hidden';
+            document.getElementById('income-count').textContent = document.querySelectorAll('#income-tbody tr').length;
+            document.getElementById('expense-count').textContent = document.querySelectorAll('#expense-tbody tr').length;
+        }
+
         function initDetailDonut() {
             var rawData = @Html.Raw(JsonSerializer.Serialize(Model.Detail.DonutData, jsonOptions));
             var el = document.getElementById('detail-donut-chart');
             if (rawData.length > 0 && el) {
-                // Filter: top 10, minimum 5%, group rest into "Other"
                 var totalAbs = rawData.reduce(function (s, d) { return s + Math.abs(d.value); }, 0);
                 var sorted = rawData.slice().sort(function (a, b) { return Math.abs(b.value) - Math.abs(a.value); });
                 var donutData = [];
@@ -118,7 +148,21 @@ else
                     '#8BC34A', '#FF9800', '#FF5722', '#795548', '#607D8B'
                 ];
                 new ApexCharts(el, {
-                    chart: { type: 'donut', height: 280, background: 'transparent' },
+                    chart: {
+                        type: 'donut',
+                        height: 280,
+                        background: 'transparent',
+                        events: {
+                            dataPointSelection: function (event, chartContext, config) {
+                                var category = donutData[config.dataPointIndex].key;
+                                if (category === activeCategory) {
+                                    clearCategoryFilter();
+                                } else {
+                                    filterByCategory(category);
+                                }
+                            }
+                        }
+                    },
                     stroke: { show: false },
                     theme: { mode: 'dark' },
                     colors: materialColors,
