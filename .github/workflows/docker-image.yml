@@ -1,13 +1,4 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-# GitHub recommends pinning actions to a commit SHA.
-# To get a newer version, you will need to update the SHA.
-# You can also reference a tag or branch, but the action may change without warning.
-
-name: Create and publish a Docker image
+name: Build and publish Docker images
 
 on:
   push:
@@ -15,14 +6,13 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -38,7 +28,7 @@ jobs:
       - name: Run tests
         run: dotnet test --no-build --verbosity normal
 
-  build-and-push-image:
+  build-and-push-images:
     needs: test
     runs-on: ubuntu-latest
     permissions:
@@ -47,10 +37,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Log in to the Container registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -60,25 +50,41 @@ jobs:
         id: timestamp
         run: echo "timestamp=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
 
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v4
+      - name: Extract metadata (API)
+        id: meta-api
+        uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/pennypincher-api
           tags: |
             type=raw,value=latest
             type=raw,value=${{ steps.timestamp.outputs.timestamp }}
-          flavor: |
-            latest=true
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
+      - name: Extract metadata (WebApp)
+        id: meta-web
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/pennypincher-web
+          tags: |
+            type=raw,value=latest
+            type=raw,value=${{ steps.timestamp.outputs.timestamp }}
+
+      - name: Build and push API image
+        uses: docker/build-push-action@v6
         with:
           context: .
+          file: PennyPincher.Api/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-api.outputs.tags }}
+          labels: ${{ steps.meta-api.outputs.labels }}
 
+      - name: Build and push WebApp image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: PennyPincher.WebApp/Dockerfile
+          push: true
+          tags: ${{ steps.meta-web.outputs.tags }}
+          labels: ${{ steps.meta-web.outputs.labels }}
 
       - name: Trigger watchtower
         run: curl -X POST -H ${{ secrets.WATCHTOWER_AUTH_HEADER }} ${{ secrets.WATCHTOWER_URL }}
