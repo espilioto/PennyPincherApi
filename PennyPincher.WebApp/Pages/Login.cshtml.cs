@@ -9,10 +9,12 @@ namespace PennyPincher.WebApp.Pages;
 public class LoginModel : PageModel
 {
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IConfiguration _configuration;
 
-    public LoginModel(IHttpClientFactory httpClientFactory)
+    public LoginModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
     {
         _httpClientFactory = httpClientFactory;
+        _configuration = configuration;
     }
 
     [BindProperty]
@@ -21,12 +23,29 @@ public class LoginModel : PageModel
     [BindProperty]
     public string Password { get; set; } = string.Empty;
 
+    [BindProperty(Name = "cf-turnstile-response")]
+    public string? TurnstileToken { get; set; }
+
+    public string TurnstileSiteKey => _configuration["Turnstile:SiteKey"] ?? "";
+
     public string? ErrorMessage { get; set; }
 
     public void OnGet() { }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        // Validate Turnstile token before checking credentials
+        var secretKey = _configuration["Turnstile:SecretKey"];
+        if (!string.IsNullOrEmpty(secretKey))
+        {
+            var turnstileValid = await ValidateTurnstileAsync(secretKey);
+            if (!turnstileValid)
+            {
+                ErrorMessage = "Verification failed. Please try again.";
+                return Page();
+            }
+        }
+
         var client = _httpClientFactory.CreateClient("PennyPincherApi");
 
         var loginPayload = new { Email, Password };
@@ -59,5 +78,28 @@ public class LoginModel : PageModel
         await HttpContext.SignInAsync("Cookies", principal);
 
         return RedirectToPage("/Statements/Index");
+    }
+
+    private async Task<bool> ValidateTurnstileAsync(string secretKey)
+    {
+        if (string.IsNullOrEmpty(TurnstileToken))
+            return false;
+
+        using var httpClient = new HttpClient();
+        var content = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["secret"] = secretKey,
+            ["response"] = TurnstileToken,
+            ["remoteip"] = HttpContext.Connection.RemoteIpAddress?.ToString() ?? ""
+        });
+
+        var response = await httpClient.PostAsync(
+            "https://challenges.cloudflare.com/turnstile/v0/siteverify", content);
+
+        if (!response.IsSuccessStatusCode)
+            return false;
+
+        var result = await response.Content.ReadFromJsonAsync<JsonElement>();
+        return result.GetProperty("success").GetBoolean();
     }
 }

@@ -23,6 +23,9 @@
             <label for="password" class="form-label">Password</label>
             <input type="password" class="form-control" id="password" name="Password" required />
         </div>
+        <div class="cf-turnstile mb-3" data-sitekey="@Model.TurnstileSiteKey"></div>
         <button type="submit" class="btn btn-primary w-100">Login</button>
     </form>
 </div>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
