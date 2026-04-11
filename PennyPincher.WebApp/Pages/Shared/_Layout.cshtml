@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - PennyPincher</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <nav class="sidebar d-flex flex-column p-3">
+            <a class="sidebar-brand mb-4" asp-page="/Index">PennyPincher</a>
+
+            <ul class="nav flex-column flex-grow-1">
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString() == "/Index" ? "active" : "")"
+                       asp-page="/Index">Overview</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/Statements") == true ? "active" : "")"
+                       asp-page="/Statements/Index">Statements</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString() == "/Stats/Index" ? "active" : "")"
+                       asp-page="/Stats/Index">Stats</a>
+                    @if (ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/Stats") == true)
+                    {
+                        <ul class="nav flex-column ms-3">
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-sub @(ViewContext.RouteData.Values["page"]?.ToString() == "/Stats/Monthly" ? "active" : "")"
+                                   asp-page="/Stats/Monthly">Monthly</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-sub @(ViewContext.RouteData.Values["page"]?.ToString() == "/Stats/Yearly" ? "active" : "")"
+                                   asp-page="/Stats/Yearly">Yearly</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-sub @(ViewContext.RouteData.Values["page"]?.ToString() == "/Stats/Savings" ? "active" : "")"
+                                   asp-page="/Stats/Savings">Savings</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-sub @(ViewContext.RouteData.Values["page"]?.ToString() == "/Stats/Categories" ? "active" : "")"
+                                   asp-page="/Stats/Categories">Categories</a>
+                            </li>
+                        </ul>
+                    }
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/Accounts") == true ? "active" : "")"
+                       asp-page="/Accounts/Index">Accounts</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/Categories") == true ? "active" : "")"
+                       asp-page="/Categories/Index">Categories</a>
+                </li>
+            </ul>
+
+            <div class="mt-auto">
+                <span class="nav-link text-muted small">@User.Identity?.Name</span>
+                <form method="post" asp-page="/Logout">
+                    <button type="submit" class="nav-link text-danger bg-transparent border-0">Logout</button>
+                </form>
+            </div>
+        </nav>
+    }
+
+    <div class="@(User.Identity?.IsAuthenticated == true ? "main-content" : "")">
+        <main class="container-fluid p-4">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/htmx/htmx.min.js"></script>
+    <script src="~/lib/apexcharts/apexcharts.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

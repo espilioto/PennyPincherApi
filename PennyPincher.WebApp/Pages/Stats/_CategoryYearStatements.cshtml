@@ -1,0 +1,31 @@
+@model PennyPincher.WebApp.Pages.Stats.CategoriesModel
+
+<div class="card">
+    <div class="card-body">
+        <h6 class="card-title text-muted mb-3">@Model.SelectedCategoryName — @Model.SelectedYear (@Model.YearStatements.Count)</h6>
+        @if (Model.YearStatements.Count > 0)
+        {
+            <table class="table table-sm table-hover mb-0">
+                <tbody>
+                    @foreach (var s in Model.YearStatements)
+                    {
+                        <tr>
+                            <td>
+                                <div>@s.Description</div>
+                                <small class="text-muted">@s.Date.ToString("yyyy-MM-dd")</small>
+                            </td>
+                            <td class="text-end text-nowrap align-middle">
+                                <div class="@(s.Amount >= 0 ? "amount-positive" : "amount-negative")">@s.Amount.ToString("N2") &euro;</div>
+                                <div class="text-muted" style="font-size: 0.8rem;">@s.Account.Name</div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="text-muted mb-0">No statements.</p>
+        }
+    </div>
+</div>

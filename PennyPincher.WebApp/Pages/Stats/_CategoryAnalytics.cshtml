@@ -1,0 +1,122 @@
+@model PennyPincher.WebApp.Pages.Stats.CategoriesModel
+@using System.Text.Json
+
+@if (Model.Analytics == null)
+{
+    <p class="text-muted">Select a category to view analytics.</p>
+}
+else
+{
+    var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
+    <h5 class="mb-3">@Model.SelectedCategoryName</h5>
+
+    <!-- Line chart -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div id="category-chart"></div>
+        </div>
+    </div>
+
+    <!-- Yearly sums table -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h6 class="card-title text-muted mb-3">Yearly Totals</h6>
+            <table class="table table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th class="text-end">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Model.Analytics.YearSums)
+                    {
+                        var isSum = row.Key == "Sum";
+                        if (isSum)
+                        {
+                            <tr>
+                                <td class="fw-bold">@row.Key</td>
+                                <td class="text-end fw-bold @(row.Value >= 0 ? "amount-positive" : "amount-negative")">
+                                    @row.Value.ToString("N2") &euro;
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr class="year-row" style="cursor: pointer;"
+                                hx-get="/Stats/Categories?handler=YearStatements&categoryId=@Model.SelectedCategoryId&year=@row.Key"
+                                hx-target="#year-statements-panel"
+                                hx-swap="innerHTML">
+                                <td>@row.Key</td>
+                                <td class="text-end @(row.Value >= 0 ? "amount-positive" : "amount-negative")">
+                                    @row.Value.ToString("N2") &euro;
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Year statements panel -->
+    <div id="year-statements-panel"></div>
+
+    <script>
+        function initCategoryChart() {
+            var chartData = @Html.Raw(JsonSerializer.Serialize(Model.Analytics.ChartData, jsonOptions));
+            var el = document.getElementById('category-chart');
+            if (!el || chartData.length === 0) return;
+
+            new ApexCharts(el, {
+                chart: {
+                    type: 'area',
+                    height: 350,
+                    background: 'transparent',
+                    toolbar: { show: true }
+                },
+                theme: { mode: 'dark' },
+                colors: ['#FF9800'],
+                stroke: { curve: 'smooth', width: 2 },
+                fill: { type: 'gradient', gradient: { opacityFrom: 0.3, opacityTo: 0.05 } },
+                series: [{
+                    name: '@Model.SelectedCategoryName',
+                    data: chartData.map(function (d) { return { x: d.key, y: Math.abs(d.value) }; })
+                }],
+                xaxis: {
+                    type: 'category',
+                    labels: { rotate: -45, rotateAlways: true, style: { fontSize: '11px' } },
+                    tickAmount: Math.min(chartData.length, 24)
+                },
+                yaxis: {
+                    labels: {
+                        formatter: function (val) {
+                            if (Math.abs(val) >= 1000) return (val / 1000).toFixed(0) + 'k';
+                            return val.toFixed(0);
+                        }
+                    }
+                },
+                tooltip: {
+                    y: { formatter: function (val) { return val.toFixed(2) + ' \u20ac'; } }
+                },
+                dataLabels: { enabled: false }
+            }).render();
+        }
+
+        document.addEventListener('click', function (e) {
+            var row = e.target.closest('.year-row');
+            if (!row) return;
+            document.querySelectorAll('.year-row').forEach(function (el) {
+                el.classList.remove('table-active');
+            });
+            row.classList.add('table-active');
+        });
+
+        if (typeof ApexCharts !== 'undefined') {
+            requestAnimationFrame(initCategoryChart);
+        } else {
+            window.addEventListener('load', initCategoryChart);
+        }
+    </script>
+}

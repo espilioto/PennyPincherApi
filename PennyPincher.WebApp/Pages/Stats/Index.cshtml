@@ -1,0 +1,207 @@
+@page
+@model PennyPincher.WebApp.Pages.Stats.IndexModel
+@{
+    ViewData["Title"] = "Stats";
+    var savingsLatest = Model.Savings?.AveragesPerYear.LastOrDefault();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Stats</h4>
+    <div class="d-flex gap-3">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="ignoreInits"
+                   @(Model.IgnoreInitsAndTransfers ? "checked" : "") onchange="submitFilters()">
+            <label class="form-check-label small" for="ignoreInits">Ignore inits & transfers</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="ignoreLoans"
+                   @(Model.IgnoreLoans ? "checked" : "") onchange="submitFilters()">
+            <label class="form-check-label small" for="ignoreLoans">Ignore loans</label>
+        </div>
+    </div>
+    <script>
+        function submitFilters() {
+            var inits = document.getElementById('ignoreInits').checked;
+            var loans = document.getElementById('ignoreLoans').checked;
+            window.location.href = '?IgnoreInitsAndTransfers=' + inits + '&IgnoreLoans=' + loans;
+        }
+    </script>
+</div>
+
+<div class="row g-4">
+    <!-- Monthly Breakdown -->
+    <div class="col-md-6">
+        <a asp-page="/Stats/Monthly" class="text-decoration-none">
+            <div class="card h-100 stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stats-card-icon bg-success bg-opacity-10 text-success">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-5 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
+                                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                            </svg>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="card-title mb-0 text-light">Monthly Breakdown</h5>
+                            <small class="text-muted">Income & expenses by month</small>
+                        </div>
+                    </div>
+                    @if (Model.LatestMonth != null)
+                    {
+                        var m = Model.LatestMonth;
+                        var total = m.Income + Math.Abs(m.Expenses);
+                        var incomePct = total > 0 ? (double)(m.Income / total) * 100 : 50;
+                        <div class="small text-muted mb-2">@m.MonthYear</div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="amount-positive fw-semibold">+@m.Income.ToString("N0") &euro;</span>
+                            <span class="amount-negative fw-semibold">@m.Expenses.ToString("N0") &euro;</span>
+                        </div>
+                        <div class="progress mb-2" style="height: 6px;">
+                            <div class="progress-bar bg-success" style="width: @incomePct.ToString("F0")%"></div>
+                            <div class="progress-bar bg-danger" style="width: @((100 - incomePct).ToString("F0"))%"></div>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge @(m.Balance >= 0 ? "bg-success" : "bg-danger")">
+                                @(m.Balance >= 0 ? "+" : "")@m.Balance.ToString("N0") &euro;
+                            </span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-muted small">No data yet</div>
+                    }
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Yearly Breakdown -->
+    <div class="col-md-6">
+        <a asp-page="/Stats/Yearly" class="text-decoration-none">
+            <div class="card h-100 stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stats-card-icon bg-primary bg-opacity-10 text-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                            </svg>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="card-title mb-0 text-light">Yearly Breakdown</h5>
+                            <small class="text-muted">Income & expenses by year</small>
+                        </div>
+                    </div>
+                    @if (Model.CurrentYear != null)
+                    {
+                        var y = Model.CurrentYear;
+                        var total = y.Income + Math.Abs(y.Expenses);
+                        var incomePct = total > 0 ? (double)(y.Income / total) * 100 : 50;
+                        <div class="small text-muted mb-2">@y.Year</div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="amount-positive fw-semibold">+@y.Income.ToString("N0") &euro;</span>
+                            <span class="amount-negative fw-semibold">@y.Expenses.ToString("N0") &euro;</span>
+                        </div>
+                        <div class="progress mb-2" style="height: 6px;">
+                            <div class="progress-bar bg-success" style="width: @incomePct.ToString("F0")%"></div>
+                            <div class="progress-bar bg-danger" style="width: @((100 - incomePct).ToString("F0"))%"></div>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge @(y.Balance >= 0 ? "bg-success" : "bg-danger")">
+                                @(y.Balance >= 0 ? "+" : "")@y.Balance.ToString("N0") &euro;
+                            </span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-muted small">No data yet</div>
+                    }
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Savings -->
+    <div class="col-md-6">
+        <a asp-page="/Stats/Savings" class="text-decoration-none">
+            <div class="card h-100 stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stats-card-icon bg-danger bg-opacity-10 text-danger">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.25-14.75v1.5a.25.25 0 0 1-.5 0v-1.5a.25.25 0 0 1 .5 0zm0 12v1.5a.25.25 0 0 1-.5 0v-1.5a.25.25 0 0 1 .5 0zM4.5 1.938a.25.25 0 0 1 .342.091l.75 1.3a.25.25 0 0 1-.434.25l-.75-1.3a.25.25 0 0 1 .092-.341zm6 10.392a.25.25 0 0 1 .342.092l.75 1.3a.25.25 0 0 1-.434.25l-.75-1.3a.25.25 0 0 1 .092-.342zM1.938 4.5a.25.25 0 0 1 .091-.342l1.3-.75a.25.25 0 0 1 .25.434l-1.3.75a.25.25 0 0 1-.341-.092zm10.392 6a.25.25 0 0 1 .092-.342l1.3-.75a.25.25 0 0 1 .25.434l-1.3.75a.25.25 0 0 1-.342-.092zM1.25 8.25h1.5a.25.25 0 0 1 0 .5h-1.5a.25.25 0 0 1 0-.5zm12 0h1.5a.25.25 0 0 1 0 .5h-1.5a.25.25 0 0 1 0-.5zM2.28 11.842a.25.25 0 0 1-.092-.342l.75-1.3a.25.25 0 0 1 .434.25l-.75 1.3a.25.25 0 0 1-.342.092zm10.392-6a.25.25 0 0 1-.092-.342l.75-1.3a.25.25 0 0 1 .434.25l-.75 1.3a.25.25 0 0 1-.342.092zM4.5 14.062a.25.25 0 0 1-.342-.091l-.75-1.3a.25.25 0 0 1 .434-.25l.75 1.3a.25.25 0 0 1-.092.341zm6-10.392a.25.25 0 0 1-.342-.092l-.75-1.3a.25.25 0 0 1 .434-.25l.75 1.3a.25.25 0 0 1-.092.342z"/>
+                                <path d="M6.94 1.553a.75.75 0 0 1 1.12 0l.999 1.124A7.009 7.009 0 0 1 12 5.292V8.5a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5V5.292a7.009 7.009 0 0 1 2.94-2.615L6.94 1.553z"/>
+                            </svg>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="card-title mb-0 text-light">Savings</h5>
+                            <small class="text-muted">Visualize your savings rate</small>
+                        </div>
+                    </div>
+                    @if (savingsLatest != null)
+                    {
+                        <div class="small text-muted mb-2">@savingsLatest.Year</div>
+                        <div class="row g-2">
+                            <div class="col-4 text-center">
+                                <div class="small text-muted">Income</div>
+                                <div class="fw-semibold amount-positive">@savingsLatest.IncomeAmount.ToString("N0") &euro;</div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="small text-muted">Expenses</div>
+                                <div class="fw-semibold amount-negative">@savingsLatest.ExpensesAmount.ToString("N0") &euro;</div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="small text-muted">Saved</div>
+                                <div class="fw-semibold @(savingsLatest.SavingsPercent >= 0 ? "amount-positive" : "amount-negative")">
+                                    @savingsLatest.SavingsPercent.ToString("N0")%
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-muted small">No data yet</div>
+                    }
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Category Analytics -->
+    <div class="col-md-6">
+        <a asp-page="/Stats/Categories" class="text-decoration-none">
+            <div class="card h-100 stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stats-card-icon bg-warning bg-opacity-10 text-warning">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.669 11.538a.498.498 0 0 1-.686.165c-1.879-1.147-4.243-1.407-7.028-.77a.499.499 0 0 1-.222-.973c3.048-.696 5.662-.397 7.77.892a.5.5 0 0 1 .166.686zm.979-2.178a.624.624 0 0 1-.858.205c-2.15-1.321-5.428-1.704-7.972-.932a.625.625 0 0 1-.362-1.194c2.905-.881 6.517-.454 8.986 1.063a.624.624 0 0 1 .206.858zm.084-2.268C10.154 5.56 5.9 5.419 3.438 6.166a.748.748 0 1 1-.434-1.432c2.825-.857 7.523-.692 10.492 1.07a.747.747 0 1 1-.764 1.288z"/>
+                            </svg>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="card-title mb-0 text-light">Category Analytics</h5>
+                            <small class="text-muted">Drill down into spending categories</small>
+                        </div>
+                    </div>
+                    @if (Model.Categories.Count > 0)
+                    {
+                        <div class="small text-muted mb-2">@Model.Categories.Count categories tracked</div>
+                        <div class="d-flex flex-wrap gap-1">
+                            @foreach (var cat in Model.Categories.Take(8))
+                            {
+                                <span class="badge bg-secondary bg-opacity-25 text-secondary-emphasis">@cat.Name</span>
+                            }
+                            @if (Model.Categories.Count > 8)
+                            {
+                                <span class="badge bg-secondary bg-opacity-25 text-secondary-emphasis">+@(Model.Categories.Count - 8) more</span>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-muted small">No categories yet</div>
+                    }
+                </div>
+            </div>
+        </a>
+    </div>
+</div>

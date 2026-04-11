@@ -1,0 +1,44 @@
+@model PennyPincher.WebApp.Pages.Statements.IndexModel
+
+@foreach (var s in Model.Statements)
+{
+    var dateLocal = s.Date.ToString("yyyy-MM-ddTHH:mm");
+    var descEscaped = s.Description.Replace("'", "\\'").Replace("\"", "&quot;");
+
+    <tr>
+        <td>@s.Date.ToString("yyyy-MM-dd")</td>
+        <td>@s.Description</td>
+        <td class="text-end text-nowrap @(s.Amount > 0 ? "amount-positive" : s.Amount < 0 ? "amount-negative" : "")">
+            @s.Amount.ToString("N2") &euro;
+        </td>
+        <td>@s.Account.Name</td>
+        <td>@s.Category.Name</td>
+        <td class="text-nowrap">
+            @if (s.CheckedAt.HasValue)
+            {
+                <span class="checked-badge" data-utc="@(s.CheckedAt.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"))"></span>
+            }
+        </td>
+        <td class="text-nowrap">
+            <button class="btn btn-sm btn-link p-0 me-1" title="Edit"
+                    onclick="openEditModal(@s.Id, '@dateLocal', '@s.Amount', @s.Account.Id, @s.Category.Id, '@descEscaped')">
+                &#9998;
+            </button>
+            <button class="btn btn-sm btn-link p-0 me-1" title="Duplicate"
+                    onclick="openDuplicateModal('@dateLocal', '@s.Amount', @s.Account.Id, @s.Category.Id, '@descEscaped')">
+                &#10697;
+            </button>
+            <button class="btn btn-sm btn-link p-0 text-danger" title="Delete"
+                    onclick="openDeleteModal(@s.Id)">
+                &#10005;
+            </button>
+        </td>
+    </tr>
+}
+
+@if (Model.Statements.Count == 0)
+{
+    <tr>
+        <td colspan="7" class="text-center text-muted py-4">No statements found.</td>
+    </tr>
+}

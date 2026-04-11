@@ -1,0 +1,92 @@
+@page
+@model PennyPincher.WebApp.Pages.Stats.YearlyModel
+@{
+    ViewData["Title"] = "Yearly Breakdown";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">Yearly Breakdown</h4>
+    <div class="d-flex gap-3">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="ignoreInits"
+                   @(Model.IgnoreInitsAndTransfers ? "checked" : "") onchange="submitFilters()">
+            <label class="form-check-label small" for="ignoreInits">Ignore inits & transfers</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="ignoreLoans"
+                   @(Model.IgnoreLoans ? "checked" : "") onchange="submitFilters()">
+            <label class="form-check-label small" for="ignoreLoans">Ignore loans</label>
+        </div>
+    </div>
+    <script>
+        function submitFilters() {
+            var inits = document.getElementById('ignoreInits').checked;
+            var loans = document.getElementById('ignoreLoans').checked;
+            window.location.href = '?IgnoreInitsAndTransfers=' + inits + '&IgnoreLoans=' + loans;
+        }
+    </script>
+</div>
+
+<div class="row">
+    <!-- Year list (left panel) -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body p-0">
+                <h6 class="card-title text-muted px-3 pt-3 mb-2">Yearly Breakdown</h6>
+                <div style="max-height: calc(100vh - 140px); overflow-y: auto;">
+                    @foreach (var y in Model.Years)
+                    {
+                        var isSelected = y.Year == Model.SelectedYear;
+                        var total = y.Income + Math.Abs(y.Expenses);
+                        var incomePct = total > 0 ? (double)(y.Income / total) * 100 : 50;
+                        <a class="d-block px-3 py-3 text-decoration-none border-bottom year-item @(isSelected ? "active" : "")"
+                           style="cursor: pointer; @(isSelected ? "background-color: var(--bs-tertiary-bg);" : "")"
+                           hx-get="/Stats/Yearly?handler=Detail&year=@y.Year&IgnoreInitsAndTransfers=@Model.IgnoreInitsAndTransfers&IgnoreLoans=@Model.IgnoreLoans"
+                           hx-target="#detail-panel"
+                           hx-swap="innerHTML">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-light fw-semibold">@y.Year</span>
+                                <span class="badge @(y.Balance >= 0 ? "bg-success" : "bg-danger")">
+                                    @y.Balance.ToString("N0") &euro;
+                                </span>
+                            </div>
+                            @if (y.Income > 0 || y.Expenses < 0)
+                            {
+                                <div class="progress mb-2" style="height: 6px;">
+                                    <div class="progress-bar bg-success" style="width: @incomePct.ToString("F0")%"></div>
+                                    <div class="progress-bar bg-danger" style="width: @((100 - incomePct).ToString("F0"))%"></div>
+                                </div>
+                            }
+                            <div class="d-flex justify-content-between">
+                                <small class="amount-positive">+@y.Income.ToString("N0") &euro;</small>
+                                <small class="amount-negative">@y.Expenses.ToString("N0") &euro;</small>
+                            </div>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail panel (right) -->
+    <div class="col-md-8">
+        <div id="detail-panel" style="max-height: calc(100vh - 140px); overflow-y: auto; overflow-x: hidden; scrollbar-gutter: stable;">
+            <partial name="_YearlyDetail" model="Model" />
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    document.addEventListener('click', function (e) {
+        var item = e.target.closest('.year-item');
+        if (!item) return;
+        document.querySelectorAll('.year-item').forEach(function (el) {
+            el.classList.remove('active');
+            el.style.backgroundColor = '';
+        });
+        item.classList.add('active');
+        item.style.backgroundColor = 'var(--bs-tertiary-bg)';
+    });
+</script>
+}
