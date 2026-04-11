@@ -79,7 +79,6 @@ namespace PennyPincher.Api
                     o.Password.RequiredUniqueChars = 0;
                 }).AddEntityFrameworkStores<PennyPincherApiDbContext>();
 
-                builder.Services.AddAutoMapper(typeof(AutomapperProfiles));
                 builder.Services.AddScoped<IStatementsService, StatementsService>();
                 builder.Services.AddScoped<ICategoriesService, CategoriesService>();
                 builder.Services.AddScoped<IAccountService, AccountService>();
