@@ -1,0 +1,111 @@
+@page
+@model PennyPincher.WebApp.Pages.Stats.SavingsModel
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Savings";
+    var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+}
+
+<h4 class="mb-3">Savings</h4>
+
+@if (Model.Data != null)
+{
+    <!-- Chart -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div id="savings-chart"></div>
+            <div class="d-flex justify-content-center gap-4 mt-2">
+                <span><span class="d-inline-block rounded-1 me-1" style="width: 12px; height: 12px; background: #47d17a;"></span> Income</span>
+                <span><span class="d-inline-block rounded-1 me-1" style="width: 12px; height: 12px; background: #e66a7a;"></span> Expenses</span>
+                <span><span class="d-inline-block rounded-1 me-1" style="width: 12px; height: 12px; background: #2196F3;"></span> Savings</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yearly averages table -->
+    <div class="card">
+        <div class="card-body">
+            <h6 class="card-title text-muted mb-3">Yearly Averages</h6>
+            <table class="table table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th class="text-end">Income</th>
+                        <th class="text-end">Expenses</th>
+                        <th class="text-end">Savings</th>
+                        <th class="text-end">Saved %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Model.Data.AveragesPerYear)
+                    {
+                        <tr>
+                            <td>@row.Year</td>
+                            <td class="text-end amount-positive">@row.IncomeAmount.ToString("N0") &euro;</td>
+                            <td class="text-end amount-negative">@row.ExpensesAmount.ToString("N0") &euro;</td>
+                            <td class="text-end @(row.SavingsAmount >= 0 ? "amount-positive" : "amount-negative")">
+                                @row.SavingsAmount.ToString("N0") &euro;
+                            </td>
+                            <td class="text-end @(row.SavingsPercent >= 0 ? "amount-positive" : "amount-negative")">
+                                @row.SavingsPercent.ToString("N0")%
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <p class="text-muted">No savings data available.</p>
+}
+
+@section Scripts {
+<script>
+    function initSavingsChart() {
+        var incomeData = @Html.Raw(JsonSerializer.Serialize(Model.Data?.IncomeChart ?? [], jsonOptions));
+        var expensesData = @Html.Raw(JsonSerializer.Serialize(Model.Data?.ExpensesChart ?? [], jsonOptions));
+        var savingsData = @Html.Raw(JsonSerializer.Serialize(Model.Data?.SavingsChart ?? [], jsonOptions));
+        var el = document.getElementById('savings-chart');
+        if (!el || incomeData.length === 0) return;
+
+        new ApexCharts(el, {
+            chart: {
+                type: 'area',
+                height: 400,
+                background: 'transparent',
+                toolbar: { show: true }
+            },
+            theme: { mode: 'dark' },
+            colors: ['#47d17a', '#e66a7a', '#2196F3'],
+            stroke: { curve: 'smooth', width: 2 },
+            fill: { type: 'gradient', gradient: { opacityFrom: 0.3, opacityTo: 0.05 } },
+            series: [
+                { name: 'Income', data: incomeData.map(function (d) { return { x: d.key, y: d.value }; }) },
+                { name: 'Expenses', data: expensesData.map(function (d) { return { x: d.key, y: Math.abs(d.value) }; }) },
+                { name: 'Savings', data: savingsData.map(function (d) { return { x: d.key, y: d.value }; }) }
+            ],
+            xaxis: { type: 'category', labels: { rotate: -45, style: { fontSize: '11px' } } },
+            yaxis: {
+                labels: {
+                    formatter: function (val) {
+                        if (Math.abs(val) >= 1000) return (val / 1000).toFixed(0) + 'k';
+                        return val.toFixed(0);
+                    }
+                }
+            },
+            tooltip: {
+                y: { formatter: function (val) { return val.toFixed(2) + ' \u20ac'; } }
+            },
+            legend: { show: false },
+            dataLabels: { enabled: false }
+        }).render();
+    }
+    if (typeof ApexCharts !== 'undefined') {
+        requestAnimationFrame(initSavingsChart);
+    } else {
+        window.addEventListener('load', initSavingsChart);
+    }
+</script>
+}
