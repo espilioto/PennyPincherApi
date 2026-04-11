@@ -75,6 +75,7 @@ public class LoginModel : PageModel
 
         var claims = new List<Claim>
         {
+            new(ClaimTypes.Name, Email),
             new(ClaimTypes.Email, Email)
         };
         var identity = new ClaimsIdentity(claims, "Cookies");
