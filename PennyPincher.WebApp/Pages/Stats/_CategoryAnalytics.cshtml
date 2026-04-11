@@ -19,7 +19,7 @@ else
     </div>
 
     <!-- Yearly sums table -->
-    <div class="card">
+    <div class="card mb-4">
         <div class="card-body">
             <h6 class="card-title text-muted mb-3">Yearly Totals</h6>
             <table class="table table-sm table-hover">
@@ -32,17 +32,36 @@ else
                 <tbody>
                     @foreach (var row in Model.Analytics.YearSums)
                     {
-                        <tr>
-                            <td>@row.Key</td>
-                            <td class="text-end @(row.Value >= 0 ? "amount-positive" : "amount-negative")">
-                                @row.Value.ToString("N2") &euro;
-                            </td>
-                        </tr>
+                        var isSum = row.Key == "Sum";
+                        if (isSum)
+                        {
+                            <tr>
+                                <td class="fw-bold">@row.Key</td>
+                                <td class="text-end fw-bold @(row.Value >= 0 ? "amount-positive" : "amount-negative")">
+                                    @row.Value.ToString("N2") &euro;
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr class="year-row" style="cursor: pointer;"
+                                hx-get="/Stats/Categories?handler=YearStatements&categoryId=@Model.SelectedCategoryId&year=@row.Key"
+                                hx-target="#year-statements-panel"
+                                hx-swap="innerHTML">
+                                <td>@row.Key</td>
+                                <td class="text-end @(row.Value >= 0 ? "amount-positive" : "amount-negative")">
+                                    @row.Value.ToString("N2") &euro;
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
             </table>
         </div>
     </div>
+
+    <!-- Year statements panel -->
+    <div id="year-statements-panel"></div>
 
     <script>
         function initCategoryChart() {
@@ -65,7 +84,11 @@ else
                     name: '@Model.SelectedCategoryName',
                     data: chartData.map(function (d) { return { x: d.key, y: Math.abs(d.value) }; })
                 }],
-                xaxis: { type: 'category', labels: { rotate: -45, style: { fontSize: '11px' } } },
+                xaxis: {
+                    type: 'category',
+                    labels: { rotate: -45, rotateAlways: true, style: { fontSize: '11px' } },
+                    tickAmount: Math.min(chartData.length, 24)
+                },
                 yaxis: {
                     labels: {
                         formatter: function (val) {
@@ -80,6 +103,16 @@ else
                 dataLabels: { enabled: false }
             }).render();
         }
+
+        document.addEventListener('click', function (e) {
+            var row = e.target.closest('.year-row');
+            if (!row) return;
+            document.querySelectorAll('.year-row').forEach(function (el) {
+                el.classList.remove('table-active');
+            });
+            row.classList.add('table-active');
+        });
+
         if (typeof ApexCharts !== 'undefined') {
             requestAnimationFrame(initCategoryChart);
         } else {
