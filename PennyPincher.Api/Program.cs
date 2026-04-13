@@ -10,6 +10,7 @@ using PennyPincher.Services;
 using PennyPincher.Services.Accounts;
 using PennyPincher.Services.Categories;
 using PennyPincher.Services.Charts;
+using PennyPincher.Services.EnableBanking;
 using PennyPincher.Services.Statements;
 using PennyPincher.Services.Utils;
 using System.Text;
@@ -84,6 +85,17 @@ namespace PennyPincher.Api
                 builder.Services.AddScoped<IAccountService, AccountService>();
                 builder.Services.AddScoped<IChartDataService, ChartDataService>();
                 builder.Services.AddScoped<IUtils, Utils>();
+
+                builder.Services.AddMemoryCache();
+                builder.Services.Configure<EnableBankingOptions>(builder.Configuration.GetSection(EnableBankingOptions.SectionName));
+                builder.Services.AddSingleton<IEnableBankingJwtFactory, EnableBankingJwtFactory>();
+                builder.Services.AddScoped<IEnableBankingClient, EnableBankingClient>();
+                builder.Services.AddScoped<IEnableBankingService, EnableBankingService>();
+                builder.Services.AddHttpClient(EnableBankingClient.HttpClientName, (sp, client) =>
+                {
+                    var opts = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<EnableBankingOptions>>().Value;
+                    client.BaseAddress = new Uri(opts.BaseUrl.TrimEnd('/') + "/");
+                });
 
                 var jwtKey = builder.Configuration["Jwt:Key"];
                 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
