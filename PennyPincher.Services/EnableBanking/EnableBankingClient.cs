@@ -1,4 +1,5 @@
 using ErrorOr;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PennyPincher.Services.EnableBanking.Models;
@@ -43,17 +44,20 @@ public class EnableBankingClient : IEnableBankingClient
     private readonly HttpClient _http;
     private readonly IEnableBankingJwtFactory _jwtFactory;
     private readonly EnableBankingOptions _options;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ILogger<EnableBankingClient> _logger;
 
     public EnableBankingClient(
         IHttpClientFactory httpClientFactory,
         IEnableBankingJwtFactory jwtFactory,
         IOptions<EnableBankingOptions> options,
+        IHttpContextAccessor httpContextAccessor,
         ILogger<EnableBankingClient> logger)
     {
         _http = httpClientFactory.CreateClient(HttpClientName);
         _jwtFactory = jwtFactory;
         _options = options.Value;
+        _httpContextAccessor = httpContextAccessor;
         _logger = logger;
     }
 
@@ -217,6 +221,28 @@ public class EnableBankingClient : IEnableBankingClient
     {
         var req = new HttpRequestMessage(method, relativeUrl);
         req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _jwtFactory.Create());
+
+        // PSD2 "PSU online" context — real banks (Piraeus observed) reject
+        // transaction queries as ASPSP_ERROR without these headers.
+        // Prefer the forwarded X-Psu-* headers set by the WebApp's delegating
+        // handler (real browser IP/UA), fall back to the API's inbound
+        // connection context.
+        var ctx = _httpContextAccessor.HttpContext;
+        if (ctx is not null)
+        {
+            var ip = ctx.Request.Headers.TryGetValue("X-Psu-Ip", out var fwdIp) && !string.IsNullOrWhiteSpace(fwdIp.ToString())
+                ? fwdIp.ToString()
+                : ctx.Connection.RemoteIpAddress?.ToString();
+            if (!string.IsNullOrEmpty(ip))
+                req.Headers.TryAddWithoutValidation("PSU-IP-Address", ip);
+
+            var ua = ctx.Request.Headers.TryGetValue("X-Psu-User-Agent", out var fwdUa) && !string.IsNullOrWhiteSpace(fwdUa.ToString())
+                ? fwdUa.ToString()
+                : ctx.Request.Headers.UserAgent.ToString();
+            if (!string.IsNullOrWhiteSpace(ua))
+                req.Headers.TryAddWithoutValidation("PSU-User-Agent", ua);
+        }
+
         if (body is not null)
             req.Content = JsonContent.Create(body);
         return req;
