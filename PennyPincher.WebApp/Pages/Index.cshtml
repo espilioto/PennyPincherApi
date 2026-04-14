@@ -134,6 +134,7 @@
                     background: 'transparent'
                 },
                 theme: { mode: 'dark' },
+                colors: [getAccentColor()],
                 series: [{
                     name: 'Balance',
                     data: chartData.map(function (d) { return d.value; })
@@ -160,7 +161,12 @@
                     gradient: { opacityFrom: 0.4, opacityTo: 0.05 }
                 }
             };
-            new ApexCharts(document.getElementById('balance-chart'), lineOptions).render();
+            var balanceChart = new ApexCharts(document.getElementById('balance-chart'), lineOptions);
+            balanceChart.render();
+            // Redraw on theme change
+            window.addEventListener('themeChanged', function() {
+                balanceChart.updateOptions({ colors: [getAccentColor()] });
+            });
         }
     })();
 </script>

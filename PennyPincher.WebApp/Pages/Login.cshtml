@@ -66,11 +66,17 @@
     const themeDots=[];
     function applyTheme(t,isRandom){
         const p=document.querySelector('.login-page');
+        const root=document.documentElement;
+        // login-specific vars
         p.style.setProperty('--accent',t.accent);
         p.style.setProperty('--accent-rgb',t.rgb);
         p.style.setProperty('--glitch1',t.glitch1);
         p.style.setProperty('--glitch2',t.glitch2);
         p.style.setProperty('--accent-dim',t.dim);
+        // app-wide vars on :root
+        root.style.setProperty('--accent',t.accent);
+        root.style.setProperty('--accent-rgb',t.rgb);
+        root.style.setProperty('--accent-dim',t.dim);
         if(!isRandom)localStorage.setItem('pp-theme',t.name);
         buildGraph(t);
         // update dots: random dot + 5 theme dots
