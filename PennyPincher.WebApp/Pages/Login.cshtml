@@ -32,17 +32,16 @@
         }
 
         <form method="post">
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
+            <div class="mb-4">
                 <input type="email" class="form-control" id="email" name="Email"
-                       value="@Model.Email" required autofocus />
+                       value="@Model.Email" placeholder="email" required autofocus />
             </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="Password" required />
+            <div class="mb-4">
+                <input type="password" class="form-control" id="password" name="Password"
+                       placeholder="password" required />
             </div>
-            <div class="cf-turnstile mb-3" data-sitekey="@Model.TurnstileSiteKey"></div>
-            <button type="submit" class="btn btn-primary w-100">Login</button>
+            <div class="cf-turnstile mb-4 d-flex justify-content-center" data-sitekey="@Model.TurnstileSiteKey"></div>
+            <button type="submit" class="btn btn-primary w-100">&gt; login<span class="login-cursor">_</span></button>
         </form>
     </div>
 </div>
@@ -90,10 +89,10 @@
 
     // === RANDOM GRAPH ===
     const isBull=Math.random()>.45;
-    const lineColor=isBull?'#5ce0a0':'#e6677a';
-    const areaOp=isBull?.06:.04;
-    const lineOp=isBull?.12:.10;
-    const secColor=isBull?'#60b4f7':'#f5c842';
+    const lineColor=isBull?'#22d3ee':'#e6677a';
+    const areaOp=isBull?.10:.07;
+    const lineOp=isBull?.20:.16;
+    const secColor=isBull?'#38bdf8':'#f5c842';
 
     function randLine(startY,trend,volatility){
         const pts=[];let y=startY;
