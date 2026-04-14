@@ -124,16 +124,48 @@
 
     if(isHaiku){
         el.remove();
-        const h=document.createElement('div');
-        h.className='login-sub-haiku';
-        h.textContent=sub;
-        wrap.appendChild(h);
+        const lines=sub.split('\n');
+        let delay=900; // ms, match the one-liner start
+        lines.forEach((line,i)=>{
+            const row=document.createElement('div');
+            row.className='login-haiku-line';
+            row.style.cssText='font-size:.82rem;color:#a0a0b4;font-family:"Courier New",monospace;letter-spacing:.05em;text-align:center;white-space:nowrap;overflow:hidden;width:0;display:inline-block;border-right:2px solid transparent';
+            // measure width
+            row.style.width='auto';row.style.overflow='visible';
+            row.textContent=line;
+            wrap.appendChild(row);
+            const w=row.offsetWidth;
+            row.style.width='0';row.style.overflow='hidden';
+            // type this line
+            const dur=line.length*45;
+            setTimeout(()=>{
+                row.style.borderRightColor='#a0a0b4';
+                row.style.transition='width '+dur+'ms steps('+line.length+')';
+                row.style.width=w+'px';
+                // hide cursor after typing, unless last line
+                setTimeout(()=>{
+                    if(i<lines.length-1)row.style.borderRightColor='transparent';
+                },dur);
+            },delay);
+            // wrap in centered container for each line
+            const rowWrap=document.createElement('div');
+            rowWrap.style.textAlign='center';
+            wrap.removeChild(row);
+            rowWrap.appendChild(row);
+            wrap.appendChild(rowWrap);
+            row.style.display='inline-block';row.style.width='0';row.style.overflow='hidden';
+            delay+=dur+200; // gap between lines
+        });
+        // blink cursor on last line
+        const blinkStyle=document.createElement('style');
+        blinkStyle.textContent='.login-haiku-line:last-child{animation:loginBlink .55s '+(delay/1000)+'s step-end infinite}';
+        document.head.appendChild(blinkStyle);
     }else{
         el.textContent=sub;
         const len=sub.length;
         el.style.width='auto';el.style.overflow='visible';el.style.borderRight='none';
         const w=el.offsetWidth+'px';
-        el.style.width='0';el.style.overflow='hidden';el.style.borderRight='2px solid #8a8aa0';
+        el.style.width='0';el.style.overflow='hidden';el.style.borderRight='2px solid #a0a0b4';
         el.style.setProperty('--type-width',w);
         el.style.setProperty('--type-steps',len);
         el.style.setProperty('--type-dur',(len*0.045)+'s');
