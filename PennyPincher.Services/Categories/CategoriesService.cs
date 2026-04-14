@@ -49,7 +49,7 @@ namespace PennyPincher.Services.Categories
                 ))
                 .ToListAsync();
 
-                return categories.Count == 0 ? Error.NotFound() : categories;
+                return categories;
             }
             catch (Exception ex)
             {
