@@ -115,14 +115,15 @@ public class StatementsServiceTests
     }
 
     [Fact]
-    public async Task GetByUserAsync_ReturnsNotFound_WhenNoStatements()
+    public async Task GetByUserAsync_ReturnsEmptyList_WhenNoStatements()
     {
         var context = TestDbContextFactory.Create();
         var service = new StatementsService(context, _logger);
 
         var result = await service.GetByUserAsync("nonexistent");
 
-        Assert.True(result.IsError);
+        Assert.False(result.IsError);
+        Assert.Empty(result.Value);
     }
 
     [Fact]

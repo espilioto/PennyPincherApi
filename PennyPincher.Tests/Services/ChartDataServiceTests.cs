@@ -86,7 +86,7 @@ public class ChartDataServiceTests
     }
 
     [Fact]
-    public async Task OverviewBalance_ReturnsNotFound_WhenNoData()
+    public async Task OverviewBalance_ReturnsEmptyList_WhenNoData()
     {
         var db = "overview_empty";
         await SeedStandardData(db);
@@ -94,7 +94,8 @@ public class ChartDataServiceTests
         var (svc, _) = CreateServices(db);
         var result = await svc.GetOverviewBalanceChartDataAsync("user1");
 
-        Assert.True(result.IsError);
+        Assert.False(result.IsError);
+        Assert.Empty(result.Value);
     }
 
     // ========== GetMonthlyBreakdownDataAsync ==========
