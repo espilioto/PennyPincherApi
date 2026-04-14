@@ -18,6 +18,9 @@
     <div class="login-corner login-c-bl"></div>
     <div class="login-corner login-c-br"></div>
 
+    <!-- theme switcher -->
+    <div class="login-themes" id="themeDots"></div>
+
     <div class="login-container">
         <!-- glitch title -->
         <div class="login-glitch" data-text="PennyPincher">PennyPincher</div>
@@ -51,6 +54,46 @@
 @section Scripts {
 <script>
 (function(){
+    // === THEME SYSTEM ===
+    const themes=[
+        {name:'amber',accent:'#e8b44c',rgb:'232,180,76',glitch1:'#e6677a',glitch2:'#d4a040',dim:'#3a2e18',chart:'#e8b44c',chart2:'#d48040'},
+        {name:'violet',accent:'#a78bfa',rgb:'167,139,250',glitch1:'#e6677a',glitch2:'#7c5cbf',dim:'#2a2240',chart:'#a78bfa',chart2:'#7c5cbf'},
+        {name:'rose',accent:'#e07a8e',rgb:'224,122,142',glitch1:'#c94060',glitch2:'#60b4f7',dim:'#3a1e28',chart:'#e07a8e',chart2:'#c94060'},
+        {name:'silver',accent:'#b0b0c0',rgb:'176,176,192',glitch1:'#8888a0',glitch2:'#6868a0',dim:'#22222e',chart:'#b0b0c0',chart2:'#8080a0'},
+        {name:'mint',accent:'#4ade80',rgb:'74,222,128',glitch1:'#e6677a',glitch2:'#38b060',dim:'#1a2e20',chart:'#4ade80',chart2:'#38b060'},
+    ];
+
+    function applyTheme(t){
+        const p=document.querySelector('.login-page');
+        p.style.setProperty('--accent',t.accent);
+        p.style.setProperty('--accent-rgb',t.rgb);
+        p.style.setProperty('--glitch1',t.glitch1);
+        p.style.setProperty('--glitch2',t.glitch2);
+        p.style.setProperty('--accent-dim',t.dim);
+        localStorage.setItem('pp-theme',t.name);
+        buildGraph(t);
+        // update dots
+        document.querySelectorAll('.login-theme-dot').forEach((d,i)=>{
+            d.classList.toggle('active',themes[i].name===t.name);
+        });
+    }
+
+    // build theme dots
+    const dotsEl=document.getElementById('themeDots');
+    themes.forEach((t,i)=>{
+        const d=document.createElement('div');
+        d.className='login-theme-dot';
+        d.style.background=t.accent;
+        d.style.color=t.accent;
+        d.onclick=()=>applyTheme(t);
+        dotsEl.appendChild(d);
+    });
+
+    // pick theme: saved > random
+    const saved=localStorage.getItem('pp-theme');
+    const theme=themes.find(t=>t.name===saved)||themes[Math.floor(Math.random()*themes.length)];
+    applyTheme(theme);
+
     // === RANDOM SUBTITLE ===
     const subs=[
         'stonks, but for real',
@@ -80,52 +123,54 @@
         const len=sub.length;
         el.style.width='auto';el.style.overflow='visible';el.style.borderRight='none';
         const w=el.offsetWidth+'px';
-        el.style.width='0';el.style.overflow='hidden';el.style.borderRight='2px solid #5a5a6e';
+        el.style.width='0';el.style.overflow='hidden';el.style.borderRight='2px solid #8a8aa0';
         el.style.setProperty('--type-width',w);
         el.style.setProperty('--type-steps',len);
         el.style.setProperty('--type-dur',(len*0.045)+'s');
         requestAnimationFrame(()=>el.classList.add('typing'));
     }
 
-    // === RANDOM GRAPH ===
-    const isBull=Math.random()>.45;
-    const lineColor=isBull?'#22d3ee':'#e6677a';
-    const areaOp=isBull?.10:.07;
-    const lineOp=isBull?.20:.16;
-    const secColor=isBull?'#38bdf8':'#f5c842';
+    // === RANDOM GRAPH (rebuilds on theme switch) ===
+    function buildGraph(t){
+        const isBull=Math.random()>.45;
+        const lineColor=isBull?t.chart:t.glitch1;
+        const areaOp=isBull?.10:.07;
+        const lineOp=isBull?.20:.16;
+        const secColor=isBull?t.chart2:'#f5c842';
 
-    function randLine(startY,trend,volatility){
-        const pts=[];let y=startY;
-        for(let i=0;i<28;i++){
-            y+=trend+(Math.random()-.5)*volatility;
-            y=Math.max(150,Math.min(700,y));
-            pts.push(i*100+','+Math.round(y));
+        function randLine(startY,trend,volatility){
+            const pts=[];let y=startY;
+            for(let i=0;i<28;i++){
+                y+=trend+(Math.random()-.5)*volatility;
+                y=Math.max(150,Math.min(700,y));
+                pts.push(i*100+','+Math.round(y));
+            }
+            return pts.join(' ');
         }
-        return pts.join(' ');
+
+        const line1=randLine(isBull?550:350,isBull?-8:6,60);
+        const line2=randLine(isBull?580:400,isBull?-5:4,50);
+
+        function lineToArea(pts){
+            const coords=pts.split(' ').map(p=>p.split(',').map(Number));
+            const lastX=coords[coords.length-1][0];
+            return 'M'+pts+' L'+lastX+',800 L0,800Z';
+        }
+
+        const gridCols=[350,700,1050,1400,1750,2100,2450].map(x=>'<line class="bg-grid" x1="'+x+'" y1="0" x2="'+x+'" y2="800"/>').join('');
+
+        document.getElementById('loginBg').innerHTML=
+            '<svg viewBox="0 0 2800 800" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">'+
+            '<defs><linearGradient id="lag" x1="0" y1="0" x2="0" y2="1">'+
+            '<stop offset="0%" stop-color="'+lineColor+'" stop-opacity="'+areaOp+'"/>'+
+            '<stop offset="100%" stop-color="'+lineColor+'" stop-opacity="0"/></linearGradient></defs>'+
+            '<g><line class="bg-grid" x1="0" y1="200" x2="2800" y2="200"/>'+
+            '<line class="bg-grid" x1="0" y1="400" x2="2800" y2="400"/>'+
+            '<line class="bg-grid" x1="0" y1="600" x2="2800" y2="600"/>'+gridCols+'</g>'+
+            '<path class="bg-area" d="'+lineToArea(line1)+'" fill="url(#lag)"/>'+
+            '<polyline class="bg-line" points="'+line1+'" stroke="'+lineColor+'" opacity="'+lineOp+'"/>'+
+            '<polyline class="bg-line" points="'+line2+'" stroke="'+secColor+'" opacity="'+(lineOp*.5)+'" style="animation-delay:1.4s"/></svg>';
     }
-
-    const line1=randLine(isBull?550:350,isBull?-8:6,60);
-    const line2=randLine(isBull?580:400,isBull?-5:4,50);
-
-    function lineToArea(pts){
-        const coords=pts.split(' ').map(p=>p.split(',').map(Number));
-        const lastX=coords[coords.length-1][0];
-        return 'M'+pts+' L'+lastX+',800 L0,800Z';
-    }
-
-    const gridCols=[350,700,1050,1400,1750,2100,2450].map(x=>'<line class="bg-grid" x1="'+x+'" y1="0" x2="'+x+'" y2="800"/>').join('');
-
-    document.getElementById('loginBg').innerHTML=
-        '<svg viewBox="0 0 2800 800" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">'+
-        '<defs><linearGradient id="lag" x1="0" y1="0" x2="0" y2="1">'+
-        '<stop offset="0%" stop-color="'+lineColor+'" stop-opacity="'+areaOp+'"/>'+
-        '<stop offset="100%" stop-color="'+lineColor+'" stop-opacity="0"/></linearGradient></defs>'+
-        '<g><line class="bg-grid" x1="0" y1="200" x2="2800" y2="200"/>'+
-        '<line class="bg-grid" x1="0" y1="400" x2="2800" y2="400"/>'+
-        '<line class="bg-grid" x1="0" y1="600" x2="2800" y2="600"/>'+gridCols+'</g>'+
-        '<path class="bg-area" d="'+lineToArea(line1)+'" fill="url(#lag)"/>'+
-        '<polyline class="bg-line" points="'+line1+'" stroke="'+lineColor+'" opacity="'+lineOp+'"/>'+
-        '<polyline class="bg-line" points="'+line2+'" stroke="'+secColor+'" opacity="'+(lineOp*.5)+'" style="animation-delay:1.4s"/></svg>';
 })();
 </script>
 }
