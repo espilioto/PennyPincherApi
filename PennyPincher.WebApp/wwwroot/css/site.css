@@ -21,6 +21,10 @@
   --bs-btn-disabled-bg:var(--accent);--bs-btn-disabled-border-color:var(--accent);
 }
 .btn-primary:hover{filter:brightness(1.15)}
+
+/* Action icons (edit/duplicate) stay neutral, not accent */
+.btn-link{--bs-btn-color:var(--pp-text-secondary);--bs-btn-hover-color:var(--pp-text)}
+.btn-link.text-danger{--bs-btn-color:var(--pp-expense);--bs-btn-hover-color:var(--pp-expense)}
 .btn-outline-secondary{--bs-btn-color:var(--accent);--bs-btn-border-color:rgba(var(--accent-rgb),.3);--bs-btn-hover-bg:rgba(var(--accent-rgb),.1);--bs-btn-hover-color:var(--accent);--bs-btn-hover-border-color:var(--accent);--bs-btn-active-bg:rgba(var(--accent-rgb),.15);--bs-btn-active-color:var(--accent);--bs-btn-active-border-color:var(--accent)}
 
 /* Accent overrides — form controls */
