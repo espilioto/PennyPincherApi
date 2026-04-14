@@ -126,11 +126,76 @@
     min-width: 250px;
 }
 
-/* Login page */
-.login-container {
-    max-width: 400px;
-    margin: 15vh auto;
+/* Login page — splash screen */
+.login-page{position:relative;min-height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden;background:#0c0c10;margin:-1.5rem}
+.login-page .container-fluid{padding:0}
+.login-container{max-width:400px;width:100%;z-index:2;padding:0 1rem}
+
+/* background graphs */
+.login-bg{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.login-bg svg{width:200%;height:100%;opacity:0;animation:loginBgIn 2s .5s ease forwards,loginBgScroll 35s 2s linear infinite}
+@keyframes loginBgIn{to{opacity:1}}
+@keyframes loginBgScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.login-bg .bg-grid{stroke:#1a1a22;stroke-width:.5}
+.login-bg .bg-line{fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:3000;stroke-dashoffset:3000;animation:loginBgDraw 3s 1s ease forwards}
+.login-bg .bg-area{opacity:0;animation:loginBgArea 2s 2s ease forwards}
+@keyframes loginBgDraw{to{stroke-dashoffset:0}}
+@keyframes loginBgArea{to{opacity:1}}
+
+/* scanlines */
+.login-page::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:100;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.03) 3px,rgba(0,0,0,0.03) 6px)}
+
+/* screen flash */
+.login-flash{position:fixed;inset:0;background:#e8e8ed;opacity:0;pointer-events:none;z-index:50;animation:loginFlash .1s .58s ease forwards}
+@keyframes loginFlash{0%{opacity:0}30%{opacity:.1}100%{opacity:0}}
+
+/* glitch title */
+.login-glitch{font-size:2.8rem;font-weight:800;color:#e8e8ed;letter-spacing:.06em;position:relative;text-align:center;margin-bottom:.6rem;opacity:0;animation:loginTextIn .01s .6s forwards}
+.login-glitch::before,.login-glitch::after{content:attr(data-text);position:absolute;top:0;left:0;width:100%;height:100%}
+.login-glitch::before{color:#e6677a;z-index:-1;animation:loginGL 5s 1.2s linear infinite}
+.login-glitch::after{color:#60b4f7;z-index:-1;animation:loginGR 5s 1.2s linear infinite}
+@keyframes loginTextIn{to{opacity:1}}
+@keyframes loginGL{
+    0%,100%{clip-path:inset(0 0 100% 0);transform:translate(0)}
+    3%{clip-path:inset(15% 0 65% 0);transform:translate(-3px,1px)}4.5%{clip-path:inset(55% 0 20% 0);transform:translate(2px)}
+    6%{clip-path:inset(0 0 100% 0);transform:translate(0)}40%{clip-path:inset(0 0 100% 0)}
+    41%{clip-path:inset(25% 0 50% 0);transform:translate(-2px)}42%{clip-path:inset(0 0 100% 0);transform:translate(0)}
+    72%{clip-path:inset(0 0 100% 0)}72.5%{clip-path:inset(10% 0 70% 0);transform:translate(-4px)}73.5%{clip-path:inset(0 0 100% 0);transform:translate(0)}
 }
+@keyframes loginGR{
+    0%,100%{clip-path:inset(0 0 100% 0);transform:translate(0)}
+    3%{clip-path:inset(60% 0 15% 0);transform:translate(3px,-1px)}4.5%{clip-path:inset(10% 0 60% 0);transform:translate(-2px)}
+    6%{clip-path:inset(0 0 100% 0);transform:translate(0)}40%{clip-path:inset(0 0 100% 0)}
+    41%{clip-path:inset(50% 0 20% 0);transform:translate(2px)}42%{clip-path:inset(0 0 100% 0);transform:translate(0)}
+    72%{clip-path:inset(0 0 100% 0)}72.5%{clip-path:inset(65% 0 10% 0);transform:translate(4px)}73.5%{clip-path:inset(0 0 100% 0);transform:translate(0)}
+}
+
+/* rule line */
+.login-rule{width:280px;height:1px;margin:0 auto .5rem;background:linear-gradient(90deg,transparent,#2a2a3a 20%,#2a2a3a 80%,transparent);opacity:0;animation:loginFadeIn .4s .8s ease forwards}
+
+/* subtitle typed */
+.login-sub-wrap{min-height:1.4rem;text-align:center;margin-bottom:1.5rem}
+.login-sub{font-size:.8rem;color:#5a5a6e;font-family:'Courier New',monospace;letter-spacing:.05em;white-space:nowrap;display:inline-block;width:0;overflow:hidden;border-right:2px solid #5a5a6e;animation:loginBlink .55s .9s step-end infinite}
+.login-sub.typing{animation:loginTyping var(--type-dur,1s) .9s steps(var(--type-steps,20)) forwards,loginBlink .55s .9s step-end infinite}
+@keyframes loginTyping{from{width:0}to{width:var(--type-width)}}
+@keyframes loginBlink{50%{border-color:transparent}}
+.login-sub-haiku{font-size:.75rem;color:#5a5a6e;font-family:'Courier New',monospace;letter-spacing:.05em;line-height:1.7;text-align:center;white-space:pre-line;opacity:0;animation:loginFadeIn .8s .9s ease forwards}
+
+/* form styling */
+.login-container .form-control{background:#111118;border:1px solid #1a1a22;color:#e8e8ed}
+.login-container .form-control:focus{background:#111118;border-color:#5ce0a0;color:#e8e8ed;box-shadow:0 0 0 .2rem rgba(92,224,160,.15)}
+.login-container .form-label{color:#5a5a6e;font-size:.8rem;letter-spacing:.05em}
+.login-container .btn-primary{background:#5ce0a0;border-color:#5ce0a0;color:#0c0c10;font-weight:600}
+.login-container .btn-primary:hover{background:#4bc88c;border-color:#4bc88c}
+
+/* corner brackets */
+.login-corner{position:fixed;width:30px;height:30px;opacity:0;animation:loginFadeIn .3s 2s ease forwards;z-index:2}
+.login-c-tl{top:2rem;left:2rem;border-top:1px solid #1a1a22;border-left:1px solid #1a1a22}
+.login-c-tr{top:2rem;right:2rem;border-top:1px solid #1a1a22;border-right:1px solid #1a1a22}
+.login-c-bl{bottom:2rem;left:2rem;border-bottom:1px solid #1a1a22;border-left:1px solid #1a1a22}
+.login-c-br{bottom:2rem;right:2rem;border-bottom:1px solid #1a1a22;border-right:1px solid #1a1a22}
+
+@keyframes loginFadeIn{to{opacity:1}}
 
 /* HTMX loading indicator */
 .htmx-indicator {

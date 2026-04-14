@@ -5,27 +5,128 @@
     Layout = "_Layout";
 }
 
-<div class="login-container">
-    <h2 class="mb-4">PennyPincher</h2>
+<div class="login-page">
+    <!-- background graphs (injected by JS) -->
+    <div class="login-bg" id="loginBg"></div>
 
-    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
-    {
-        <div class="alert alert-danger">@Model.ErrorMessage</div>
-    }
+    <!-- screen flash -->
+    <div class="login-flash"></div>
 
-    <form method="post">
-        <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="Email"
-                   value="@Model.Email" required autofocus />
+    <!-- corner brackets -->
+    <div class="login-corner login-c-tl"></div>
+    <div class="login-corner login-c-tr"></div>
+    <div class="login-corner login-c-bl"></div>
+    <div class="login-corner login-c-br"></div>
+
+    <div class="login-container">
+        <!-- glitch title -->
+        <div class="login-glitch" data-text="PennyPincher">PennyPincher</div>
+        <div class="login-rule"></div>
+        <div class="login-sub-wrap" id="loginSubWrap">
+            <span class="login-sub" id="loginSub"></span>
         </div>
-        <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" name="Password" required />
-        </div>
-        <div class="cf-turnstile mb-3" data-sitekey="@Model.TurnstileSiteKey"></div>
-        <button type="submit" class="btn btn-primary w-100">Login</button>
-    </form>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger">@Model.ErrorMessage</div>
+        }
+
+        <form method="post">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="Email"
+                       value="@Model.Email" required autofocus />
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="Password" required />
+            </div>
+            <div class="cf-turnstile mb-3" data-sitekey="@Model.TurnstileSiteKey"></div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+    </div>
 </div>
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+@section Scripts {
+<script>
+(function(){
+    // === RANDOM SUBTITLE ===
+    const subs=[
+        'stonks, but for real',
+        'because ramen gets old',
+        'adulting, but make it cute',
+        'pennies become more\nwhen you watch where they wander\nwealth begins with sight',
+        'numbers tell the truth\nyour wallet has a story\nlet the data speak',
+        'small leaks sink big ships\nbut those who track every drop\nsail to golden shores',
+        'data over doubt\nyour finances laid bare here\nclarity is power',
+        'money comes and goes\nbut the ones who track it know\nwhere the river flows',
+        'swipe and forget not\nevery purchase tells a tale\nread between the lines',
+        'less chaos more cash\nwhen you know where pennies go\ndollars follow suit',
+    ];
+    const sub=subs[Math.floor(Math.random()*subs.length)];
+    const isHaiku=sub.includes('\n');
+    const wrap=document.getElementById('loginSubWrap');
+    const el=document.getElementById('loginSub');
+
+    if(isHaiku){
+        el.remove();
+        const h=document.createElement('div');
+        h.className='login-sub-haiku';
+        h.textContent=sub;
+        wrap.appendChild(h);
+    }else{
+        el.textContent=sub;
+        const len=sub.length;
+        el.style.width='auto';el.style.overflow='visible';el.style.borderRight='none';
+        const w=el.offsetWidth+'px';
+        el.style.width='0';el.style.overflow='hidden';el.style.borderRight='2px solid #5a5a6e';
+        el.style.setProperty('--type-width',w);
+        el.style.setProperty('--type-steps',len);
+        el.style.setProperty('--type-dur',(len*0.045)+'s');
+        requestAnimationFrame(()=>el.classList.add('typing'));
+    }
+
+    // === RANDOM GRAPH ===
+    const isBull=Math.random()>.45;
+    const lineColor=isBull?'#5ce0a0':'#e6677a';
+    const areaOp=isBull?.06:.04;
+    const lineOp=isBull?.12:.10;
+    const secColor=isBull?'#60b4f7':'#f5c842';
+
+    function randLine(startY,trend,volatility){
+        const pts=[];let y=startY;
+        for(let i=0;i<28;i++){
+            y+=trend+(Math.random()-.5)*volatility;
+            y=Math.max(150,Math.min(700,y));
+            pts.push(i*100+','+Math.round(y));
+        }
+        return pts.join(' ');
+    }
+
+    const line1=randLine(isBull?550:350,isBull?-8:6,60);
+    const line2=randLine(isBull?580:400,isBull?-5:4,50);
+
+    function lineToArea(pts){
+        const coords=pts.split(' ').map(p=>p.split(',').map(Number));
+        const lastX=coords[coords.length-1][0];
+        return 'M'+pts+' L'+lastX+',800 L0,800Z';
+    }
+
+    const gridCols=[350,700,1050,1400,1750,2100,2450].map(x=>'<line class="bg-grid" x1="'+x+'" y1="0" x2="'+x+'" y2="800"/>').join('');
+
+    document.getElementById('loginBg').innerHTML=
+        '<svg viewBox="0 0 2800 800" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">'+
+        '<defs><linearGradient id="lag" x1="0" y1="0" x2="0" y2="1">'+
+        '<stop offset="0%" stop-color="'+lineColor+'" stop-opacity="'+areaOp+'"/>'+
+        '<stop offset="100%" stop-color="'+lineColor+'" stop-opacity="0"/></linearGradient></defs>'+
+        '<g><line class="bg-grid" x1="0" y1="200" x2="2800" y2="200"/>'+
+        '<line class="bg-grid" x1="0" y1="400" x2="2800" y2="400"/>'+
+        '<line class="bg-grid" x1="0" y1="600" x2="2800" y2="600"/>'+gridCols+'</g>'+
+        '<path class="bg-area" d="'+lineToArea(line1)+'" fill="url(#lag)"/>'+
+        '<polyline class="bg-line" points="'+line1+'" stroke="'+lineColor+'" opacity="'+lineOp+'"/>'+
+        '<polyline class="bg-line" points="'+line2+'" stroke="'+secColor+'" opacity="'+(lineOp*.5)+'" style="animation-delay:1.4s"/></svg>';
+})();
+</script>
+}
