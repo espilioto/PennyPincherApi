@@ -56,7 +56,7 @@ public class StatementsService : IStatementsService
                 ))
                 .ToListAsync();
 
-            return statements.Count != 0 ? statements : Error.NotFound();
+            return statements;
         }
         catch (Exception ex)
         {
@@ -122,7 +122,7 @@ public class StatementsService : IStatementsService
                 ))
                 .ToListAsync();
 
-            return statements.Count != 0 ? statements : Error.NotFound();
+            return statements;
         }
         catch (Exception ex)
         {

@@ -37,7 +37,7 @@ public class AccountService : IAccountService
                 ))
                 .ToListAsync();
 
-            return accounts.Count == 0 ? Error.NotFound() : accounts;
+            return accounts;
         }
         catch (Exception ex)
         {
@@ -64,7 +64,7 @@ public class AccountService : IAccountService
                 ))
                 .ToListAsync();
 
-            return accounts.Count == 0 ? Error.NotFound() : accounts;
+            return accounts;
         }
         catch (Exception ex)
         {

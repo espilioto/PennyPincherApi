@@ -95,6 +95,9 @@ public class ChartDataService : IChartDataService
             if (statements.IsError)
                 return statements.Errors;
 
+            if (!statements.Value.Any())
+                return result;
+
             var groupedStatements = statements.Value.GroupBy(x => new { date = $"{x.Date.ToString("MMMM yyyy", CultureInfo.InvariantCulture)}", month = x.Date.Month, year = x.Date.Year });
 
             foreach (var item in groupedStatements)
@@ -112,7 +115,7 @@ public class ChartDataService : IChartDataService
                 );
             }
 
-            return result.Count > 0 ? result : Error.NotFound();
+            return result;
         }
         catch (Exception ex)
         {
@@ -133,6 +136,9 @@ public class ChartDataService : IChartDataService
             if (statements.IsError)
                 return statements.Errors;
 
+            if (!statements.Value.Any())
+                return result;
+
             var groupedStatements = statements.Value.GroupBy(x => new { date = $"{x.Date.ToString("MM/yy", CultureInfo.InvariantCulture)}" });
 
             foreach (var item in groupedStatements)
@@ -141,7 +147,7 @@ public class ChartDataService : IChartDataService
                 result.Add(new GenericKeyValueResponse(item.Key.date, balanceSum));
             }
 
-            return result.Count > 0 ? result : Error.NotFound();
+            return result;
         }
         catch (Exception ex)
         {
@@ -165,6 +171,9 @@ public class ChartDataService : IChartDataService
 
             if (statements.IsError)
                 return statements.Errors;
+
+            if (!statements.Value.Any())
+                return new CategoryAnalyticsResponse(yearSums, chartData);
 
             var minDate = statements.Value.Min(x => x.Date);
             var currentDate = DateTime.UtcNow;
@@ -230,6 +239,9 @@ public class ChartDataService : IChartDataService
 
             if (statements.IsError)
                 return statements.Errors;
+
+            if (!statements.Value.Any())
+                return new SavingsChartResponse(yearlyAmounts, incomeResult, expensesResult, savingsResult);
 
             //monthly calculations
             var statementsGroupedByMonth = statements.Value.GroupBy(x => new { date = $"{x.Date.ToString("MM/yy", CultureInfo.InvariantCulture)}" });
@@ -307,6 +319,9 @@ public class ChartDataService : IChartDataService
             if (statements.IsError)
                 return statements.Errors;
 
+            if (!statements.Value.Any())
+                return result;
+
             var groupedStatements = statements.Value.GroupBy(x => x.Date.Year);
 
             foreach (var item in groupedStatements)
@@ -322,7 +337,7 @@ public class ChartDataService : IChartDataService
                 );
             }
 
-            return result.Count > 0 ? result : Error.NotFound();
+            return result;
         }
         catch (Exception ex)
         {
