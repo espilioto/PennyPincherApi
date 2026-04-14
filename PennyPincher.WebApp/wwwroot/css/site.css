@@ -206,17 +206,17 @@
 
 /* subtitle typed */
 .login-sub-wrap{min-height:1.6rem;text-align:center;margin-bottom:1.6rem}
-.login-sub{font-size:.88rem;color:#8a8aa0;font-family:'Courier New',monospace;letter-spacing:.05em;white-space:nowrap;display:inline-block;width:0;overflow:hidden;border-right:2px solid #8a8aa0;animation:loginBlink .55s .9s step-end infinite}
+.login-sub{font-size:.88rem;color:#a0a0b4;font-family:'Courier New',monospace;letter-spacing:.05em;white-space:nowrap;display:inline-block;width:0;overflow:hidden;border-right:2px solid #a0a0b4;animation:loginBlink .55s .9s step-end infinite}
 .login-sub.typing{animation:loginTyping var(--type-dur,1s) .9s steps(var(--type-steps,20)) forwards,loginBlink .55s .9s step-end infinite}
 @keyframes loginTyping{from{width:0}to{width:var(--type-width)}}
 @keyframes loginBlink{50%{border-color:transparent}}
-.login-sub-haiku{font-size:.82rem;color:#8a8aa0;font-family:'Courier New',monospace;letter-spacing:.05em;line-height:1.7;text-align:center;white-space:pre-line;opacity:0;animation:loginFadeIn .8s .9s ease forwards}
+.login-sub-haiku{font-size:.82rem;color:#a0a0b4;font-family:'Courier New',monospace;letter-spacing:.05em;line-height:1.7;text-align:center;white-space:pre-line;opacity:0;animation:loginFadeIn .8s .9s ease forwards}
 
 /* form styling — the wired */
 .login-container .form-control{background:transparent;border:none;border-bottom:1px solid #1e1e2a;border-radius:0;color:var(--accent);font-family:'Courier New',monospace;font-size:.82rem;letter-spacing:.04em;text-align:center;padding:.55rem .4rem;transition:all .3s;caret-color:var(--accent)}
 .login-container .form-control:focus{background:transparent;border-color:var(--accent);color:var(--accent);box-shadow:0 1px 8px rgba(var(--accent-rgb),.12)}
 .login-container .form-control:not(:placeholder-shown){border-color:var(--accent);color:var(--accent);text-shadow:0 0 8px rgba(var(--accent-rgb),.2)}
-.login-container .form-control::placeholder{color:#2e2e40;font-style:italic}
+.login-container .form-control::placeholder{color:#4a4a5e;font-style:italic}
 .login-container .form-control:-webkit-autofill,
 .login-container .form-control:-webkit-autofill:hover,
 .login-container .form-control:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 1000px #0c0c10 inset;-webkit-text-fill-color:var(--accent);caret-color:var(--accent);border-bottom:1px solid var(--accent);transition:background-color 5000s}
