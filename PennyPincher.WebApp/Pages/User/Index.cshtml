@@ -42,6 +42,37 @@
     <button class="btn btn-sm btn-primary" onclick="changePassword()">Update Password</button>
 </div>
 
+<!-- Delete Account -->
+<div style="max-width: 400px; border: 1px solid var(--pp-expense); border-radius: 0.5rem; padding: 1rem;">
+    <h6 class="mb-2" style="color: var(--pp-expense);">Delete Account</h6>
+    <p class="text-muted small mb-3">This will permanently delete your account and all your data. This action cannot be undone.</p>
+    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">Delete my account</button>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" style="color: var(--pp-expense);">Delete Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="small text-muted">Enter your password to confirm.</p>
+                <div id="delete-msg"></div>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="delete-pwd" placeholder="Password" />
+                    <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1">&#128065;</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="deleteAccount()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
 <script>
     document.querySelectorAll('.pwd-toggle').forEach(function (btn) {
@@ -106,6 +137,35 @@
                     msg.innerHTML = '<div class="alert alert-danger small py-2">' + text + '</div>';
                 }).catch(function () {
                     msg.innerHTML = '<div class="alert alert-danger small py-2">Password change failed.</div>';
+                });
+            }
+        });
+    }
+
+    function deleteAccount() {
+        var msg = document.getElementById('delete-msg');
+        var pwd = document.getElementById('delete-pwd').value;
+
+        if (!pwd) { msg.innerHTML = '<div class="alert alert-danger small py-2">Password is required.</div>'; return; }
+
+        fetch('/User?handler=DeleteAccount', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: JSON.stringify({ password: pwd })
+        }).then(function (r) {
+            if (r.ok || r.redirected) {
+                window.location.href = '/Login';
+            } else {
+                r.json().then(function (d) {
+                    var text = 'Delete failed.';
+                    if (Array.isArray(d)) text = d.map(function (e) { return e.description; }).join(' ');
+                    else if (d.message) text = d.message;
+                    msg.innerHTML = '<div class="alert alert-danger small py-2">' + text + '</div>';
+                }).catch(function () {
+                    msg.innerHTML = '<div class="alert alert-danger small py-2">Delete failed.</div>';
                 });
             }
         });

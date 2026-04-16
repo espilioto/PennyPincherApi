@@ -102,4 +102,26 @@ public class UsersController : ControllerBase
         return Ok();
     }
 
+    [HttpDelete]
+    public async Task<IActionResult> Delete([FromBody] DeleteAccountRequest request)
+    {
+        var userId = User.GetUserId();
+        if (userId is null)
+            return Forbid();
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+            return NotFound();
+
+        if (!await _userManager.CheckPasswordAsync(user, request.Password))
+            return BadRequest(new[] { new { Code = "PasswordMismatch", Description = "Incorrect password." } });
+
+        var result = await _userManager.DeleteAsync(user);
+
+        if (!result.Succeeded)
+            return BadRequest(result.Errors);
+
+        return NoContent();
+    }
+
 }
