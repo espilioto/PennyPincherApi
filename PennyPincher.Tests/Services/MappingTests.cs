@@ -42,7 +42,7 @@ public class MappingTests
                 s.Amount,
                 s.Description,
                 s.CheckedAt,
-                new CategoryResponse(s.Category!.Id, s.Category.Name),
+                new CategoryResponse(s.Category!.Id, s.Category.Name, s.Category.SortOrder),
                 new AccountResponseLite(s.Account!.Id, s.Account.Name)
             ))
             .ToListAsync(TestContext.Current.CancellationToken);

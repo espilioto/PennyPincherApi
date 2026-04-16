@@ -2,5 +2,6 @@
 
 public record CategoryResponse(
         int Id,
-        string Name
+        string Name,
+        int SortOrder = 0
     );

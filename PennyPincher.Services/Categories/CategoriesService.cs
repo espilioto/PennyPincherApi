@@ -22,8 +22,13 @@ namespace PennyPincher.Services.Categories
         {
             try
             {
+                var maxOrder = await _context.Categories
+                    .Where(x => x.UserId == userId)
+                    .MaxAsync(x => (int?)x.SortOrder) ?? -1;
+
                 var category = request.ToEntity();
                 category.UserId = userId;
+                category.SortOrder = maxOrder + 1;
                 _ = await _context.Categories.AddAsync(category);
                 var success = await _context.SaveChangesAsync();
 
@@ -42,10 +47,12 @@ namespace PennyPincher.Services.Categories
             {
                 var categories = await _context.Categories
                 .Where(x => x.UserId == userId)
+                .OrderBy(x => x.SortOrder)
                 .Select(x => new CategoryResponse
                 (
                     x.Id,
-                    x.Name
+                    x.Name,
+                    x.SortOrder
                 ))
                 .ToListAsync();
 
@@ -90,6 +97,33 @@ namespace PennyPincher.Services.Categories
                 var success = await _context.SaveChangesAsync();
 
                 return success == 1 ? true : Error.Failure(description: "Error deleting category");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("{Message}", ex.Message);
+                return Error.Unexpected(description: ex.Message);
+            }
+        }
+
+        public async Task<ErrorOr<bool>> UpdateOrderAsync(string userId, List<int> categoryIds)
+        {
+            try
+            {
+                var categories = await _context.Categories
+                    .Where(x => x.UserId == userId)
+                    .ToListAsync();
+
+                if (categoryIds.Count != categories.Count || !categoryIds.All(id => categories.Any(c => c.Id == id)))
+                    return Error.Validation(description: "Invalid category IDs");
+
+                for (var i = 0; i < categoryIds.Count; i++)
+                {
+                    var category = categories.First(c => c.Id == categoryIds[i]);
+                    category.SortOrder = i;
+                }
+
+                await _context.SaveChangesAsync();
+                return true;
             }
             catch (Exception ex)
             {

@@ -30,9 +30,9 @@ public static class TestDbContextFactory
         await context.SaveChangesAsync();
     }
 
-    public static async Task SeedCategoryAsync(PennyPincherApiDbContext context, int id, string userId, string name = "Test Category")
+    public static async Task SeedCategoryAsync(PennyPincherApiDbContext context, int id, string userId, string name = "Test Category", int sortOrder = 0)
     {
-        context.Categories.Add(new Category { Id = id, Name = name, UserId = userId });
+        context.Categories.Add(new Category { Id = id, Name = name, UserId = userId, SortOrder = sortOrder });
         await context.SaveChangesAsync();
     }
 
