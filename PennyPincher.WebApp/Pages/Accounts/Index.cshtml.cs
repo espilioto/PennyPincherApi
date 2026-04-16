@@ -57,4 +57,15 @@ public class IndexModel : PageModel
 
         return new JsonResult(new { success = true });
     }
+
+    public async Task<IActionResult> OnPostReorderAsync([FromBody] List<int> orderedIds)
+    {
+        var client = _httpClientFactory.CreateClient("PennyPincherApi");
+        var response = await client.PutAsJsonAsync("api/accounts/reorder", orderedIds);
+
+        if (!response.IsSuccessStatusCode)
+            return BadRequest();
+
+        return new JsonResult(new { success = true });
+    }
 }

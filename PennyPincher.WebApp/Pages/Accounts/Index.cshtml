@@ -18,17 +18,19 @@
     <table class="table table-hover table-statements">
         <thead>
             <tr>
+                <th style="width: 40px;"></th>
                 <th style="width: 50px;">Color</th>
                 <th>Name</th>
                 <th class="text-end" style="width: 140px;">Balance</th>
                 <th style="width: 90px;"></th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="accountSortable">
             @foreach (var a in Model.Accounts)
             {
                 var nameEscaped = a.Name.Replace("'", "\\'").Replace("\"", "&quot;");
-                <tr>
+                <tr data-id="@a.Id">
+                    <td class="drag-handle" title="Drag to reorder">&#9776;</td>
                     <td>
                         <span class="d-inline-block rounded-circle" style="width: 20px; height: 20px; background-color: @a.ColorHex;"></span>
                     </td>
@@ -51,7 +53,7 @@
             @if (Model.Accounts.Count == 0)
             {
                 <tr>
-                    <td colspan="4" class="text-center text-muted py-4">No accounts found.</td>
+                    <td colspan="5" class="text-center text-muted py-4">No accounts found.</td>
                 </tr>
             }
         </tbody>
@@ -172,6 +174,26 @@
             if (!r.ok) { alert('Delete failed.'); return; }
             deleteModal.hide();
             window.location.reload();
+        });
+    }
+
+    var sortableEl = document.getElementById('accountSortable');
+    if (sortableEl && sortableEl.children.length > 0 && sortableEl.children[0].dataset.id) {
+        Sortable.create(sortableEl, {
+            handle: '.drag-handle',
+            animation: 150,
+            onEnd: function () {
+                var rows = sortableEl.querySelectorAll('tr[data-id]');
+                var orderedIds = Array.from(rows).map(function(r) { return parseInt(r.dataset.id); });
+                fetch('/Accounts?handler=Reorder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    },
+                    body: JSON.stringify(orderedIds)
+                });
+            }
         });
     }
 </script>
