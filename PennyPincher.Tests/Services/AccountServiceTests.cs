@@ -146,4 +146,110 @@ public class AccountServiceTests
         Assert.Equal("Middle", result.Value[1].Name);
         Assert.Equal("Last", result.Value[2].Name);
     }
+
+    [Fact]
+    public async Task InsertAsync_SetsSortOrderToMaxPlusOne()
+    {
+        var context = TestDbContextFactory.Create();
+        var service = new AccountService(context, _logger);
+
+        await TestDbContextFactory.SeedUserAsync(context, "user1");
+        await TestDbContextFactory.SeedAccountAsync(context, 1, "user1", "First", sortOrder: 0);
+        await TestDbContextFactory.SeedAccountAsync(context, 2, "user1", "Second", sortOrder: 1);
+
+        var request = new AccountRequest("Third", "user1", "#00FF00");
+        var result = await service.InsertAsync(request, "user1");
+
+        Assert.False(result.IsError);
+        var newAccount = context.Accounts.OrderByDescending(a => a.SortOrder).First();
+        Assert.Equal("Third", newAccount.Name);
+        Assert.Equal(2, newAccount.SortOrder);
+    }
+
+    [Fact]
+    public async Task InsertAsync_SetsSortOrderToZero_WhenNoAccounts()
+    {
+        var context = TestDbContextFactory.Create();
+        var service = new AccountService(context, _logger);
+
+        await TestDbContextFactory.SeedUserAsync(context, "user1");
+
+        var request = new AccountRequest("First", "user1", "#00FF00");
+        var result = await service.InsertAsync(request, "user1");
+
+        Assert.False(result.IsError);
+        Assert.Equal(0, context.Accounts.First().SortOrder);
+    }
+
+    [Fact]
+    public async Task UpdateOrderAsync_ReordersAccountsCorrectly()
+    {
+        var context = TestDbContextFactory.Create();
+        var service = new AccountService(context, _logger);
+
+        await TestDbContextFactory.SeedUserAsync(context, "user1");
+        await TestDbContextFactory.SeedAccountAsync(context, 1, "user1", "First", sortOrder: 0);
+        await TestDbContextFactory.SeedAccountAsync(context, 2, "user1", "Second", sortOrder: 1);
+        await TestDbContextFactory.SeedAccountAsync(context, 3, "user1", "Third", sortOrder: 2);
+
+        var result = await service.UpdateOrderAsync("user1", [3, 1, 2]);
+
+        Assert.False(result.IsError);
+        Assert.Equal(0, context.Accounts.First(a => a.Id == 3).SortOrder);
+        Assert.Equal(1, context.Accounts.First(a => a.Id == 1).SortOrder);
+        Assert.Equal(2, context.Accounts.First(a => a.Id == 2).SortOrder);
+
+        var getResult = await service.GetByUserAsync("user1");
+        Assert.Equal("Third", getResult.Value[0].Name);
+        Assert.Equal("First", getResult.Value[1].Name);
+        Assert.Equal("Second", getResult.Value[2].Name);
+    }
+
+    [Fact]
+    public async Task UpdateOrderAsync_ReturnsError_WhenIdsDoNotMatchUserAccounts()
+    {
+        var context = TestDbContextFactory.Create();
+        var service = new AccountService(context, _logger);
+
+        await TestDbContextFactory.SeedUserAsync(context, "user1");
+        await TestDbContextFactory.SeedAccountAsync(context, 1, "user1", "First");
+        await TestDbContextFactory.SeedAccountAsync(context, 2, "user1", "Second");
+
+        var result = await service.UpdateOrderAsync("user1", [1, 999]);
+
+        Assert.True(result.IsError);
+    }
+
+    [Fact]
+    public async Task UpdateOrderAsync_ReturnsError_WhenCountMismatch()
+    {
+        var context = TestDbContextFactory.Create();
+        var service = new AccountService(context, _logger);
+
+        await TestDbContextFactory.SeedUserAsync(context, "user1");
+        await TestDbContextFactory.SeedAccountAsync(context, 1, "user1", "First");
+        await TestDbContextFactory.SeedAccountAsync(context, 2, "user1", "Second");
+
+        var result = await service.UpdateOrderAsync("user1", [1]);
+
+        Assert.True(result.IsError);
+    }
+
+    [Fact]
+    public async Task UpdateOrderAsync_DoesNotAffectOtherUsers()
+    {
+        var context = TestDbContextFactory.Create();
+        var service = new AccountService(context, _logger);
+
+        await TestDbContextFactory.SeedUserAsync(context, "user1");
+        await TestDbContextFactory.SeedUserAsync(context, "user2", "other@test.com");
+        await TestDbContextFactory.SeedAccountAsync(context, 1, "user1", "A1", sortOrder: 0);
+        await TestDbContextFactory.SeedAccountAsync(context, 2, "user1", "A2", sortOrder: 1);
+        await TestDbContextFactory.SeedAccountAsync(context, 3, "user2", "B1", sortOrder: 0);
+
+        var result = await service.UpdateOrderAsync("user1", [2, 1]);
+
+        Assert.False(result.IsError);
+        Assert.Equal(0, context.Accounts.First(a => a.Id == 3).SortOrder);
+    }
 }
