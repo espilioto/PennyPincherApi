@@ -42,21 +42,6 @@
         var themes = window.ppThemes;
         var saved = localStorage.getItem('pp-theme');
 
-        // random dot
-        var rd = document.createElement('div');
-        rd.className = 'settings-theme-dot';
-        rd.title = 'random';
-        rd.innerHTML = '<span class="settings-dot-circle" style="background:conic-gradient(#e8b44c,#a78bfa,#e07a8e,#b0b0c0,#4ade80,#e8b44c)"></span><span class="settings-dot-label">Random</span>';
-        if (!saved) rd.classList.add('active');
-        rd.onclick = function () {
-            localStorage.removeItem('pp-theme');
-            var t = themes[Math.floor(Math.random() * themes.length)];
-            window.applyTheme(t);
-            container.querySelectorAll('.settings-theme-dot').forEach(function (d) { d.classList.remove('active'); });
-            rd.classList.add('active');
-        };
-        container.appendChild(rd);
-
         // theme dots
         themes.forEach(function (t) {
             var d = document.createElement('div');
@@ -68,7 +53,6 @@
             d.onclick = function () {
                 window.applyTheme(t);
                 container.querySelectorAll('.settings-theme-dot').forEach(function (el) { el.classList.toggle('active', el.dataset.theme === t.name); });
-                rd.classList.remove('active');
             };
             container.appendChild(d);
         });
