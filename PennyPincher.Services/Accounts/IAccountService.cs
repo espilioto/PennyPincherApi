@@ -10,4 +10,5 @@ public interface IAccountService
     public Task<ErrorOr<List<AccountResponse>>> GetByUserAsync(string userId);
     public Task<ErrorOr<bool>> InsertAsync(AccountRequest request, string userId);
     public Task<ErrorOr<bool>> UpdateAsync(string userId, int accountId, AccountRequest request);
+    public Task<ErrorOr<bool>> UpdateOrderAsync(string userId, List<int> accountIds);
 }
