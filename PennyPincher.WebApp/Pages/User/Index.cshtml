@@ -20,21 +20,39 @@
     <div id="pwd-msg"></div>
     <div class="mb-3">
         <label for="pwd-current" class="form-label small">Current password</label>
-        <input type="password" class="form-control" id="pwd-current" />
+        <div class="input-group">
+            <input type="password" class="form-control" id="pwd-current" />
+            <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1">&#128065;</button>
+        </div>
     </div>
     <div class="mb-3">
         <label for="pwd-new" class="form-label small">New password</label>
-        <input type="password" class="form-control" id="pwd-new" />
+        <div class="input-group">
+            <input type="password" class="form-control" id="pwd-new" />
+            <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1">&#128065;</button>
+        </div>
     </div>
     <div class="mb-3">
         <label for="pwd-confirm" class="form-label small">Confirm new password</label>
-        <input type="password" class="form-control" id="pwd-confirm" />
+        <div class="input-group">
+            <input type="password" class="form-control" id="pwd-confirm" />
+            <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1">&#128065;</button>
+        </div>
     </div>
     <button class="btn btn-sm btn-primary" onclick="changePassword()">Update Password</button>
 </div>
 
 @section Scripts {
 <script>
+    document.querySelectorAll('.pwd-toggle').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var input = btn.parentElement.querySelector('input');
+            var isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            btn.style.opacity = isPassword ? '1' : '.5';
+        });
+    });
+
     (function () {
         var container = document.getElementById('settingsThemeDots');
         if (!container || !window.ppThemes) return;
