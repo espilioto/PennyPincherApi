@@ -18,12 +18,10 @@
         window.dispatchEvent(new Event('themeChanged'));
     }
 
-    // Apply saved or random theme
+    // Apply saved or random theme (random is saved for consistency)
     var saved=localStorage.getItem('pp-theme');
-    var isRandom=!saved;
     var theme=themes.find(function(t){return t.name===saved})||themes[Math.floor(Math.random()*themes.length)];
     applyTheme(theme);
-    if(isRandom){localStorage.removeItem('pp-theme')}
 
     // Expose for settings page
     window.ppThemes=themes;

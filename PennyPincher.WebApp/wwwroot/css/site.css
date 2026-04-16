@@ -296,11 +296,6 @@
 .login-c-bl{bottom:2rem;left:2rem;border-bottom:1px solid #1a1a22;border-left:1px solid #1a1a22}
 .login-c-br{bottom:2rem;right:2rem;border-bottom:1px solid #1a1a22;border-right:1px solid #1a1a22}
 
-/* theme switcher dots */
-.login-themes{position:fixed;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;gap:.5rem;z-index:2;opacity:0;animation:loginFadeIn .4s 2.5s ease forwards}
-.login-theme-dot{width:14px;height:14px;border-radius:50%;cursor:pointer;border:1px solid #2a2a3a;transition:all .3s;opacity:.5}
-.login-theme-dot:hover{opacity:1;transform:scale(1.3)}
-.login-theme-dot.active{opacity:1;border-color:transparent;box-shadow:0 0 8px currentColor}
 
 @keyframes loginFadeIn{to{opacity:1}}
 
