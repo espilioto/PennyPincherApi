@@ -19,7 +19,7 @@
         <thead>
             <tr>
                 <th style="width: 40px;"></th>
-                <th style="width: 50px;">Color</th>
+                <th class="text-center" style="width: 50px;">Color</th>
                 <th>Name</th>
                 <th class="text-end" style="width: 140px;">Balance</th>
                 <th style="width: 90px;"></th>
@@ -31,7 +31,7 @@
                 var nameEscaped = a.Name.Replace("'", "\\'").Replace("\"", "&quot;");
                 <tr data-id="@a.Id">
                     <td class="drag-handle" title="Drag to reorder">&#9776;</td>
-                    <td>
+                    <td class="text-center">
                         <span class="d-inline-block rounded-circle" style="width: 20px; height: 20px; background-color: @a.ColorHex;"></span>
                     </td>
                     <td>@a.Name</td>
