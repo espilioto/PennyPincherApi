@@ -6,10 +6,31 @@
 
 <h4 class="mb-4">Settings</h4>
 
+@Html.AntiForgeryToken()
+
 <!-- Theme -->
 <div class="mb-5">
     <h6 class="text-muted mb-3">Theme</h6>
     <div class="d-flex gap-3 flex-wrap" id="settingsThemeDots"></div>
+</div>
+
+<!-- Change Password -->
+<div class="mb-5" style="max-width: 400px;">
+    <h6 class="text-muted mb-3">Change Password</h6>
+    <div id="pwd-msg"></div>
+    <div class="mb-3">
+        <label for="pwd-current" class="form-label small">Current password</label>
+        <input type="password" class="form-control" id="pwd-current" />
+    </div>
+    <div class="mb-3">
+        <label for="pwd-new" class="form-label small">New password</label>
+        <input type="password" class="form-control" id="pwd-new" />
+    </div>
+    <div class="mb-3">
+        <label for="pwd-confirm" class="form-label small">Confirm new password</label>
+        <input type="password" class="form-control" id="pwd-confirm" />
+    </div>
+    <button class="btn btn-sm btn-primary" onclick="changePassword()">Update Password</button>
 </div>
 
 @section Scripts {
@@ -52,5 +73,40 @@
             container.appendChild(d);
         });
     })();
+
+    function changePassword() {
+        var msg = document.getElementById('pwd-msg');
+        var curr = document.getElementById('pwd-current').value;
+        var newPwd = document.getElementById('pwd-new').value;
+        var confirm = document.getElementById('pwd-confirm').value;
+
+        if (!curr || !newPwd) { msg.innerHTML = '<div class="alert alert-danger small py-2">All fields are required.</div>'; return; }
+        if (newPwd !== confirm) { msg.innerHTML = '<div class="alert alert-danger small py-2">Passwords do not match.</div>'; return; }
+
+        fetch('/User?handler=ChangePassword', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: JSON.stringify({ currentPassword: curr, newPassword: newPwd })
+        }).then(function (r) {
+            if (r.ok) {
+                msg.innerHTML = '<div class="alert alert-success small py-2">Password updated.</div>';
+                document.getElementById('pwd-current').value = '';
+                document.getElementById('pwd-new').value = '';
+                document.getElementById('pwd-confirm').value = '';
+            } else {
+                r.json().then(function (d) {
+                    var text = 'Password change failed.';
+                    if (Array.isArray(d)) text = d.map(function (e) { return e.description; }).join(' ');
+                    else if (d.message) text = d.message;
+                    msg.innerHTML = '<div class="alert alert-danger small py-2">' + text + '</div>';
+                }).catch(function () {
+                    msg.innerHTML = '<div class="alert alert-danger small py-2">Password change failed.</div>';
+                });
+            }
+        });
+    }
 </script>
 }

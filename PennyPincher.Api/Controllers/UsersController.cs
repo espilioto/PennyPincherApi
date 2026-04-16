@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using PennyPincher.Api.Extensions;
+using PennyPincher.Contracts.Users;
 using PennyPincher.Services.User.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -79,6 +81,25 @@ public class UsersController : ControllerBase
             signingCredentials: creds);
 
         return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
+    }
+
+    [HttpPut("password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        var userId = User.GetUserId();
+        if (userId is null)
+            return Forbid();
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+            return NotFound();
+
+        var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
+
+        if (!result.Succeeded)
+            return BadRequest(result.Errors);
+
+        return Ok();
     }
 
 }
