@@ -59,8 +59,8 @@
             </ul>
 
             <div class="mt-auto">
-                <div class="sidebar-theme-dots" id="sidebarThemeDots" style="display:none"></div>
-                <span class="nav-link text-muted small sidebar-email" id="sidebarEmail" style="cursor:pointer" title="Change theme">@User.Identity?.Name</span>
+                <a class="nav-link text-muted small @(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/User") == true ? "active" : "")"
+                   asp-page="/User/Index">@User.Identity?.Name</a>
                 <form method="post" asp-page="/Logout">
                     <button type="submit" class="nav-link text-danger bg-transparent border-0">Logout</button>
                 </form>

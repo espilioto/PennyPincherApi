@@ -7,7 +7,6 @@
         {name:'silver',accent:'#b0b0c0',rgb:'176,176,192',dim:'#22222e',text:'#0c0c10'},
         {name:'mint',accent:'#4ade80',rgb:'74,222,128',dim:'#1a2e20',text:'#0c0c10'},
     ];
-    var themeDots=[];
 
     function applyTheme(t){
         var s=document.documentElement.style;
@@ -16,55 +15,7 @@
         s.setProperty('--accent-dim',t.dim);
         s.setProperty('--accent-text',t.text);
         localStorage.setItem('pp-theme',t.name);
-        themeDots.forEach(function(d){d.classList.toggle('active',d.dataset.theme===t.name)});
-        if(rd)rd.classList.remove('active');
         window.dispatchEvent(new Event('themeChanged'));
-    }
-
-    // Build sidebar dots
-    var dotsEl=document.getElementById('sidebarThemeDots');
-    var emailEl=document.getElementById('sidebarEmail');
-    var rd=null;
-
-    if(dotsEl&&emailEl){
-        // random dot
-        rd=document.createElement('div');
-        rd.className='sidebar-theme-dot';
-        rd.style.background='conic-gradient(#e8b44c,#a78bfa,#e07a8e,#b0b0c0,#4ade80,#e8b44c)';
-        rd.style.color='#888';
-        rd.title='random';
-        rd.onclick=function(e){
-            e.stopPropagation();
-            localStorage.removeItem('pp-theme');
-            var t=themes[Math.floor(Math.random()*themes.length)];
-            applyTheme(t);
-            themeDots.forEach(function(d){d.classList.remove('active')});
-            rd.classList.add('active');
-        };
-        dotsEl.appendChild(rd);
-
-        // theme dots
-        themes.forEach(function(t){
-            var d=document.createElement('div');
-            d.className='sidebar-theme-dot';
-            d.style.background=t.accent;
-            d.style.color=t.accent;
-            d.dataset.theme=t.name;
-            d.title=t.name;
-            d.onclick=function(e){e.stopPropagation();applyTheme(t)};
-            themeDots.push(d);
-            dotsEl.appendChild(d);
-        });
-
-        // toggle dots on email click
-        emailEl.addEventListener('click',function(e){
-            e.stopPropagation();
-            var vis=dotsEl.style.display!=='flex';
-            dotsEl.style.display=vis?'flex':'none';
-        });
-        document.addEventListener('click',function(e){
-            if(!e.target.closest('.sidebar'))dotsEl.style.display='none';
-        });
     }
 
     // Apply saved or random theme
@@ -72,7 +23,11 @@
     var isRandom=!saved;
     var theme=themes.find(function(t){return t.name===saved})||themes[Math.floor(Math.random()*themes.length)];
     applyTheme(theme);
-    if(isRandom){localStorage.removeItem('pp-theme');if(rd)rd.classList.add('active')}
+    if(isRandom){localStorage.removeItem('pp-theme')}
+
+    // Expose for settings page
+    window.ppThemes=themes;
+    window.applyTheme=applyTheme;
 
     // Global helper for charts
     window.getAccentColor=function(){
