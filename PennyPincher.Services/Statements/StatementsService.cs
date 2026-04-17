@@ -175,6 +175,20 @@ public class StatementsService : IStatementsService
         }
     }
 
+    public async Task<ErrorOr<bool>> DeleteAllByUserAsync(string userId)
+    {
+        try
+        {
+            await _context.Statements.Where(x => x.UserId == userId).ExecuteDeleteAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("{Message}", ex.Message);
+            return Error.Unexpected(description: ex.Message);
+        }
+    }
+
     /// <summary>
     /// Marks all statements where CheckedAt is null with the given datetime.
     /// </summary>

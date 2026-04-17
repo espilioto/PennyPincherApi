@@ -147,4 +147,18 @@ public class AccountService : IAccountService
             return Error.Unexpected(description: ex.Message);
         }
     }
+
+    public async Task<ErrorOr<bool>> DeleteAllByUserAsync(string userId)
+    {
+        try
+        {
+            await _context.Accounts.Where(x => x.UserId == userId).ExecuteDeleteAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("{Message}", ex.Message);
+            return Error.Unexpected(description: ex.Message);
+        }
+    }
 }
