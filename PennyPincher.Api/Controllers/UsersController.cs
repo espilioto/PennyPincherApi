@@ -1,86 +1,56 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using PennyPincher.Api.Extensions;
 using PennyPincher.Contracts.Users;
-using PennyPincher.Services.User.Models;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using PennyPincher.Services.Users;
 
 namespace PennyPincher.Api.Controllers;
 
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-
-public class UsersController : ControllerBase
+public class UsersController : ErrorOrApiController
 {
-    private readonly UserManager<IdentityUser> _userManager;
+    private readonly IUserService _userService;
 
-    public UsersController(UserManager<IdentityUser> userManager)
+    public UsersController(IUserService userService)
     {
-        _userManager = userManager;
+        _userService = userService;
     }
 
-    // GET: api/<UsersController>
     [HttpGet]
-    public async Task<List<User>> Get()
+    public async Task<IActionResult> Get()
     {
-        return await _userManager.Users.Select(x => new User { Username = x.UserName }).ToListAsync();
+        var result = await _userService.GetAllAsync();
+
+        return result.Match(
+            users => Ok(users),
+            errors => Problem(errors)
+        );
     }
 
-    // POST api/<UsersController>
     [AllowAnonymous]
     [HttpPost]
-    public async Task<ActionResult<User>> Post([FromBody] User user)
+    public async Task<IActionResult> Post([FromBody] RegisterRequest request)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        var result = await _userService.RegisterAsync(request);
 
-        var result = await _userManager.CreateAsync(
-            new IdentityUser() { UserName = user.Username, Email = user.Email }, user.Password
+        return result.Match(
+            _ => Created(string.Empty, request),
+            errors => Problem(errors)
         );
-
-        if (!result.Succeeded)
-            return BadRequest(result.Errors);
-
-        return Created(string.Empty, user);
     }
 
-    // POST api/<UsersController>/login
     [AllowAnonymous]
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest user)
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var identityUser = await _userManager.FindByEmailAsync(user.Email);
-        if (identityUser == null || !await _userManager.CheckPasswordAsync(identityUser, user.Password))
-            return Unauthorized();
+        var result = await _userService.LoginAsync(request);
 
-        var jwtKey = HttpContext.RequestServices.GetRequiredService<IConfiguration>()["Jwt:Key"];
-        var jwtIssuer = HttpContext.RequestServices.GetRequiredService<IConfiguration>()["Jwt:Issuer"];
-        var jwtTtlHours = int.Parse(HttpContext.RequestServices.GetRequiredService<IConfiguration>()["Jwt:TtlHours"]!);
-
-        var claims = new[]
-        {
-            new Claim(JwtRegisteredClaimNames.Sub, identityUser.Id),
-            new Claim(JwtRegisteredClaimNames.Email, identityUser.Email!)
-        };
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var token = new JwtSecurityToken(
-            issuer: jwtIssuer,
-            audience: null,
-            claims: claims,
-            expires: DateTime.UtcNow.AddHours(jwtTtlHours),
-            signingCredentials: creds);
-
-        return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
+        return result.Match(
+            response => Ok(response),
+            errors => Problem(errors)
+        );
     }
 
     [HttpPut("password")]
@@ -88,18 +58,14 @@ public class UsersController : ControllerBase
     {
         var userId = User.GetUserId();
         if (userId is null)
-            return Forbid();
+            return Problem(ErrorOr.Error.Forbidden());
 
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user is null)
-            return NotFound();
+        var result = await _userService.ChangePasswordAsync(userId, request);
 
-        var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
-
-        if (!result.Succeeded)
-            return BadRequest(result.Errors);
-
-        return Ok();
+        return result.Match(
+            _ => Ok(),
+            errors => Problem(errors)
+        );
     }
 
     [HttpDelete]
@@ -107,21 +73,13 @@ public class UsersController : ControllerBase
     {
         var userId = User.GetUserId();
         if (userId is null)
-            return Forbid();
+            return Problem(ErrorOr.Error.Forbidden());
 
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user is null)
-            return NotFound();
+        var result = await _userService.DeleteAsync(userId, request);
 
-        if (!await _userManager.CheckPasswordAsync(user, request.Password))
-            return BadRequest(new[] { new { Code = "PasswordMismatch", Description = "Incorrect password." } });
-
-        var result = await _userManager.DeleteAsync(user);
-
-        if (!result.Succeeded)
-            return BadRequest(result.Errors);
-
-        return NoContent();
+        return result.Match(
+            _ => NoContent(),
+            errors => Problem(errors)
+        );
     }
-
 }

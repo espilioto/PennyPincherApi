@@ -11,6 +11,7 @@ using PennyPincher.Services.Accounts;
 using PennyPincher.Services.Categories;
 using PennyPincher.Services.Charts;
 using PennyPincher.Services.Statements;
+using PennyPincher.Services.Users;
 using PennyPincher.Services.Utils;
 using System.Text;
 
@@ -83,6 +84,7 @@ namespace PennyPincher.Api
                 builder.Services.AddScoped<ICategoriesService, CategoriesService>();
                 builder.Services.AddScoped<IAccountService, AccountService>();
                 builder.Services.AddScoped<IChartDataService, ChartDataService>();
+                builder.Services.AddScoped<IUserService, UserService>();
                 builder.Services.AddScoped<IUtils, Utils>();
 
                 var jwtKey = builder.Configuration["Jwt:Key"];
