@@ -26,7 +26,7 @@ public class IndexModel : PageModel
         if (!response.IsSuccessStatusCode)
         {
             var body = await response.Content.ReadAsStringAsync();
-            return new ContentResult { Content = body, ContentType = "application/json", StatusCode = 400 };
+            return new ContentResult { Content = body, ContentType = "application/json", StatusCode = (int)response.StatusCode };
         }
 
         return new JsonResult(new { success = true });
@@ -44,7 +44,7 @@ public class IndexModel : PageModel
         if (!response.IsSuccessStatusCode)
         {
             var body = await response.Content.ReadAsStringAsync();
-            return new ContentResult { Content = body, ContentType = "application/json", StatusCode = 400 };
+            return new ContentResult { Content = body, ContentType = "application/json", StatusCode = (int)response.StatusCode };
         }
 
         await HttpContext.SignOutAsync("Cookies");
