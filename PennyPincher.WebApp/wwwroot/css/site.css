@@ -5,7 +5,13 @@
   --pp-text:#e8e8ed;--pp-text-secondary:#a0a0b4;--pp-text-ghost:#4a4a5e;
   --pp-income:#47d17a;--pp-expense:#e66a7a;--pp-info:#60b4f7;--pp-warning:#f5c842;
 }
-[data-bs-theme="dark"]{
+/* Light base palette — only the canvas flips; accent vars still swap via JS */
+:root[data-theme="white"]{
+  --pp-bg:#f6f4ee;--pp-surface:#ffffff;--pp-border:#e2dfd6;
+  --pp-text:#1d1d28;--pp-text-secondary:#5a5a6e;--pp-text-ghost:#a8a8b4;
+}
+[data-bs-theme="dark"],
+[data-bs-theme="light"]{
   --bs-body-bg:var(--pp-bg);--bs-body-color:var(--pp-text);
   --bs-secondary-color:var(--pp-text-secondary);--bs-tertiary-bg:var(--pp-surface);
   --bs-border-color:var(--pp-border);--bs-primary:var(--accent);--bs-primary-rgb:var(--accent-rgb);

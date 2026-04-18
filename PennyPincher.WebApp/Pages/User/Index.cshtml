@@ -116,7 +116,8 @@
             d.dataset.theme = t.name;
             d.title = t.name;
             if (saved === t.name) d.classList.add('active');
-            d.innerHTML = '<span class="settings-dot-circle" style="background:' + t.accent + '"></span><span class="settings-dot-label">' + t.name.charAt(0).toUpperCase() + t.name.slice(1) + '</span>';
+            var dotBg = t.dotColor || t.accent;
+            d.innerHTML = '<span class="settings-dot-circle" style="background:' + dotBg + '"></span><span class="settings-dot-label">' + t.name.charAt(0).toUpperCase() + t.name.slice(1) + '</span>';
             d.onclick = function () {
                 window.applyTheme(t);
                 container.querySelectorAll('.settings-theme-dot').forEach(function (el) { el.classList.toggle('active', el.dataset.theme === t.name); });

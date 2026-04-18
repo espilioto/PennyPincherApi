@@ -6,14 +6,23 @@
         {name:'rose',accent:'#e07a8e',rgb:'224,122,142',dim:'#3a1e28',text:'#e8e8ed'},
         {name:'silver',accent:'#b0b0c0',rgb:'176,176,192',dim:'#22222e',text:'#0c0c10'},
         {name:'mint',accent:'#4ade80',rgb:'74,222,128',dim:'#1a2e20',text:'#0c0c10'},
+        {name:'white',accent:'#a78bfa',rgb:'167,139,250',dim:'#2a2240',text:'#e8e8ed',light:true,dotColor:'#ffffff'},
     ];
 
     function applyTheme(t){
-        var s=document.documentElement.style;
+        var html=document.documentElement;
+        var s=html.style;
         s.setProperty('--accent',t.accent);
         s.setProperty('--accent-rgb',t.rgb);
         s.setProperty('--accent-dim',t.dim);
         s.setProperty('--accent-text',t.text);
+        if(t.light){
+            html.setAttribute('data-theme',t.name);
+            html.setAttribute('data-bs-theme','light');
+        }else{
+            html.removeAttribute('data-theme');
+            html.setAttribute('data-bs-theme','dark');
+        }
         localStorage.setItem('pp-theme',t.name);
         window.dispatchEvent(new Event('themeChanged'));
     }
@@ -30,6 +39,9 @@
     // Global helper for charts
     window.getAccentColor=function(){
         return getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#a78bfa';
+    };
+    window.getChartThemeMode=function(){
+        return document.documentElement.getAttribute('data-bs-theme')==='light'?'light':'dark';
     };
 })();
 
