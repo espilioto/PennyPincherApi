@@ -58,11 +58,7 @@ public class UsersController : ErrorOrApiController
     [HttpPut("password")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
     {
-        var userId = User.GetUserId();
-        if (userId is null)
-            return Problem(ErrorOr.Error.Forbidden());
-
-        var result = await _userService.ChangePasswordAsync(userId, request);
+        var result = await _userService.ChangePasswordAsync(User.GetUserId()!, request);
 
         return result.Match(
             _ => Ok(),
@@ -73,11 +69,7 @@ public class UsersController : ErrorOrApiController
     [HttpDelete]
     public async Task<IActionResult> Delete([FromBody] DeleteAccountRequest request)
     {
-        var userId = User.GetUserId();
-        if (userId is null)
-            return Problem(ErrorOr.Error.Forbidden());
-
-        var result = await _userService.DeleteAsync(userId, request);
+        var result = await _userService.DeleteAsync(User.GetUserId()!, request);
 
         return result.Match(
             _ => NoContent(),
