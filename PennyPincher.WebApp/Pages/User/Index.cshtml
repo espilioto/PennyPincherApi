@@ -93,6 +93,22 @@
 
 @section Scripts {
 <script>
+    function extractApiError(d) {
+        if (!d) return null;
+        if (d.errors && typeof d.errors === 'object') {
+            var msgs = [];
+            Object.keys(d.errors).forEach(function (k) {
+                var v = d.errors[k];
+                if (Array.isArray(v)) msgs = msgs.concat(v);
+                else if (v) msgs.push(v);
+            });
+            if (msgs.length) return msgs.join(' ');
+        }
+        if (d.detail) return d.detail;
+        if (d.title) return d.title;
+        return null;
+    }
+
     document.querySelectorAll('.pwd-toggle').forEach(function (btn) {
         btn.addEventListener('click', function () {
             var input = btn.parentElement.querySelector('input');
@@ -150,9 +166,7 @@
                 document.getElementById('pwd-confirm').value = '';
             } else {
                 r.json().then(function (d) {
-                    var text = 'Password change failed.';
-                    if (Array.isArray(d)) text = d.map(function (e) { return e.description; }).join(' ');
-                    else if (d.message) text = d.message;
+                    var text = extractApiError(d) || 'Password change failed.';
                     msg.innerHTML = '<div class="alert alert-danger small py-2">' + text + '</div>';
                 }).catch(function () {
                     msg.innerHTML = '<div class="alert alert-danger small py-2">Password change failed.</div>';
@@ -179,9 +193,7 @@
                 window.location.href = '/Login';
             } else {
                 r.json().then(function (d) {
-                    var text = 'Delete failed.';
-                    if (Array.isArray(d)) text = d.map(function (e) { return e.description; }).join(' ');
-                    else if (d.message) text = d.message;
+                    var text = extractApiError(d) || 'Delete failed.';
                     msg.innerHTML = '<div class="alert alert-danger small py-2">' + text + '</div>';
                 }).catch(function () {
                     msg.innerHTML = '<div class="alert alert-danger small py-2">Delete failed.</div>';
