@@ -6,7 +6,7 @@
     <title>@ViewData["Title"] - PennyPincher</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <script>(function(){var t=localStorage.getItem('pp-theme');var m={amber:['#e8b44c','232,180,76','#3a2e18','#0c0c10'],violet:['#a78bfa','167,139,250','#2a2240','#e8e8ed'],rose:['#e07a8e','224,122,142','#3a1e28','#e8e8ed'],silver:['#b0b0c0','176,176,192','#22222e','#0c0c10'],mint:['#4ade80','74,222,128','#1a2e20','#0c0c10']};var c=m[t];if(c){var s=document.documentElement.style;s.setProperty('--accent',c[0]);s.setProperty('--accent-rgb',c[1]);s.setProperty('--accent-dim',c[2]);s.setProperty('--accent-text',c[3])}})();</script>
+    <script>(function(){var t=localStorage.getItem('pp-theme');var m={amber:['#e8b44c','232,180,76','#3a2e18','#0c0c10',0],violet:['#a78bfa','167,139,250','#2a2240','#e8e8ed',0],rose:['#e07a8e','224,122,142','#3a1e28','#e8e8ed',0],silver:['#b0b0c0','176,176,192','#22222e','#0c0c10',0],mint:['#4ade80','74,222,128','#1a2e20','#0c0c10',0],white:['#a78bfa','167,139,250','#2a2240','#e8e8ed',1]};var c=m[t];if(c){var h=document.documentElement;var s=h.style;s.setProperty('--accent',c[0]);s.setProperty('--accent-rgb',c[1]);s.setProperty('--accent-dim',c[2]);s.setProperty('--accent-text',c[3]);if(c[4]){h.setAttribute('data-theme',t);h.setAttribute('data-bs-theme','light')}}})();</script>
 </head>
 <body>
     @if (User.Identity?.IsAuthenticated == true)
@@ -59,8 +59,8 @@
             </ul>
 
             <div class="mt-auto">
-                <div class="sidebar-theme-dots" id="sidebarThemeDots" style="display:none"></div>
-                <span class="nav-link text-muted small sidebar-email" id="sidebarEmail" style="cursor:pointer" title="Change theme">@User.Identity?.Name</span>
+                <a class="nav-link text-muted small @(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/User") == true ? "active" : "")"
+                   asp-page="/User/Index">@User.Identity?.Name</a>
                 <form method="post" asp-page="/Logout">
                     <button type="submit" class="nav-link text-danger bg-transparent border-0">Logout</button>
                 </form>

@@ -98,7 +98,7 @@ else
                 background: 'transparent',
                 toolbar: { show: true }
             },
-            theme: { mode: 'dark' },
+            theme: { mode: window.getChartThemeMode() },
             colors: ['#47d17a', '#e66a7a', '#2196F3'],
             stroke: { curve: 'smooth', width: 2 },
             fill: { type: 'gradient', gradient: { opacityFrom: 0.3, opacityTo: 0.05 } },

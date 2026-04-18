@@ -18,9 +18,6 @@
     <div class="login-corner login-c-bl"></div>
     <div class="login-corner login-c-br"></div>
 
-    <!-- theme switcher -->
-    <div class="login-themes" id="themeDots"></div>
-
     <div class="login-container">
         <!-- glitch title -->
         <div class="login-glitch" data-text="PennyPincher">PennyPincher</div>
@@ -61,55 +58,27 @@
         {name:'rose',accent:'#e07a8e',rgb:'224,122,142',glitch1:'#c94060',glitch2:'#60b4f7',dim:'#3a1e28',chart:'#e07a8e',chart2:'#c94060'},
         {name:'silver',accent:'#b0b0c0',rgb:'176,176,192',glitch1:'#8888a0',glitch2:'#6868a0',dim:'#22222e',chart:'#b0b0c0',chart2:'#8080a0'},
         {name:'mint',accent:'#4ade80',rgb:'74,222,128',glitch1:'#e6677a',glitch2:'#38b060',dim:'#1a2e20',chart:'#4ade80',chart2:'#38b060'},
+        // White theme shares violet's splash visuals — login stays dark regardless.
+        {name:'white',accent:'#a78bfa',rgb:'167,139,250',glitch1:'#e6677a',glitch2:'#7c5cbf',dim:'#2a2240',chart:'#a78bfa',chart2:'#7c5cbf'},
     ];
 
-    const themeDots=[];
-    function applyTheme(t,isRandom){
+    function applyLoginTheme(t){
         const p=document.querySelector('.login-page');
-        const root=document.documentElement;
-        // login-specific vars
-        p.style.setProperty('--accent',t.accent);
-        p.style.setProperty('--accent-rgb',t.rgb);
         p.style.setProperty('--glitch1',t.glitch1);
         p.style.setProperty('--glitch2',t.glitch2);
-        p.style.setProperty('--accent-dim',t.dim);
-        // app-wide vars on :root
-        root.style.setProperty('--accent',t.accent);
-        root.style.setProperty('--accent-rgb',t.rgb);
-        root.style.setProperty('--accent-dim',t.dim);
-        if(!isRandom)localStorage.setItem('pp-theme',t.name);
         buildGraph(t);
-        // update dots: random dot + 5 theme dots
-        rd.classList.toggle('active',!!isRandom);
-        themeDots.forEach((d,i)=>d.classList.toggle('active',!isRandom&&themes[i].name===t.name));
     }
 
-    // build theme dots
-    const dotsEl=document.getElementById('themeDots');
-    // random dot
-    const rd=document.createElement('div');
-    rd.className='login-theme-dot';
-    rd.style.background='conic-gradient(#e8b44c,#a78bfa,#e07a8e,#b0b0c0,#4ade80,#e8b44c)';
-    rd.style.color='#888';
-    rd.title='random each visit';
-    rd.onclick=()=>{localStorage.removeItem('pp-theme');applyTheme(themes[Math.floor(Math.random()*themes.length)],true)};
-    dotsEl.appendChild(rd);
-    // theme dots
-    themes.forEach((t,i)=>{
-        const d=document.createElement('div');
-        d.className='login-theme-dot';
-        d.style.background=t.accent;
-        d.style.color=t.accent;
-        d.title=t.name;
-        d.onclick=()=>applyTheme(t,false);
-        themeDots.push(d);
-        dotsEl.appendChild(d);
-    });
-
-    // pick theme: saved > random
-    const saved=localStorage.getItem('pp-theme');
-    const theme=themes.find(t=>t.name===saved)||themes[Math.floor(Math.random()*themes.length)];
-    applyTheme(theme,!saved);
+    // pick theme: saved or random (save it so it persists)
+    let saved=localStorage.getItem('pp-theme');
+    if(!saved){
+        const picked=themes[Math.floor(Math.random()*themes.length)];
+        localStorage.setItem('pp-theme',picked.name);
+        saved=picked.name;
+        if(window.applyTheme)window.applyTheme(picked);
+    }
+    const theme=themes.find(t=>t.name===saved)||themes[0];
+    applyLoginTheme(theme);
 
     // === RANDOM SUBTITLE ===
     const subs=[

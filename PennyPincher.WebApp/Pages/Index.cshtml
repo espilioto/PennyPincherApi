@@ -82,7 +82,7 @@
         if (accounts.length > 0) {
             var donutOptions = {
                 chart: { type: 'donut', height: 300, background: 'transparent' },
-                theme: { mode: 'dark' },
+                theme: { mode: window.getChartThemeMode() },
                 stroke: { show: false },
                 series: accounts.map(function (a) { return Math.abs(a.balance); }),
                 labels: accounts.map(function (a) { return a.name; }),
@@ -96,6 +96,7 @@
                     }
                 },
                 tooltip: {
+                    theme: window.getChartThemeMode(),
                     y: {
                         formatter: function (val) { return val.toFixed(2) + ' \u20ac'; }
                     }
@@ -133,7 +134,7 @@
                     toolbar: { show: true },
                     background: 'transparent'
                 },
-                theme: { mode: 'dark' },
+                theme: { mode: window.getChartThemeMode() },
                 colors: [getAccentColor()],
                 series: [{
                     name: 'Balance',

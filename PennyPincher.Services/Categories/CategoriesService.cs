@@ -131,5 +131,20 @@ namespace PennyPincher.Services.Categories
                 return Error.Unexpected(description: ex.Message);
             }
         }
+
+        public async Task<ErrorOr<bool>> DeleteAllByUserAsync(string userId)
+        {
+            try
+            {
+                // Defensive pre-purge before UserManager.DeleteAsync: raw SQL (no tracker load). The subsequent user-delete cascade would also clear these, but purging first avoids surprises if cascade rules ever change.
+                await _context.Categories.Where(x => x.UserId == userId).ExecuteDeleteAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("{Message}", ex.Message);
+                return Error.Unexpected(description: ex.Message);
+            }
+        }
     }
 }

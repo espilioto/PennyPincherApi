@@ -1,0 +1,218 @@
+@page
+@model PennyPincher.WebApp.Pages.User.IndexModel
+@{
+    ViewData["Title"] = "Settings";
+}
+
+<h4 class="mb-4">Settings</h4>
+
+@Html.AntiForgeryToken()
+
+<div class="settings-sections">
+    <!-- Appearance -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h6 class="mb-0">Appearance</h6>
+            <small class="text-muted">Pick the color theme used across the app.</small>
+        </div>
+        <div class="card-body">
+            <div class="d-flex gap-3 flex-wrap" id="settingsThemeDots"></div>
+        </div>
+    </div>
+
+    <!-- Security -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h6 class="mb-0">Security</h6>
+            <small class="text-muted">Update the password used to sign in.</small>
+        </div>
+        <div class="card-body" style="max-width: 400px;">
+            <div id="pwd-msg"></div>
+            <div class="mb-3">
+                <label for="pwd-current" class="form-label small">Current password</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="pwd-current" />
+                    <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1" aria-label="Show password">&#128065;</button>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="pwd-new" class="form-label small">New password</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="pwd-new" />
+                    <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1" aria-label="Show password">&#128065;</button>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="pwd-confirm" class="form-label small">Confirm new password</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="pwd-confirm" />
+                    <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1" aria-label="Show password">&#128065;</button>
+                </div>
+            </div>
+            <button class="btn btn-sm btn-primary" onclick="changePassword()">Update Password</button>
+        </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="card mb-4" style="border-color: var(--pp-expense);">
+        <div class="card-header" style="border-bottom-color: var(--pp-expense);">
+            <h6 class="mb-0" style="color: var(--pp-expense);">Danger Zone</h6>
+            <small class="text-muted">Irreversible actions. Proceed with caution.</small>
+        </div>
+        <div class="card-body" style="max-width: 400px;">
+            <div class="fw-semibold mb-1">Delete account</div>
+            <p class="text-muted small mb-3">This will permanently delete your account and all your data. This action cannot be undone.</p>
+            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">Delete my account</button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" style="color: var(--pp-expense);">Delete Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="small text-muted">Enter your password to confirm.</p>
+                <div id="delete-msg"></div>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="delete-pwd" placeholder="Password" />
+                    <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1" aria-label="Show password">&#128065;</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="delete-confirm-btn" class="btn btn-danger" onclick="deleteAccount()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function setAlert(el, variant, text) {
+        el.innerHTML = '';
+        var div = document.createElement('div');
+        div.className = 'alert alert-' + variant + ' small py-2';
+        div.textContent = text;
+        el.appendChild(div);
+    }
+
+    function extractApiError(d) {
+        if (!d) return null;
+        if (d.errors && typeof d.errors === 'object') {
+            var msgs = [];
+            Object.keys(d.errors).forEach(function (k) {
+                var v = d.errors[k];
+                if (Array.isArray(v)) msgs = msgs.concat(v);
+                else if (v) msgs.push(v);
+            });
+            if (msgs.length) return msgs.join(' ');
+        }
+        if (d.detail) return d.detail;
+        if (d.title) return d.title;
+        return null;
+    }
+
+    document.querySelectorAll('.pwd-toggle').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var input = btn.parentElement.querySelector('input');
+            var isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            btn.style.opacity = isPassword ? '1' : '.5';
+            btn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+        });
+    });
+
+    (function () {
+        var container = document.getElementById('settingsThemeDots');
+        if (!container || !window.ppThemes) return;
+
+        var themes = window.ppThemes;
+        var saved = localStorage.getItem('pp-theme');
+
+        // theme dots
+        themes.forEach(function (t) {
+            var d = document.createElement('div');
+            d.className = 'settings-theme-dot';
+            d.dataset.theme = t.name;
+            d.title = t.name;
+            if (saved === t.name) d.classList.add('active');
+            var dotBg = t.dotColor || t.accent;
+            d.innerHTML = '<span class="settings-dot-circle" style="background:' + dotBg + '"></span><span class="settings-dot-label">' + t.name.charAt(0).toUpperCase() + t.name.slice(1) + '</span>';
+            d.onclick = function () {
+                window.applyTheme(t);
+                container.querySelectorAll('.settings-theme-dot').forEach(function (el) { el.classList.toggle('active', el.dataset.theme === t.name); });
+            };
+            container.appendChild(d);
+        });
+    })();
+
+    function changePassword() {
+        var msg = document.getElementById('pwd-msg');
+        var curr = document.getElementById('pwd-current').value;
+        var newPwd = document.getElementById('pwd-new').value;
+        var confirm = document.getElementById('pwd-confirm').value;
+
+        if (!curr || !newPwd) { setAlert(msg, 'danger', 'All fields are required.'); return; }
+        if (newPwd !== confirm) { setAlert(msg, 'danger', 'Passwords do not match.'); return; }
+
+        fetch('/User?handler=ChangePassword', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: JSON.stringify({ currentPassword: curr, newPassword: newPwd })
+        }).then(function (r) {
+            if (r.ok) {
+                setAlert(msg, 'success', 'Password updated.');
+                document.getElementById('pwd-current').value = '';
+                document.getElementById('pwd-new').value = '';
+                document.getElementById('pwd-confirm').value = '';
+            } else {
+                r.json().then(function (d) {
+                    setAlert(msg, 'danger', extractApiError(d) || 'Password change failed.');
+                }).catch(function () {
+                    setAlert(msg, 'danger', 'Password change failed.');
+                });
+            }
+        });
+    }
+
+    function deleteAccount() {
+        var msg = document.getElementById('delete-msg');
+        var pwd = document.getElementById('delete-pwd').value;
+        var btn = document.getElementById('delete-confirm-btn');
+
+        if (!pwd) { setAlert(msg, 'danger', 'Password is required.'); return; }
+
+        btn.disabled = true;
+        fetch('/User?handler=DeleteAccount', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: JSON.stringify({ password: pwd })
+        }).then(function (r) {
+            if (r.ok || r.redirected) {
+                window.location.href = '/Login';
+            } else {
+                btn.disabled = false;
+                r.json().then(function (d) {
+                    setAlert(msg, 'danger', extractApiError(d) || 'Delete failed.');
+                }).catch(function () {
+                    setAlert(msg, 'danger', 'Delete failed.');
+                });
+            }
+        }).catch(function () {
+            btn.disabled = false;
+            setAlert(msg, 'danger', 'Delete failed.');
+        });
+    }
+</script>
+}

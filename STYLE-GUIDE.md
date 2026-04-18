@@ -8,15 +8,18 @@ Lain-inspired dark aesthetic. CRT monitor vibes — scanlines, vignette, phospho
 
 ### Themes
 
-Five switchable accent themes. Stored in `localStorage('pp-theme')`. No saved preference = random each visit.
+Six switchable themes. Stored in `localStorage('pp-theme')`. First visit with no saved preference = random pick, persisted immediately; sticky on every visit thereafter. Theme is changed only from the Settings page — the login splash has no picker.
 
-| Theme | Accent | RGB | Glitch 1 | Glitch 2 | Dim |
-|-------|--------|-----|----------|----------|-----|
-| Amber | `#e8b44c` | `232,180,76` | `#e6677a` | `#d4a040` | `#3a2e18` |
-| Violet | `#a78bfa` | `167,139,250` | `#e6677a` | `#7c5cbf` | `#2a2240` |
-| Rose | `#e07a8e` | `224,122,142` | `#c94060` | `#60b4f7` | `#3a1e28` |
-| Silver | `#b0b0c0` | `176,176,192` | `#8888a0` | `#6868a0` | `#22222e` |
-| Mint | `#4ade80` | `74,222,128` | `#e6677a` | `#38b060` | `#1a2e20` |
+| Theme | Accent | RGB | Glitch 1 | Glitch 2 | Dim | Canvas |
+|-------|--------|-----|----------|----------|-----|--------|
+| Amber | `#e8b44c` | `232,180,76` | `#e6677a` | `#d4a040` | `#3a2e18` | dark |
+| Violet | `#a78bfa` | `167,139,250` | `#e6677a` | `#7c5cbf` | `#2a2240` | dark |
+| Rose | `#e07a8e` | `224,122,142` | `#c94060` | `#60b4f7` | `#3a1e28` | dark |
+| Silver | `#b0b0c0` | `176,176,192` | `#8888a0` | `#6868a0` | `#22222e` | dark |
+| Mint | `#4ade80` | `74,222,128` | `#e6677a` | `#38b060` | `#1a2e20` | dark |
+| White | `#a78bfa` | `167,139,250` | `#e6677a` | `#7c5cbf` | `#2a2240` | **light** |
+
+White uses the violet accent on a light canvas. It's the only theme that flips the base palette — see "Light Mode" below.
 
 ### Base Palette (theme-independent)
 
@@ -54,6 +57,23 @@ All accent references use CSS variables set on `.login-page` (and eventually `:r
 
 Usage: `color: var(--accent)` or `rgba(var(--accent-rgb), .15)` for transparency.
 
+### Light Mode
+
+Dark themes share one base palette (`--pp-bg`, `--pp-surface`, `--pp-border`, `--pp-text`, `--pp-text-secondary`, `--pp-text-ghost`). The white theme swaps it via `:root[data-theme="white"]` in `site.css`. The JS theme applier sets `data-theme` and flips `data-bs-theme` to `"light"` so Bootstrap's own dark-surface assumptions step aside.
+
+Light canvas values:
+
+| Role | Color |
+|------|-------|
+| Background | `#f6f4ee` |
+| Surface | `#ffffff` |
+| Border | `#e2dfd6` |
+| Text Primary | `#1d1d28` |
+| Text Secondary | `#5a5a6e` |
+| Text Ghost | `#a8a8b4` |
+
+Semantic colors (income/expense/info/warning) stay identical across themes. The login splash is unaffected — it hardcodes its own `#0c0c10` background. Charts read theme mode via `window.getChartThemeMode()`.
+
 ## Typography
 
 | Context | Font | Weight | Size |
@@ -77,7 +97,6 @@ Usage: `color: var(--accent)` or `rgba(var(--accent-rgb), .15)` for transparency
 - **Vignette**: Radial gradient darkening edges.
 - **Screen flash**: Brief white flash at 0.58s on load.
 - **Corner brackets**: Decorative, fade in at 2s.
-- **Theme dots**: 6 dots at bottom center (1 rainbow random + 5 themes). Click to switch live.
 
 ### Subtitle Pool
 

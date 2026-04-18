@@ -152,7 +152,7 @@ else
                         }
                     },
                     stroke: { show: false },
-                    theme: { mode: 'dark' },
+                    theme: { mode: window.getChartThemeMode() },
                     colors: materialColors,
                     series: donutData.map(function (d) { return Math.abs(d.value); }),
                     labels: donutData.map(function (d) { return d.key; }),
@@ -169,6 +169,7 @@ else
                         pie: { donut: { size: '55%' } }
                     },
                     tooltip: {
+                        theme: window.getChartThemeMode(),
                         y: {
                             formatter: function (val) {
                                 var pct = totalAbs > 0 ? (val / totalAbs) * 100 : 0;
