@@ -85,7 +85,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" onclick="deleteAccount()">Delete</button>
+                <button type="button" id="delete-confirm-btn" class="btn btn-danger" onclick="deleteAccount()">Delete</button>
             </div>
         </div>
     </div>
@@ -178,9 +178,11 @@
     function deleteAccount() {
         var msg = document.getElementById('delete-msg');
         var pwd = document.getElementById('delete-pwd').value;
+        var btn = document.getElementById('delete-confirm-btn');
 
         if (!pwd) { msg.innerHTML = '<div class="alert alert-danger small py-2">Password is required.</div>'; return; }
 
+        btn.disabled = true;
         fetch('/User?handler=DeleteAccount', {
             method: 'POST',
             headers: {
@@ -192,6 +194,7 @@
             if (r.ok || r.redirected) {
                 window.location.href = '/Login';
             } else {
+                btn.disabled = false;
                 r.json().then(function (d) {
                     var text = extractApiError(d) || 'Delete failed.';
                     msg.innerHTML = '<div class="alert alert-danger small py-2">' + text + '</div>';
@@ -199,6 +202,9 @@
                     msg.innerHTML = '<div class="alert alert-danger small py-2">Delete failed.</div>';
                 });
             }
+        }).catch(function () {
+            btn.disabled = false;
+            msg.innerHTML = '<div class="alert alert-danger small py-2">Delete failed.</div>';
         });
     }
 </script>
