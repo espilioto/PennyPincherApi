@@ -16,8 +16,6 @@ public class IndexModel : PageModel
         _httpClientFactory = httpClientFactory;
     }
 
-    public string Email => User.Identity?.Name ?? "";
-
     public async Task<IActionResult> OnPostChangePasswordAsync([FromBody] ChangePasswordRequest request)
     {
         var client = _httpClientFactory.CreateClient("PennyPincherApi");
