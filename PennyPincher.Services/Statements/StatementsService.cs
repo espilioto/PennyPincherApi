@@ -179,6 +179,7 @@ public class StatementsService : IStatementsService
     {
         try
         {
+            // ExecuteDeleteAsync bypasses the EF change tracker; relies on the DB-level cascade from IdentityUser.
             await _context.Statements.Where(x => x.UserId == userId).ExecuteDeleteAsync();
             return true;
         }

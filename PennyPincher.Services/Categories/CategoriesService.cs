@@ -136,6 +136,7 @@ namespace PennyPincher.Services.Categories
         {
             try
             {
+                // ExecuteDeleteAsync bypasses the EF change tracker; relies on the DB-level cascade from IdentityUser.
                 await _context.Categories.Where(x => x.UserId == userId).ExecuteDeleteAsync();
                 return true;
             }

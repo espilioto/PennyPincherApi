@@ -184,6 +184,7 @@ public class AccountService : IAccountService
     {
         try
         {
+            // ExecuteDeleteAsync bypasses the EF change tracker; relies on the DB-level cascade from IdentityUser.
             await _context.Accounts.Where(x => x.UserId == userId).ExecuteDeleteAsync();
             return true;
         }
