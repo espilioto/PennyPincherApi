@@ -32,21 +32,21 @@
                 <label for="pwd-current" class="form-label small">Current password</label>
                 <div class="input-group">
                     <input type="password" class="form-control" id="pwd-current" />
-                    <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1">&#128065;</button>
+                    <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1" aria-label="Show password">&#128065;</button>
                 </div>
             </div>
             <div class="mb-3">
                 <label for="pwd-new" class="form-label small">New password</label>
                 <div class="input-group">
                     <input type="password" class="form-control" id="pwd-new" />
-                    <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1">&#128065;</button>
+                    <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1" aria-label="Show password">&#128065;</button>
                 </div>
             </div>
             <div class="mb-3">
                 <label for="pwd-confirm" class="form-label small">Confirm new password</label>
                 <div class="input-group">
                     <input type="password" class="form-control" id="pwd-confirm" />
-                    <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1">&#128065;</button>
+                    <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1" aria-label="Show password">&#128065;</button>
                 </div>
             </div>
             <button class="btn btn-sm btn-primary" onclick="changePassword()">Update Password</button>
@@ -80,7 +80,7 @@
                 <div id="delete-msg"></div>
                 <div class="input-group">
                     <input type="password" class="form-control" id="delete-pwd" placeholder="Password" />
-                    <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1">&#128065;</button>
+                    <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1" aria-label="Show password">&#128065;</button>
                 </div>
             </div>
             <div class="modal-footer">
@@ -123,6 +123,7 @@
             var isPassword = input.type === 'password';
             input.type = isPassword ? 'text' : 'password';
             btn.style.opacity = isPassword ? '1' : '.5';
+            btn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
         });
     });
 
