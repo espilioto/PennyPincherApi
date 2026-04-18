@@ -8,7 +8,7 @@ Lain-inspired dark aesthetic. CRT monitor vibes — scanlines, vignette, phospho
 
 ### Themes
 
-Six switchable themes. Stored in `localStorage('pp-theme')`. No saved preference = random each visit.
+Six switchable themes. Stored in `localStorage('pp-theme')`. First visit with no saved preference = random pick, persisted immediately; sticky on every visit thereafter. Theme is changed only from the Settings page — the login splash has no picker.
 
 | Theme | Accent | RGB | Glitch 1 | Glitch 2 | Dim | Canvas |
 |-------|--------|-----|----------|----------|-----|--------|
@@ -97,7 +97,6 @@ Semantic colors (income/expense/info/warning) stay identical across themes. The 
 - **Vignette**: Radial gradient darkening edges.
 - **Screen flash**: Brief white flash at 0.58s on load.
 - **Corner brackets**: Decorative, fade in at 2s.
-- **Theme dots**: 6 dots at bottom center (1 rainbow random + 5 themes). Click to switch live.
 
 ### Subtitle Pool
 
