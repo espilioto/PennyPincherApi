@@ -64,6 +64,21 @@ public class CategoriesController : ErrorOrApiController
         );
     }
 
+    [HttpPut("reorder")]
+    public async Task<IActionResult> Reorder([FromBody] List<int> categoryIds)
+    {
+        var userId = User.GetUserId();
+        if (userId is null)
+            return Problem(ErrorOr.Error.Forbidden());
+
+        var result = await _categoriesService.UpdateOrderAsync(userId, categoryIds);
+
+        return result.Match(
+            _ => Ok(),
+            errors => Problem(errors)
+        );
+    }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {

@@ -10,5 +10,6 @@ namespace PennyPincher.Services.Categories
         public Task<ErrorOr<IEnumerable<CategoryResponse>>> GetByUserAsync(string userId);
         public Task<ErrorOr<bool>> InsertAsync(CategoryRequest categoryRequest, string userId);
         public Task<ErrorOr<bool>> UpdateAsync(string userId, int categoryId, CategoryRequest categoryRequest);
+        public Task<ErrorOr<bool>> UpdateOrderAsync(string userId, List<int> categoryIds);
     }
 }

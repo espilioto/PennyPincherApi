@@ -85,8 +85,13 @@ public class AccountService : IAccountService
             if (errors.Count > 0)
                 return errors;
 
+            var maxOrder = await _context.Accounts
+                .Where(a => a.UserId == userId)
+                .MaxAsync(a => (int?)a.SortOrder) ?? -1;
+
             var account = request.ToEntity();
             account.UserId = userId;
+            account.SortOrder = maxOrder + 1;
             _ = await _context.Accounts.AddAsync(account);
             var success = await _context.SaveChangesAsync();
 
@@ -140,6 +145,33 @@ public class AccountService : IAccountService
             var success = await _context.SaveChangesAsync();
 
             return success == 1 ? true : Error.Failure(description: "Error deleting account");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("{Message}", ex.Message);
+            return Error.Unexpected(description: ex.Message);
+        }
+    }
+
+    public async Task<ErrorOr<bool>> UpdateOrderAsync(string userId, List<int> accountIds)
+    {
+        try
+        {
+            var accounts = await _context.Accounts
+                .Where(x => x.UserId == userId)
+                .ToListAsync();
+
+            if (accountIds.Count != accounts.Count || !accountIds.All(id => accounts.Any(a => a.Id == id)))
+                return Error.Validation(description: "Invalid account IDs");
+
+            for (var i = 0; i < accountIds.Count; i++)
+            {
+                var account = accounts.First(a => a.Id == accountIds[i]);
+                account.SortOrder = i;
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
         }
         catch (Exception ex)
         {

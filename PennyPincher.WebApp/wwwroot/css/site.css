@@ -299,6 +299,12 @@
 
 @keyframes loginFadeIn{to{opacity:1}}
 
+/* Drag handle for sortable rows */
+.drag-handle{cursor:grab;color:var(--pp-text-ghost);user-select:none;font-size:1.1rem;text-align:center}
+.drag-handle:hover{color:var(--pp-text-secondary)}
+.sortable-ghost{opacity:.4;background:rgba(var(--accent-rgb),.06)}
+.sortable-chosen{background:var(--pp-surface)}
+
 /* HTMX loading indicator */
 .htmx-indicator {
     display: none;
