@@ -18,6 +18,7 @@ public class UsersController : ErrorOrApiController
         _userService = userService;
     }
 
+#if DEBUG
     [HttpGet]
     public async Task<IActionResult> Get()
     {
@@ -28,6 +29,7 @@ public class UsersController : ErrorOrApiController
             errors => Problem(errors)
         );
     }
+#endif
 
     [AllowAnonymous]
     [HttpPost]
