@@ -8,45 +8,63 @@
 
 @Html.AntiForgeryToken()
 
-<!-- Theme -->
-<div class="mb-5">
-    <h6 class="text-muted mb-3">Theme</h6>
-    <div class="d-flex gap-3 flex-wrap" id="settingsThemeDots"></div>
-</div>
+<div class="settings-sections">
+    <!-- Appearance -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h6 class="mb-0">Appearance</h6>
+            <small class="text-muted">Pick the color theme used across the app.</small>
+        </div>
+        <div class="card-body">
+            <div class="d-flex gap-3 flex-wrap" id="settingsThemeDots"></div>
+        </div>
+    </div>
 
-<!-- Change Password -->
-<div class="mb-5" style="max-width: 400px;">
-    <h6 class="text-muted mb-3">Change Password</h6>
-    <div id="pwd-msg"></div>
-    <div class="mb-3">
-        <label for="pwd-current" class="form-label small">Current password</label>
-        <div class="input-group">
-            <input type="password" class="form-control" id="pwd-current" />
-            <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1">&#128065;</button>
+    <!-- Security -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h6 class="mb-0">Security</h6>
+            <small class="text-muted">Update the password used to sign in.</small>
+        </div>
+        <div class="card-body" style="max-width: 400px;">
+            <div id="pwd-msg"></div>
+            <div class="mb-3">
+                <label for="pwd-current" class="form-label small">Current password</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="pwd-current" />
+                    <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1">&#128065;</button>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="pwd-new" class="form-label small">New password</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="pwd-new" />
+                    <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1">&#128065;</button>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="pwd-confirm" class="form-label small">Confirm new password</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="pwd-confirm" />
+                    <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1">&#128065;</button>
+                </div>
+            </div>
+            <button class="btn btn-sm btn-primary" onclick="changePassword()">Update Password</button>
         </div>
     </div>
-    <div class="mb-3">
-        <label for="pwd-new" class="form-label small">New password</label>
-        <div class="input-group">
-            <input type="password" class="form-control" id="pwd-new" />
-            <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1">&#128065;</button>
-        </div>
-    </div>
-    <div class="mb-3">
-        <label for="pwd-confirm" class="form-label small">Confirm new password</label>
-        <div class="input-group">
-            <input type="password" class="form-control" id="pwd-confirm" />
-            <button class="btn btn-outline-secondary pwd-toggle" type="button" tabindex="-1">&#128065;</button>
-        </div>
-    </div>
-    <button class="btn btn-sm btn-primary" onclick="changePassword()">Update Password</button>
-</div>
 
-<!-- Delete Account -->
-<div style="max-width: 400px; border: 1px solid var(--pp-expense); border-radius: 0.5rem; padding: 1rem;">
-    <h6 class="mb-2" style="color: var(--pp-expense);">Delete Account</h6>
-    <p class="text-muted small mb-3">This will permanently delete your account and all your data. This action cannot be undone.</p>
-    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">Delete my account</button>
+    <!-- Danger Zone -->
+    <div class="card mb-4" style="border-color: var(--pp-expense);">
+        <div class="card-header" style="border-bottom-color: var(--pp-expense);">
+            <h6 class="mb-0" style="color: var(--pp-expense);">Danger Zone</h6>
+            <small class="text-muted">Irreversible actions. Proceed with caution.</small>
+        </div>
+        <div class="card-body" style="max-width: 400px;">
+            <div class="fw-semibold mb-1">Delete account</div>
+            <p class="text-muted small mb-3">This will permanently delete your account and all your data. This action cannot be undone.</p>
+            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">Delete my account</button>
+        </div>
+    </div>
 </div>
 
 <!-- Delete Account Modal -->
