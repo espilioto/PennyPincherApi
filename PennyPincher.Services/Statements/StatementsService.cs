@@ -179,7 +179,7 @@ public class StatementsService : IStatementsService
     {
         try
         {
-            // ExecuteDeleteAsync bypasses the EF change tracker; relies on the DB-level cascade from IdentityUser.
+            // Defensive pre-purge before UserManager.DeleteAsync: raw SQL (no tracker load). The subsequent user-delete cascade would also clear these, but purging first avoids surprises if cascade rules ever change.
             await _context.Statements.Where(x => x.UserId == userId).ExecuteDeleteAsync();
             return true;
         }
